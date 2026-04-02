@@ -37,14 +37,14 @@ export function PizzariaMagica() {
 
   if (phaseComplete) {
     return (
-      <GameShell title="Pizzaria Mágica" emoji="🍕" color="var(--c1)" currentPhase={phase} totalPhases={5} score={score}>
+      <GameShell title="Pizzaria Mágica" emoji="🍕" color="var(--c1)" currentPhase={phase} totalPhases={5} score={score} onRestart={restart}>
         <PhaseCompleteCard phase={phase} totalPhases={5} score={score} isGameComplete={gameComplete} onNext={nextPhase} onRestart={restart} color="var(--c1)" />
       </GameShell>
     );
   }
 
   return (
-    <GameShell title="Pizzaria Mágica" emoji="🍕" color="var(--c1)" currentPhase={phase} totalPhases={5} score={score}>
+    <GameShell title="Pizzaria Mágica" emoji="🍕" color="var(--c1)" currentPhase={phase} totalPhases={5} score={score} onRestart={restart}>
       <FeedbackOverlay type={feedback} />
 
       <div style={{ textAlign: 'center', marginBottom: 16 }}>

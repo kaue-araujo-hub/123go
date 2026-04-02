@@ -98,14 +98,14 @@ export function NaveOrganizadora() {
 
   if (phaseComplete) {
     return (
-      <GameShell title="Nave Organizadora" emoji="🚀" color="var(--c2)" currentPhase={phase} totalPhases={5} score={score}>
+      <GameShell title="Nave Organizadora" emoji="🚀" color="var(--c2)" currentPhase={phase} totalPhases={5} score={score} onRestart={restart}>
         <PhaseCompleteCard phase={phase} totalPhases={5} score={score} isGameComplete={gameComplete} onNext={nextPhase} onRestart={restart} color="var(--c2)" />
       </GameShell>
     );
   }
 
   return (
-    <GameShell title="Nave Organizadora" emoji="🚀" color="var(--c2)" currentPhase={phase} totalPhases={5} score={score}>
+    <GameShell title="Nave Organizadora" emoji="🚀" color="var(--c2)" currentPhase={phase} totalPhases={5} score={score} onRestart={restart}>
       <FeedbackOverlay type={feedback} />
       <h2 style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 18, textAlign: 'center', marginBottom: 16, color: 'var(--text)' }}>
         {phaseData.label}

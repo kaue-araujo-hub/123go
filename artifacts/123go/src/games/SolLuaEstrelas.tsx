@@ -38,7 +38,7 @@ export function SolLuaEstrelas() {
 
   if (phaseComplete) {
     return (
-      <GameShell title="Sol, Lua e Estrelas" emoji="☀️" color="var(--c4)" currentPhase={phase} totalPhases={5} score={score}>
+      <GameShell title="Sol, Lua e Estrelas" emoji="☀️" color="var(--c4)" currentPhase={phase} totalPhases={5} score={score} onRestart={restart}>
         <PhaseCompleteCard phase={phase} totalPhases={5} score={score} isGameComplete={gameComplete} onNext={nextPhase} onRestart={restart} color="var(--c4)" />
       </GameShell>
     );
@@ -46,7 +46,7 @@ export function SolLuaEstrelas() {
 
   if (phaseData.ordering) {
     return (
-      <GameShell title="Sol, Lua e Estrelas" emoji="☀️" color="var(--c4)" currentPhase={phase} totalPhases={5} score={score}>
+      <GameShell title="Sol, Lua e Estrelas" emoji="☀️" color="var(--c4)" currentPhase={phase} totalPhases={5} score={score} onRestart={restart}>
         <div style={{ textAlign: 'center', marginBottom: 16 }}>
           <h2 style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 17, color: 'var(--text)' }}>
             Os períodos do dia na ordem certa!
@@ -71,7 +71,7 @@ export function SolLuaEstrelas() {
   }
 
   return (
-    <GameShell title="Sol, Lua e Estrelas" emoji="☀️" color="var(--c4)" currentPhase={phase} totalPhases={5} score={score}>
+    <GameShell title="Sol, Lua e Estrelas" emoji="☀️" color="var(--c4)" currentPhase={phase} totalPhases={5} score={score} onRestart={restart}>
       <FeedbackOverlay type={feedback} />
 
       <div style={{ textAlign: 'center', marginBottom: 20 }}>

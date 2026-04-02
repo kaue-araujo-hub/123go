@@ -126,14 +126,14 @@ export function AtelieOrdem() {
 
   if (phaseComplete) {
     return (
-      <GameShell title="Ateliê da Ordem" emoji="🎨" color="var(--c2)" currentPhase={phase} totalPhases={5} score={score}>
+      <GameShell title="Ateliê da Ordem" emoji="🎨" color="var(--c2)" currentPhase={phase} totalPhases={5} score={score} onRestart={restart}>
         <PhaseCompleteCard phase={phase} totalPhases={5} score={score} isGameComplete={gameComplete} onNext={nextPhase} onRestart={restart} color="var(--c2)" />
       </GameShell>
     );
   }
 
   return (
-    <GameShell title="Ateliê da Ordem" emoji="🎨" color="var(--c2)" currentPhase={phase} totalPhases={5} score={score}>
+    <GameShell title="Ateliê da Ordem" emoji="🎨" color="var(--c2)" currentPhase={phase} totalPhases={5} score={score} onRestart={restart}>
       <FeedbackOverlay type={feedback} />
 
       <div style={{ textAlign: 'center', marginBottom: 16 }}>

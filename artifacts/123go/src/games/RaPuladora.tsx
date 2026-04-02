@@ -46,7 +46,7 @@ export function RaPuladora() {
 
   if (phaseComplete) {
     return (
-      <GameShell title="Rã Puladora" emoji="🐸" color="var(--c3)" currentPhase={phase} totalPhases={5} score={score}>
+      <GameShell title="Rã Puladora" emoji="🐸" color="var(--c3)" currentPhase={phase} totalPhases={5} score={score} onRestart={restart}>
         <PhaseCompleteCard phase={phase} totalPhases={5} score={score} isGameComplete={gameComplete} onNext={nextPhase} onRestart={restart} color="var(--c3)" />
       </GameShell>
     );
@@ -54,7 +54,7 @@ export function RaPuladora() {
 
   if (phaseData.correct === -1 && !answered) {
     return (
-      <GameShell title="Rã Puladora" emoji="🐸" color="var(--c3)" currentPhase={phase} totalPhases={5} score={score}>
+      <GameShell title="Rã Puladora" emoji="🐸" color="var(--c3)" currentPhase={phase} totalPhases={5} score={score} onRestart={restart}>
         <div style={{ textAlign: 'center', padding: 32, background: '#fff', borderRadius: 'var(--radius)', border: '1.5px solid var(--border)' }}>
           <div style={{ fontSize: 64, marginBottom: 16 }}>🐸</div>
           <h2 style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 20, color: 'var(--text)', marginBottom: 12 }}>
@@ -71,7 +71,7 @@ export function RaPuladora() {
   }
 
   return (
-    <GameShell title="Rã Puladora" emoji="🐸" color="var(--c3)" currentPhase={phase} totalPhases={5} score={score}>
+    <GameShell title="Rã Puladora" emoji="🐸" color="var(--c3)" currentPhase={phase} totalPhases={5} score={score} onRestart={restart}>
       <FeedbackOverlay type={feedback} />
       <div style={{ textAlign: 'center', marginBottom: 20 }}>
         <p style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 18, color: 'var(--text)' }}>{phaseData.question}</p>

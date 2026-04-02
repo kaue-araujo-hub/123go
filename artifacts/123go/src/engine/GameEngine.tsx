@@ -28,10 +28,65 @@ interface GameShellProps {
   onNextPhase?: () => void;
   showNextPhase?: boolean;
   score?: number;
+  onRestart?: () => void;
 }
 
-export function GameShell({ title, emoji, color, currentPhase, totalPhases, children, onNextPhase, showNextPhase, score }: GameShellProps) {
+function ControlBtn({ onClick, title, children, active = true }: { onClick: () => void; title: string; children: React.ReactNode; active?: boolean }) {
+  return (
+    <button
+      onClick={onClick}
+      title={title}
+      aria-label={title}
+      style={{
+        width: 34,
+        height: 34,
+        borderRadius: 8,
+        border: '1.5px solid var(--border)',
+        background: active ? '#fff' : 'var(--bg)',
+        color: active ? 'var(--text)' : 'var(--text3)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        cursor: active ? 'pointer' : 'default',
+        transition: 'all 0.15s ease',
+        flexShrink: 0,
+      }}
+    >
+      {children}
+    </button>
+  );
+}
+
+export function GameShell({ title, emoji, color, currentPhase, totalPhases, children, onNextPhase, showNextPhase, score, onRestart }: GameShellProps) {
   const [, setLocation] = useLocation();
+  const [paused, setPaused] = useState(false);
+  const [stopped, setStopped] = useState(false);
+
+  const isPlaying = !paused && !stopped;
+
+  const handlePlay = () => {
+    if (stopped) {
+      setStopped(false);
+      onRestart?.();
+    } else {
+      setPaused(false);
+    }
+  };
+
+  const handlePause = () => {
+    if (!stopped) setPaused(true);
+  };
+
+  const handleStop = () => {
+    setPaused(false);
+    setStopped(true);
+  };
+
+  const handleRestart = () => {
+    setPaused(false);
+    setStopped(false);
+    onRestart?.();
+  };
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg)', display: 'flex', flexDirection: 'column' }}>
@@ -43,11 +98,12 @@ export function GameShell({ title, emoji, color, currentPhase, totalPhases, chil
         height: 56,
         display: 'flex',
         alignItems: 'center',
-        gap: 12,
+        gap: 10,
         position: 'sticky',
         top: 0,
         zIndex: 50,
       }}>
+        {/* Back */}
         <button
           onClick={() => setLocation('/')}
           aria-label="Voltar ao catálogo"
@@ -63,12 +119,50 @@ export function GameShell({ title, emoji, color, currentPhase, totalPhases, chil
             cursor: 'pointer',
             fontSize: 16,
             color: 'var(--text2)',
+            flexShrink: 0,
           }}
         >←</button>
 
-        <span style={{ fontSize: 22 }}>{emoji}</span>
-        <h1 style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 15, color: 'var(--text)', flex: 1 }}>{title}</h1>
+        <span style={{ fontSize: 20, flexShrink: 0 }}>{emoji}</span>
+        <h1 style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 15, color: 'var(--text)', flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{title}</h1>
 
+        {/* Playback controls */}
+        <div style={{ display: 'flex', gap: 5, alignItems: 'center' }}>
+          {/* Play */}
+          <ControlBtn onClick={handlePlay} title="Jogar" active={!isPlaying}>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+              <polygon points="5,3 19,12 5,21"/>
+            </svg>
+          </ControlBtn>
+
+          {/* Pause */}
+          <ControlBtn onClick={handlePause} title="Pausar" active={isPlaying}>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+              <rect x="6" y="4" width="4" height="16"/>
+              <rect x="14" y="4" width="4" height="16"/>
+            </svg>
+          </ControlBtn>
+
+          {/* Stop */}
+          <ControlBtn onClick={handleStop} title="Parar" active={!stopped}>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+              <rect x="4" y="4" width="16" height="16" rx="2"/>
+            </svg>
+          </ControlBtn>
+
+          {/* Restart */}
+          <ControlBtn onClick={handleRestart} title="Reiniciar">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="1 4 1 10 7 10"/>
+              <path d="M3.51 15a9 9 0 1 0 .49-4.5"/>
+            </svg>
+          </ControlBtn>
+        </div>
+
+        {/* Divider */}
+        <div style={{ width: 1, height: 22, background: 'var(--border)', flexShrink: 0 }} />
+
+        {/* Score */}
         {score !== undefined && (
           <span style={{
             background: color,
@@ -78,6 +172,7 @@ export function GameShell({ title, emoji, color, currentPhase, totalPhases, chil
             fontSize: 13,
             padding: '4px 12px',
             borderRadius: 'var(--radius-pill)',
+            flexShrink: 0,
           }}>
             ★ {score}
           </span>
@@ -101,7 +196,7 @@ export function GameShell({ title, emoji, color, currentPhase, totalPhases, chil
                   background: done ? color : current ? color : 'var(--border)',
                   opacity: current ? 1 : done ? 0.8 : 0.4,
                   transition: 'all 0.3s ease',
-                  animation: current ? 'pulseDot 1.2s ease-in-out infinite' : 'none',
+                  animation: current && isPlaying ? 'pulseDot 1.2s ease-in-out infinite' : 'none',
                 }}
               />
             );
@@ -113,8 +208,106 @@ export function GameShell({ title, emoji, color, currentPhase, totalPhases, chil
       </div>
 
       {/* Game content */}
-      <div style={{ flex: 1, padding: '20px 16px', maxWidth: 700, margin: '0 auto', width: '100%' }}>
+      <div style={{ flex: 1, padding: '20px 16px', maxWidth: 700, margin: '0 auto', width: '100%', position: 'relative' }}>
         {children}
+
+        {/* Paused overlay */}
+        {paused && (
+          <div style={{
+            position: 'absolute',
+            inset: 0,
+            background: 'rgba(255,255,255,0.88)',
+            backdropFilter: 'blur(4px)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 16,
+            borderRadius: 12,
+            zIndex: 40,
+          }}>
+            <div style={{ fontSize: 56 }}>⏸️</div>
+            <p style={{ fontFamily: 'Nunito', fontWeight: 900, fontSize: 22, color: 'var(--text)', margin: 0 }}>Jogo pausado</p>
+            <button
+              onClick={handlePlay}
+              style={{
+                padding: '12px 28px',
+                borderRadius: 'var(--radius-pill)',
+                border: 'none',
+                background: color,
+                color: '#fff',
+                fontFamily: 'Nunito',
+                fontWeight: 800,
+                fontSize: 16,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+              }}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
+              Retomar
+            </button>
+          </div>
+        )}
+
+        {/* Stopped overlay */}
+        {stopped && (
+          <div style={{
+            position: 'absolute',
+            inset: 0,
+            background: 'rgba(255,255,255,0.92)',
+            backdropFilter: 'blur(4px)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 16,
+            borderRadius: 12,
+            zIndex: 40,
+          }}>
+            <div style={{ fontSize: 56 }}>⏹️</div>
+            <p style={{ fontFamily: 'Nunito', fontWeight: 900, fontSize: 22, color: 'var(--text)', margin: 0 }}>Jogo encerrado</p>
+            <p style={{ color: 'var(--text2)', fontSize: 14, margin: 0 }}>Deseja jogar novamente?</p>
+            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', justifyContent: 'center' }}>
+              <button
+                onClick={() => setLocation('/')}
+                style={{
+                  padding: '10px 22px',
+                  borderRadius: 'var(--radius-pill)',
+                  border: '1.5px solid var(--border)',
+                  background: '#fff',
+                  color: 'var(--text)',
+                  fontFamily: 'Nunito',
+                  fontWeight: 700,
+                  fontSize: 14,
+                  cursor: 'pointer',
+                }}
+              >
+                ← Voltar ao catálogo
+              </button>
+              <button
+                onClick={handleRestart}
+                style={{
+                  padding: '10px 22px',
+                  borderRadius: 'var(--radius-pill)',
+                  border: 'none',
+                  background: color,
+                  color: '#fff',
+                  fontFamily: 'Nunito',
+                  fontWeight: 800,
+                  fontSize: 14,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                }}
+              >
+                ↺ Recomeçar
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       <style>{`

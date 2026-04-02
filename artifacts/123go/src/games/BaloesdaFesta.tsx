@@ -39,14 +39,14 @@ export function BaloesdaFesta() {
 
   if (phaseComplete) {
     return (
-      <GameShell title="Balões da Festa" emoji="🎈" color="var(--c3)" currentPhase={phase} totalPhases={5} score={score}>
+      <GameShell title="Balões da Festa" emoji="🎈" color="var(--c3)" currentPhase={phase} totalPhases={5} score={score} onRestart={restart}>
         <PhaseCompleteCard phase={phase} totalPhases={5} score={score} isGameComplete={gameComplete} onNext={nextPhase} onRestart={restart} color="var(--c3)" />
       </GameShell>
     );
   }
 
   return (
-    <GameShell title="Balões da Festa" emoji="🎈" color="var(--c3)" currentPhase={phase} totalPhases={5} score={score}>
+    <GameShell title="Balões da Festa" emoji="🎈" color="var(--c3)" currentPhase={phase} totalPhases={5} score={score} onRestart={restart}>
       <FeedbackOverlay type={feedback} />
       <div style={{ textAlign: 'center', marginBottom: 20 }}>
         <h2 style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 17, color: 'var(--text)', marginBottom: 6 }}>

@@ -46,14 +46,14 @@ export function RoboPerdido() {
 
   if (phaseComplete) {
     return (
-      <GameShell title="Robô Perdido" emoji="🤖" color="var(--c1)" currentPhase={phase} totalPhases={5} score={score}>
+      <GameShell title="Robô Perdido" emoji="🤖" color="var(--c1)" currentPhase={phase} totalPhases={5} score={score} onRestart={restart}>
         <PhaseCompleteCard phase={phase} totalPhases={5} score={score} isGameComplete={gameComplete} onNext={nextPhase} onRestart={restart} color="var(--c1)" />
       </GameShell>
     );
   }
 
   return (
-    <GameShell title="Robô Perdido" emoji="🤖" color="var(--c1)" currentPhase={phase} totalPhases={5} score={score}>
+    <GameShell title="Robô Perdido" emoji="🤖" color="var(--c1)" currentPhase={phase} totalPhases={5} score={score} onRestart={restart}>
       <FeedbackOverlay type={feedback} />
 
       <div style={{ textAlign: 'center', marginBottom: 16 }}>
