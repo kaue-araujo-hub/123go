@@ -149,9 +149,37 @@ export function GameCard({ game, onInfo }: GameCardProps) {
           color: 'var(--text2)',
           fontSize: 13,
           lineHeight: 1.5,
+          marginBottom: 12,
         }}>
           {game.desc}
         </p>
+
+        {/* Play button */}
+        <button
+          onClick={handleCardClick}
+          style={{
+            width: '100%',
+            padding: '10px 0',
+            borderRadius: 'var(--radius-pill)',
+            background: temaColors[game.tema],
+            color: '#fff',
+            fontFamily: 'Nunito',
+            fontWeight: 800,
+            fontSize: 14,
+            border: 'none',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 6,
+            minHeight: 40,
+            transition: 'opacity 0.15s ease',
+          }}
+          onMouseEnter={e => (e.currentTarget.style.opacity = '0.88')}
+          onMouseLeave={e => (e.currentTarget.style.opacity = '1')}
+        >
+          🎮 Jogar
+        </button>
       </div>
     </div>
   );
