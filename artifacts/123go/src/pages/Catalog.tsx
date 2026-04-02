@@ -3,27 +3,53 @@ import { Header } from '../components/Header';
 import { HeroCard } from '../components/HeroCard';
 import { FilterBar, type FilterState } from '../components/FilterBar';
 import { GameCard } from '../components/GameCard';
+import { GameListRow } from '../components/GameListRow';
 import { GameModal } from '../components/GameModal';
 import { Pagination } from '../components/Pagination';
 import { games, type Game } from '../data/games';
 
 const ITEMS_PER_PAGE = 10;
 
+type ViewMode = 'grid' | 'list';
+
+function GridIcon({ active }: { active: boolean }) {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="3" width="7" height="7" fill={active ? 'currentColor' : 'none'} />
+      <rect x="14" y="3" width="7" height="7" fill={active ? 'currentColor' : 'none'} />
+      <rect x="3" y="14" width="7" height="7" fill={active ? 'currentColor' : 'none'} />
+      <rect x="14" y="14" width="7" height="7" fill={active ? 'currentColor' : 'none'} />
+    </svg>
+  );
+}
+
+function ListIcon({ active }: { active: boolean }) {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="8" y1="6" x2="21" y2="6" strokeWidth={active ? 2.5 : 2} />
+      <line x1="8" y1="12" x2="21" y2="12" strokeWidth={active ? 2.5 : 2} />
+      <line x1="8" y1="18" x2="21" y2="18" strokeWidth={active ? 2.5 : 2} />
+      <circle cx="3" cy="6" r="1.5" fill="currentColor" />
+      <circle cx="3" cy="12" r="1.5" fill="currentColor" />
+      <circle cx="3" cy="18" r="1.5" fill="currentColor" />
+    </svg>
+  );
+}
+
 export function Catalog() {
   const [searchQuery, setSearchQuery] = useState('');
   const [filters, setFilters] = useState<FilterState>({ ano: null, periodo: null, tema: null });
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedGame, setSelectedGame] = useState<Game | null>(null);
+  const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const gridRef = useRef<HTMLDivElement>(null);
 
   const filteredGames = useMemo(() => {
     return games.filter(game => {
-      // Filters
       if (filters.ano !== null && game.ano !== filters.ano) return false;
       if (filters.periodo !== null && game.periodo !== filters.periodo) return false;
       if (filters.tema !== null && game.tema !== filters.tema) return false;
 
-      // Search
       if (searchQuery) {
         const q = searchQuery.toLowerCase();
         const searchable = [
@@ -63,6 +89,21 @@ export function Catalog() {
     gridRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, []);
 
+  const viewBtn = (mode: ViewMode): React.CSSProperties => ({
+    width: 38,
+    height: 38,
+    borderRadius: 10,
+    border: `1.5px solid ${viewMode === mode ? 'var(--text)' : 'var(--border)'}`,
+    background: viewMode === mode ? 'var(--text)' : '#fff',
+    color: viewMode === mode ? '#fff' : 'var(--text2)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    cursor: 'pointer',
+    transition: 'all 0.15s ease',
+    flexShrink: 0,
+  });
+
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <Header onSearch={handleSearch} />
@@ -81,7 +122,36 @@ export function Catalog() {
         <HeroCard count={filteredGames.length} onExplore={handleExplore} />
 
         <div ref={gridRef}>
-          <FilterBar filters={filters} onFilterChange={handleFilterChange} />
+          {/* Toolbar: filters + view toggle */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'flex-start',
+            justifyContent: 'space-between',
+            gap: 12,
+            marginBottom: 0,
+          }}>
+            <FilterBar filters={filters} onFilterChange={handleFilterChange} />
+
+            {/* View toggle buttons */}
+            <div style={{ display: 'flex', gap: 6, paddingTop: 0, flexShrink: 0 }}>
+              <button
+                onClick={() => setViewMode('grid')}
+                style={viewBtn('grid')}
+                aria-label="Ver em grade"
+                title="Grade"
+              >
+                <GridIcon active={viewMode === 'grid'} />
+              </button>
+              <button
+                onClick={() => setViewMode('list')}
+                style={viewBtn('list')}
+                aria-label="Ver em lista"
+                title="Lista"
+              >
+                <ListIcon active={viewMode === 'list'} />
+              </button>
+            </div>
+          </div>
 
           {pagedGames.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '60px 20px', color: 'var(--text3)' }}>
@@ -91,18 +161,27 @@ export function Catalog() {
             </div>
           ) : (
             <>
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
-                gap: 16,
-                marginBottom: 8,
-              }}
-              className="games-grid"
-              >
-                {pagedGames.map(game => (
-                  <GameCard key={game.id} game={game} onInfo={setSelectedGame} />
-                ))}
-              </div>
+              {viewMode === 'grid' ? (
+                <div
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
+                    gap: 16,
+                    marginBottom: 8,
+                  }}
+                  className="games-grid"
+                >
+                  {pagedGames.map(game => (
+                    <GameCard key={game.id} game={game} onInfo={setSelectedGame} />
+                  ))}
+                </div>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 8 }}>
+                  {pagedGames.map(game => (
+                    <GameListRow key={game.id} game={game} onInfo={setSelectedGame} />
+                  ))}
+                </div>
+              )}
 
               <Pagination
                 currentPage={currentPage}
