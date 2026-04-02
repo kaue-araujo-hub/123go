@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "123GO! — Plataforma de Jogos de Matemática"
+version = "1.0.0"
+id = "artifacts/123go"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 18816
+
+[services.development]
+run = "pnpm --filter @workspace/123go run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/123go", "run", "build" ]
+publicDir = "artifacts/123go/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "18816"
+BASE_PATH = "/"

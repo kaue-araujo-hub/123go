@@ -25,3 +25,18 @@ pnpm workspace monorepo using TypeScript. Each package manages its own dependenc
 - `pnpm --filter @workspace/api-server run dev` — run API server locally
 
 See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and package details.
+
+## Artifacts
+
+### 123GO! — Plataforma de Jogos de Matemática (`artifacts/123go`)
+- React + Vite frontend-only app (no backend)
+- **21 interactive math games** for Brazilian elementary school students (1st year focus)
+- Aligned with the Currículo Paulista / BNCC
+- Catalog page with filtering by bimestre, tema, search, and pagination
+- GameShell + useGameEngine system for all game pages (5 phases each)
+- Dependencies: `canvas-confetti`, `gsap`, `wouter`
+- Game files in `artifacts/123go/src/games/`
+- Data in `artifacts/123go/src/data/games.ts`
+- Engine in `artifacts/123go/src/engine/GameEngine.tsx`
+- Components in `artifacts/123go/src/components/`
+- Router wired in `artifacts/123go/src/App.tsx`
