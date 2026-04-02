@@ -157,11 +157,27 @@ export function GameModal({ game, onClose }: GameModalProps) {
               <p style={{ color: 'var(--text)', fontSize: 13, lineHeight: 1.6 }}>{game.habilidade}</p>
             </div>
 
-            <div>
+            <div style={{ marginBottom: 16 }}>
               <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--text3)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>
                 Objeto de Conhecimento
               </p>
               <p style={{ color: 'var(--text)', fontSize: 13, lineHeight: 1.6 }}>{game.objeto}</p>
+            </div>
+
+            {/* Como Jogar */}
+            <div style={{
+              background: 'var(--bg)',
+              borderRadius: 12,
+              padding: '14px 16px',
+              border: '1.5px solid var(--border)',
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                <span style={{ fontSize: 18 }}>🎮</span>
+                <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--text3)', textTransform: 'uppercase', letterSpacing: '0.08em', margin: 0 }}>
+                  Como Jogar
+                </p>
+              </div>
+              <p style={{ color: 'var(--text)', fontSize: 13, lineHeight: 1.7, margin: 0 }}>{game.comoJogar}</p>
             </div>
           </div>
 
