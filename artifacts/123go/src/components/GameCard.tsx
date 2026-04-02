@@ -72,6 +72,17 @@ export function GameCard({ game, onInfo }: GameCardProps) {
         zIndex: 2,
       }}>
         <span style={{
+          background: '#7C3AED',
+          color: '#fff',
+          fontSize: 11,
+          fontWeight: 700,
+          padding: '3px 10px',
+          borderRadius: 'var(--radius-pill)',
+          fontFamily: 'Nunito',
+        }}>
+          {game.ano}º Ano
+        </span>
+        <span style={{
           background: 'var(--text)',
           color: '#fff',
           fontSize: 11,

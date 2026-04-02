@@ -80,6 +80,18 @@ export function GameListRow({ game, onInfo }: GameListRowProps) {
             {game.title}
           </h3>
           <span style={{
+            background: '#7C3AED',
+            color: '#fff',
+            fontSize: 10,
+            fontWeight: 700,
+            padding: '2px 8px',
+            borderRadius: 'var(--radius-pill)',
+            fontFamily: 'Nunito',
+            whiteSpace: 'nowrap',
+          }}>
+            {game.ano}º Ano
+          </span>
+          <span style={{
             background: 'var(--text)',
             color: '#fff',
             fontSize: 10,
