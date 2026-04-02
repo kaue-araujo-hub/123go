@@ -3,7 +3,7 @@ import useEmblaCarousel from 'embla-carousel-react';
 import { useLocation } from 'wouter';
 import { games } from '../data/games';
 
-const FEATURED_IDS = [1, 4, 7, 11, 15];
+const FEATURED_IDS = [1, 4, 7, 11, 15, 18];
 
 const temaColors: Record<string, string> = {
   numeros:      '#10B981',
@@ -20,7 +20,7 @@ const temaLabels: Record<string, string> = {
   probabilidade:'Probabilidade',
 };
 
-const medals = ['🥇', '🥈', '🥉', '4°', '5°'];
+const medals = ['🥇', '🥈', '🥉', '4°', '5°', '6°'];
 
 export function FeaturedCarousel() {
   const [, setLocation] = useLocation();
