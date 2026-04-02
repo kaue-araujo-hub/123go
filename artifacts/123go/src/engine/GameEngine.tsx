@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useLocation } from 'wouter';
 import confetti from 'canvas-confetti';
+import { CountdownOverlay } from '../components/CountdownOverlay';
 
 interface PhaseConfig {
   speed: number;
@@ -82,7 +83,20 @@ export function GameShell({ title, emoji, color, currentPhase, totalPhases, chil
   const [stopped, setStopped] = useState(false);
   const [muted, setMuted] = useState(false);
 
-  const isPlaying = !paused && !stopped;
+  /* Countdown state */
+  const [countdownKey, setCountdownKey]   = useState(0);
+  const [countdownDone, setCountdownDone] = useState(false);
+  const pendingRestartRef = useRef(false);
+
+  const handleCountdownComplete = useCallback(() => {
+    setCountdownDone(true);
+    if (pendingRestartRef.current) {
+      pendingRestartRef.current = false;
+      onRestart?.();
+    }
+  }, [onRestart]);
+
+  const isPlaying = countdownDone && !paused && !stopped;
 
   const handlePlay = () => {
     if (stopped) {
@@ -105,11 +119,21 @@ export function GameShell({ title, emoji, color, currentPhase, totalPhases, chil
   const handleRestart = () => {
     setPaused(false);
     setStopped(false);
-    onRestart?.();
+    setCountdownDone(false);
+    pendingRestartRef.current = true;
+    setCountdownKey(k => k + 1);
   };
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg)', display: 'flex', flexDirection: 'column' }}>
+      {/* 123GO! countdown overlay */}
+      {!countdownDone && (
+        <CountdownOverlay
+          countdownKey={countdownKey}
+          onComplete={handleCountdownComplete}
+        />
+      )}
+
       {/* Top bar */}
       <div style={{
         background: '#fff',
