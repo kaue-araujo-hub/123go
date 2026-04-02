@@ -171,10 +171,10 @@ export function Catalog() {
           {/* Toolbar: filters + view toggle */}
           <div style={{
             display: 'flex',
-            alignItems: 'flex-start',
+            alignItems: 'center',
             justifyContent: 'space-between',
             gap: 12,
-            marginBottom: 0,
+            marginBottom: 16,
           }}>
             <FilterBar filters={filters} onFilterChange={handleFilterChange} />
 
