@@ -139,7 +139,7 @@ export function Catalog() {
           </span>
 
           {/* Stats pills */}
-          <div style={{ display: 'flex', gap: 6 }}>
+          <div style={{ display: 'flex', gap: 6, marginLeft: 10 }}>
             <span style={{
               background: 'var(--c3)',
               color: '#fff',
