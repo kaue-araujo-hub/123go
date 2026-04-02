@@ -109,15 +109,74 @@ export function Catalog() {
       <Header onSearch={handleSearch} />
 
       <main style={{ flex: 1, maxWidth: 900, margin: '0 auto', width: '100%', padding: '20px 16px' }}>
-        <h1 style={{
-          fontFamily: 'Nunito',
-          fontWeight: 800,
-          fontSize: 22,
-          color: 'var(--text)',
-          marginBottom: 16,
-        }}>
-          Jogos
-        </h1>
+        {/* Breadcrumb + stats */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 0, marginBottom: 16, flexWrap: 'wrap', rowGap: 8 }}>
+          <h1 style={{
+            fontFamily: 'Nunito',
+            fontWeight: 800,
+            fontSize: 22,
+            color: 'var(--text)',
+            margin: 0,
+          }}>
+            Jogos
+          </h1>
+
+          {/* Separator */}
+          <span style={{
+            fontFamily: 'Nunito',
+            fontWeight: 400,
+            fontSize: 20,
+            color: 'var(--text3)',
+            margin: '0 6px',
+            lineHeight: 1,
+          }}>
+            /
+          </span>
+
+          {/* Matemática label */}
+          <span style={{
+            fontFamily: 'Nunito',
+            fontWeight: 700,
+            fontSize: 18,
+            color: 'var(--text2)',
+          }}>
+            Matemática
+          </span>
+
+          {/* Arrow */}
+          <svg style={{ margin: '0 10px', flexShrink: 0 }} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12" />
+            <polyline points="12 5 19 12 12 19" />
+          </svg>
+
+          {/* Stats pills */}
+          <div style={{ display: 'flex', gap: 6 }}>
+            <span style={{
+              background: 'var(--c3)',
+              color: '#fff',
+              fontFamily: 'Nunito',
+              fontWeight: 700,
+              fontSize: 12,
+              padding: '4px 12px',
+              borderRadius: 'var(--radius-pill)',
+              whiteSpace: 'nowrap',
+            }}>
+              {games.length} Jogos
+            </span>
+            <span style={{
+              background: 'var(--c1)',
+              color: '#fff',
+              fontFamily: 'Nunito',
+              fontWeight: 700,
+              fontSize: 12,
+              padding: '4px 12px',
+              borderRadius: 'var(--radius-pill)',
+              whiteSpace: 'nowrap',
+            }}>
+              5 Temas
+            </span>
+          </div>
+        </div>
 
         <HeroCard count={filteredGames.length} onExplore={handleExplore} />
 
