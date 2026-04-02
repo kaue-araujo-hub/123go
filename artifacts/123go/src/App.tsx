@@ -1,4 +1,5 @@
 import { Switch, Route, Router as WouterRouter } from "wouter";
+import { HomePage } from "./pages/HomePage";
 import { Catalog } from "./pages/Catalog";
 import { FestaDaLagarta } from "./games/FestaDaLagarta";
 import { ParOuImpar } from "./games/ParOuImpar";
@@ -27,7 +28,7 @@ function NotFound() {
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16, background: 'var(--bg)' }}>
       <div style={{ fontSize: 64 }}>🎮</div>
       <h1 style={{ fontFamily: 'Nunito', fontWeight: 900, fontSize: 24, color: 'var(--text)' }}>Página não encontrada</h1>
-      <a href="/" style={{ background: 'var(--c3)', color: '#fff', padding: '12px 24px', borderRadius: 'var(--radius-pill)', fontFamily: 'Nunito', fontWeight: 700, fontSize: 15 }}>
+      <a href="/catalog" style={{ background: 'var(--c3)', color: '#fff', padding: '12px 24px', borderRadius: 'var(--radius-pill)', fontFamily: 'Nunito', fontWeight: 700, fontSize: 15 }}>
         Voltar ao catálogo
       </a>
     </div>
@@ -37,7 +38,8 @@ function NotFound() {
 function Router() {
   return (
     <Switch>
-      <Route path="/" component={Catalog} />
+      <Route path="/" component={HomePage} />
+      <Route path="/catalog" component={Catalog} />
       <Route path="/games/g01-festa-lagarta" component={FestaDaLagarta} />
       <Route path="/games/g02-par-impar" component={ParOuImpar} />
       <Route path="/games/g03-caca-estrelas" component={CacaEstrelas} />

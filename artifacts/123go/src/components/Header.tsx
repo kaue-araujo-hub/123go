@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useLocation } from 'wouter';
 
 interface HeaderProps {
   onSearch: (query: string) => void;
@@ -14,6 +15,7 @@ function SearchIcon() {
 }
 
 export function Header({ onSearch }: HeaderProps) {
+  const [, setLocation] = useLocation();
   const [query, setQuery] = useState('');
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const mobileInputRef = useRef<HTMLInputElement>(null);
@@ -113,14 +115,22 @@ export function Header({ onSearch }: HeaderProps) {
       {/* ── DEFAULT STATE (logo + desktop search + mobile icon) ── */}
       {!mobileSearchOpen && (
         <>
-          {/* Logo — always visible */}
-          <div style={{
-            fontFamily: 'Nunito',
-            fontWeight: 900,
-            fontSize: 24,
-            letterSpacing: '-0.5px',
-            flexShrink: 0,
-          }}>
+          {/* Logo — always visible, click → homepage */}
+          <div
+            onClick={() => setLocation('/')}
+            role="link"
+            tabIndex={0}
+            onKeyDown={e => e.key === 'Enter' && setLocation('/')}
+            style={{
+              fontFamily: 'Nunito',
+              fontWeight: 900,
+              fontSize: 24,
+              letterSpacing: '-0.5px',
+              flexShrink: 0,
+              cursor: 'pointer',
+              userSelect: 'none',
+            }}
+          >
             <span style={{ color: 'var(--c3)' }}>1</span>
             <span style={{ color: 'var(--c2)' }}>2</span>
             <span style={{ color: 'var(--c1)' }}>3</span>

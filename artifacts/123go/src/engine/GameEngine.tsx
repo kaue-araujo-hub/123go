@@ -125,7 +125,7 @@ export function GameShell({ title, emoji, color, currentPhase, totalPhases, chil
         {/* LEFT: back + title */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, flex: 1, minWidth: 0 }}>
           <button
-            onClick={() => setLocation('/')}
+            onClick={() => setLocation('/catalog')}
             aria-label="Voltar ao catálogo"
             style={{
               width: 36,
@@ -332,7 +332,7 @@ export function GameShell({ title, emoji, color, currentPhase, totalPhases, chil
             <p style={{ color: 'var(--text2)', fontSize: 14, margin: 0 }}>Deseja jogar novamente?</p>
             <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', justifyContent: 'center' }}>
               <button
-                onClick={() => setLocation('/')}
+                onClick={() => setLocation('/catalog')}
                 style={{
                   padding: '10px 22px',
                   borderRadius: 'var(--radius-pill)',
@@ -528,7 +528,7 @@ export function PhaseCompleteCard({ phase, totalPhases, score, isGameComplete, o
         )}
         {isGameComplete && (
           <button
-            onClick={() => setLocation('/')}
+            onClick={() => setLocation('/catalog')}
             style={{
               padding: '12px 24px',
               borderRadius: 'var(--radius-pill)',
