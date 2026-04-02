@@ -57,10 +57,30 @@ function ControlBtn({ onClick, title, children, active = true }: { onClick: () =
   );
 }
 
+function SoundIcon({ muted }: { muted: boolean }) {
+  if (muted) {
+    return (
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+        <line x1="23" y1="9" x2="17" y2="15"/>
+        <line x1="17" y1="9" x2="23" y2="15"/>
+      </svg>
+    );
+  }
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+      <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+      <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+    </svg>
+  );
+}
+
 export function GameShell({ title, emoji, color, currentPhase, totalPhases, children, onNextPhase, showNextPhase, score, onRestart }: GameShellProps) {
   const [, setLocation] = useLocation();
   const [paused, setPaused] = useState(false);
   const [stopped, setStopped] = useState(false);
+  const [muted, setMuted] = useState(false);
 
   const isPlaying = !paused && !stopped;
 
@@ -149,6 +169,18 @@ export function GameShell({ title, emoji, color, currentPhase, totalPhases, chil
               <polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.5"/>
             </svg>
           </ControlBtn>
+
+          {/* Divider */}
+          <div style={{ width: 1, height: 20, background: 'var(--border)', margin: '0 2px' }} />
+
+          {/* Sound toggle */}
+          <ControlBtn
+            onClick={() => setMuted(m => !m)}
+            title={muted ? 'Ativar som' : 'Desativar som'}
+            active={!muted}
+          >
+            <SoundIcon muted={muted} />
+          </ControlBtn>
         </div>
 
         {/* RIGHT: score */}
@@ -193,6 +225,18 @@ export function GameShell({ title, emoji, color, currentPhase, totalPhases, chil
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.5"/>
           </svg>
+        </ControlBtn>
+
+        {/* Divider */}
+        <div style={{ width: 1, height: 20, background: 'var(--border)', margin: '0 2px' }} />
+
+        {/* Sound toggle */}
+        <ControlBtn
+          onClick={() => setMuted(m => !m)}
+          title={muted ? 'Ativar som' : 'Desativar som'}
+          active={!muted}
+        >
+          <SoundIcon muted={muted} />
         </ControlBtn>
       </div>
 
