@@ -22,6 +22,7 @@ export function Header({ onSearch }: HeaderProps) {
       height: 60,
       display: 'flex',
       alignItems: 'center',
+      justifyContent: 'center',
       padding: '0 16px',
       gap: 16,
     }}>
@@ -37,8 +38,8 @@ export function Header({ onSearch }: HeaderProps) {
 
       {/* Search */}
       <div style={{
-        flex: 1,
-        maxWidth: 480,
+        width: '100%',
+        maxWidth: 440,
         position: 'relative',
       }}>
         <svg
