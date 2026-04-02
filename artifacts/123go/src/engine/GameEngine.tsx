@@ -98,44 +98,49 @@ export function GameShell({ title, emoji, color, currentPhase, totalPhases, chil
         height: 56,
         display: 'flex',
         alignItems: 'center',
-        gap: 10,
         position: 'sticky',
         top: 0,
         zIndex: 50,
       }}>
-        {/* Back */}
-        <button
-          onClick={() => setLocation('/')}
-          aria-label="Voltar ao catálogo"
-          style={{
-            width: 36,
-            height: 36,
-            borderRadius: '50%',
-            border: '1.5px solid var(--border)',
-            background: '#fff',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'pointer',
-            fontSize: 16,
-            color: 'var(--text2)',
-            flexShrink: 0,
-          }}
-        >←</button>
+        {/* LEFT: back + title */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, flex: 1, minWidth: 0 }}>
+          <button
+            onClick={() => setLocation('/')}
+            aria-label="Voltar ao catálogo"
+            style={{
+              width: 36,
+              height: 36,
+              borderRadius: '50%',
+              border: '1.5px solid var(--border)',
+              background: '#fff',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              fontSize: 16,
+              color: 'var(--text2)',
+              flexShrink: 0,
+            }}
+          >←</button>
+          <span style={{ fontSize: 20, flexShrink: 0 }}>{emoji}</span>
+          <h1 style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 15, color: 'var(--text)', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{title}</h1>
+        </div>
 
-        <span style={{ fontSize: 20, flexShrink: 0 }}>{emoji}</span>
-        <h1 style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 15, color: 'var(--text)', flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{title}</h1>
-
-        {/* Playback controls */}
-        <div style={{ display: 'flex', gap: 5, alignItems: 'center' }}>
-          {/* Play */}
+        {/* CENTER: playback controls (absolutely centered) */}
+        <div style={{
+          position: 'absolute',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          display: 'flex',
+          gap: 6,
+          alignItems: 'center',
+        }}>
           <ControlBtn onClick={handlePlay} title="Jogar" active={!isPlaying}>
             <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
               <polygon points="5,3 19,12 5,21"/>
             </svg>
           </ControlBtn>
 
-          {/* Pause */}
           <ControlBtn onClick={handlePause} title="Pausar" active={isPlaying}>
             <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
               <rect x="6" y="4" width="4" height="16"/>
@@ -143,14 +148,12 @@ export function GameShell({ title, emoji, color, currentPhase, totalPhases, chil
             </svg>
           </ControlBtn>
 
-          {/* Stop */}
           <ControlBtn onClick={handleStop} title="Parar" active={!stopped}>
             <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
               <rect x="4" y="4" width="16" height="16" rx="2"/>
             </svg>
           </ControlBtn>
 
-          {/* Restart */}
           <ControlBtn onClick={handleRestart} title="Reiniciar">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="1 4 1 10 7 10"/>
@@ -159,24 +162,23 @@ export function GameShell({ title, emoji, color, currentPhase, totalPhases, chil
           </ControlBtn>
         </div>
 
-        {/* Divider */}
-        <div style={{ width: 1, height: 22, background: 'var(--border)', flexShrink: 0 }} />
-
-        {/* Score */}
-        {score !== undefined && (
-          <span style={{
-            background: color,
-            color: '#fff',
-            fontFamily: 'Nunito',
-            fontWeight: 800,
-            fontSize: 13,
-            padding: '4px 12px',
-            borderRadius: 'var(--radius-pill)',
-            flexShrink: 0,
-          }}>
-            ★ {score}
-          </span>
-        )}
+        {/* RIGHT: score */}
+        <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
+          {score !== undefined && (
+            <span style={{
+              background: color,
+              color: '#fff',
+              fontFamily: 'Nunito',
+              fontWeight: 800,
+              fontSize: 13,
+              padding: '4px 12px',
+              borderRadius: 'var(--radius-pill)',
+              flexShrink: 0,
+            }}>
+              ★ {score}
+            </span>
+          )}
+        </div>
       </div>
 
       {/* Progress bar */}
