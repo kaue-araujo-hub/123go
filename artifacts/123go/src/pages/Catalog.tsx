@@ -1,6 +1,5 @@
 import React, { useState, useMemo, useRef, useCallback } from 'react';
 import { Header } from '../components/Header';
-import { HeroCard } from '../components/HeroCard';
 import { FilterBar, type FilterState } from '../components/FilterBar';
 import { GameCard } from '../components/GameCard';
 import { GameListRow } from '../components/GameListRow';
@@ -83,10 +82,6 @@ export function Catalog() {
   const handlePageChange = useCallback((page: number) => {
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, []);
-
-  const handleExplore = useCallback(() => {
-    gridRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, []);
 
   const viewBtn = (mode: ViewMode): React.CSSProperties => ({
@@ -177,8 +172,6 @@ export function Catalog() {
             </span>
           </div>
         </div>
-
-        <HeroCard count={filteredGames.length} onExplore={handleExplore} />
 
         <div ref={gridRef}>
           {/* Toolbar: filters + view toggle */}
