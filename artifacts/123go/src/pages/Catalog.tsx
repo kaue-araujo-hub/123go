@@ -5,6 +5,7 @@ import { GameCard } from '../components/GameCard';
 import { GameListRow } from '../components/GameListRow';
 import { GameModal } from '../components/GameModal';
 import { Pagination } from '../components/Pagination';
+import { FeaturedCarousel } from '../components/FeaturedCarousel';
 import { games, type Game } from '../data/games';
 
 const ITEMS_PER_PAGE = 10;
@@ -166,6 +167,9 @@ export function Catalog() {
             </span>
           </div>
         </div>
+
+        {/* Featured carousel */}
+        <FeaturedCarousel />
 
         <div ref={gridRef}>
           {/* Toolbar: filters + view toggle */}
