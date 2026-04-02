@@ -126,8 +126,8 @@ export function GameShell({ title, emoji, color, currentPhase, totalPhases, chil
           <h1 style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 15, color: 'var(--text)', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{title}</h1>
         </div>
 
-        {/* CENTER: playback controls (absolutely centered) */}
-        <div style={{
+        {/* CENTER: playback controls — desktop only */}
+        <div className="game-controls-desktop" style={{
           position: 'absolute',
           left: '50%',
           transform: 'translateX(-50%)',
@@ -136,28 +136,17 @@ export function GameShell({ title, emoji, color, currentPhase, totalPhases, chil
           alignItems: 'center',
         }}>
           <ControlBtn onClick={handlePlay} title="Jogar" active={!isPlaying}>
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
-              <polygon points="5,3 19,12 5,21"/>
-            </svg>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
           </ControlBtn>
-
           <ControlBtn onClick={handlePause} title="Pausar" active={isPlaying}>
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
-              <rect x="6" y="4" width="4" height="16"/>
-              <rect x="14" y="4" width="4" height="16"/>
-            </svg>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
           </ControlBtn>
-
           <ControlBtn onClick={handleStop} title="Parar" active={!stopped}>
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
-              <rect x="4" y="4" width="16" height="16" rx="2"/>
-            </svg>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="4" width="16" height="16" rx="2"/></svg>
           </ControlBtn>
-
           <ControlBtn onClick={handleRestart} title="Reiniciar">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="1 4 1 10 7 10"/>
-              <path d="M3.51 15a9 9 0 1 0 .49-4.5"/>
+              <polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.5"/>
             </svg>
           </ControlBtn>
         </div>
@@ -179,6 +168,32 @@ export function GameShell({ title, emoji, color, currentPhase, totalPhases, chil
             </span>
           )}
         </div>
+      </div>
+
+      {/* Mobile controls bar — shown only on small screens */}
+      <div className="game-controls-mobile" style={{
+        background: '#fff',
+        borderBottom: '1px solid var(--border)',
+        padding: '8px 16px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 10,
+      }}>
+        <ControlBtn onClick={handlePlay} title="Jogar" active={!isPlaying}>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
+        </ControlBtn>
+        <ControlBtn onClick={handlePause} title="Pausar" active={isPlaying}>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+        </ControlBtn>
+        <ControlBtn onClick={handleStop} title="Parar" active={!stopped}>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="4" width="16" height="16" rx="2"/></svg>
+        </ControlBtn>
+        <ControlBtn onClick={handleRestart} title="Reiniciar">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.5"/>
+          </svg>
+        </ControlBtn>
       </div>
 
       {/* Progress bar */}
@@ -316,6 +331,16 @@ export function GameShell({ title, emoji, color, currentPhase, totalPhases, chil
         @keyframes pulseDot {
           0%, 100% { opacity: 1; }
           50% { opacity: 0.5; }
+        }
+        /* Desktop: show centered controls in header, hide mobile bar */
+        @media (min-width: 600px) {
+          .game-controls-mobile  { display: none !important; }
+          .game-controls-desktop { display: flex !important; }
+        }
+        /* Mobile: hide centered controls in header, show bar below */
+        @media (max-width: 599px) {
+          .game-controls-desktop { display: none !important; }
+          .game-controls-mobile  { display: flex !important; }
         }
       `}</style>
     </div>
