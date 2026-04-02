@@ -27,12 +27,13 @@ export function FeaturedCarousel() {
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: false,
     align: 'start',
-    skipSnaps: false,
     dragFree: true,
+    containScroll: 'trimSnaps',
   });
 
   const [canPrev, setCanPrev] = useState(false);
   const [canNext, setCanNext] = useState(true);
+  const [dragging, setDragging] = useState(false);
 
   const onSelect = useCallback(() => {
     if (!emblaApi) return;
@@ -45,6 +46,8 @@ export function FeaturedCarousel() {
     onSelect();
     emblaApi.on('select', onSelect);
     emblaApi.on('reInit', onSelect);
+    emblaApi.on('pointerDown', () => setDragging(true));
+    emblaApi.on('pointerUp', () => setTimeout(() => setDragging(false), 50));
     return () => { emblaApi.off('select', onSelect); };
   }, [emblaApi, onSelect]);
 
@@ -79,17 +82,28 @@ export function FeaturedCarousel() {
         </div>
       </div>
 
-      {/* Embla viewport */}
-      <div ref={emblaRef} style={{ overflow: 'hidden' }}>
-        <div style={{ display: 'flex', gap: 14 }}>
+      {/* Embla viewport — overflow hidden here, cursor feedback */}
+      <div
+        ref={emblaRef}
+        style={{
+          overflow: 'hidden',
+          cursor: dragging ? 'grabbing' : 'grab',
+          userSelect: 'none',
+          WebkitUserSelect: 'none',
+        }}
+      >
+        {/* Embla track — negative left margin balances slide padding */}
+        <div style={{ display: 'flex', marginLeft: -14 }}>
           {featured.map((game, i) => (
-            <FeaturedCard
-              key={game.id}
-              game={game}
-              rank={i}
-              medal={medals[i]}
-              onClick={() => setLocation(game.path)}
-            />
+            /* Each slide: padding-left creates the gap */
+            <div key={game.id} style={{ paddingLeft: 14, flex: '0 0 234px', minWidth: 0 }}>
+              <FeaturedCard
+                game={game}
+                rank={i}
+                medal={medals[i]}
+                onClick={() => { if (!dragging) setLocation(game.path); }}
+              />
+            </div>
           ))}
         </div>
       </div>
