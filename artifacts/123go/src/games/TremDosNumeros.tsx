@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { GameShell, useGameEngine, FeedbackOverlay, PhaseCompleteCard } from '../engine/GameEngine';
+import { AppleEmoji } from '../utils/AppleEmoji';
 
 const PHASES = [
   { ops: [{ a: 2, b: 1, op: '+', ans: 3 }, { a: 3, b: 2, op: '+', ans: 5 }, { a: 1, b: 4, op: '+', ans: 5 }], label: 'Adição até 5' },
@@ -75,7 +76,11 @@ export function TremDosNumeros() {
 
       {/* Train */}
       <div style={{ background: '#fff', borderRadius: 'var(--radius)', border: '1.5px solid var(--border)', padding: 20, marginBottom: 24, textAlign: 'center' }}>
-        <div style={{ fontSize: 24, marginBottom: 12 }}>🚂 ————————— 🚃</div>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4, marginBottom: 12 }}>
+          <AppleEmoji emoji="🚂" size={28} />
+          <span style={{ color: 'var(--text3)', fontSize: 14 }}>—————————</span>
+          <AppleEmoji emoji="🚃" size={28} />
+        </div>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, flexWrap: 'wrap' }}>
           <div style={{ fontFamily: 'Nunito', fontWeight: 900, fontSize: 48, color: 'var(--text)' }}>{currentOp.a}</div>
           <div style={{ fontFamily: 'Nunito', fontWeight: 700, fontSize: 36, color: 'var(--c2)' }}>{currentOp.op}</div>

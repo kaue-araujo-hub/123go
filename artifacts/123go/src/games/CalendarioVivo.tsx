@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { GameShell, useGameEngine, FeedbackOverlay, PhaseCompleteCard } from '../engine/GameEngine';
+import { AppleEmoji } from '../utils/AppleEmoji';
 
 const DAYS = [
   { name: 'Segunda', emoji: '📚', color: '#5B4FCF' },
@@ -79,7 +80,7 @@ export function CalendarioVivo() {
             padding: '10px 14px',
             border: `2px solid ${day.color}30`,
           }}>
-            <span style={{ fontSize: 28 }}>{day.emoji}</span>
+            <AppleEmoji emoji={day.emoji} size={32} />
             <span style={{ fontFamily: 'Nunito', fontWeight: 700, fontSize: 15, flex: 1, color: day.color }}>{day.name}</span>
             <div style={{ display: 'flex', gap: 4 }}>
               <button onClick={() => moveDay(idx, -1)} disabled={idx === 0}

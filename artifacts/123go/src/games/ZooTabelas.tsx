@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { GameShell, useGameEngine, FeedbackOverlay, PhaseCompleteCard } from '../engine/GameEngine';
+import { AppleEmoji } from '../utils/AppleEmoji';
 
 const ZOO_DATA = [
   { name: 'Leão', emoji: '🦁', count: 5 },
@@ -80,7 +81,7 @@ export function ZooTabelas() {
               minHeight: 52,
             }}
           >
-            <span style={{ fontSize: 20 }}>{animal.emoji} {animal.name}</span>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><AppleEmoji emoji={animal.emoji} size={22} /> {animal.name}</span>
             <span style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 18, color: 'var(--c5)' }}>{animal.count}</span>
             <div style={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
               {Array.from({ length: animal.count }).map((_, i) => (

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { GameShell, useGameEngine, FeedbackOverlay, PhaseCompleteCard, getPhaseConfig } from '../engine/GameEngine';
+import { AppleEmoji } from '../utils/AppleEmoji';
 
 const PHASES = [
   { target: 3, max: 5, label: 'Arraste 3 folhas para a lagarta!' },
@@ -107,12 +108,12 @@ export function FestaDaLagarta() {
           gap: 8,
         }}
       >
-        <div style={{ fontSize: 56, animation: folhasColetadas > 0 ? 'wriggle 0.5s ease' : 'none' }}>
-          {'🐛'.repeat(1)}
+        <div style={{ animation: folhasColetadas > 0 ? 'wriggle 0.5s ease' : 'none' }}>
+          <AppleEmoji emoji="🐛" size={72} style={{ filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.2))' }} />
         </div>
         <div style={{ display: 'flex', gap: 4 }}>
           {Array.from({ length: folhasColetadas }).map((_, i) => (
-            <span key={i} style={{ fontSize: 16 }}>🌿</span>
+            <AppleEmoji key={i} emoji="🌿" size={20} />
           ))}
         </div>
         <p style={{ color: 'var(--text3)', fontSize: 12, fontWeight: 600 }}>

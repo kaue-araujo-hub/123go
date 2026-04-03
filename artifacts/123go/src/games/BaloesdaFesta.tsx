@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { GameShell, useGameEngine, FeedbackOverlay, PhaseCompleteCard } from '../engine/GameEngine';
+import { AppleEmoji } from '../utils/AppleEmoji';
 
 const PHASES = [
   { g1: 20, g2: 12, pop: 8, question: 'Estoure 8 balões do grupo azul para igualar!' },
@@ -62,7 +63,7 @@ export function BaloesdaFesta() {
         <div style={{ flex: 1, background: '#fff', borderRadius: 16, padding: 16, border: '1.5px solid var(--border)', textAlign: 'center' }}>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, justifyContent: 'center', marginBottom: 8 }}>
             {Array.from({ length: Math.min(phaseData.g2, 20) }).map((_, i) => (
-              <span key={i} style={{ fontSize: 18 }}>🎈</span>
+              <AppleEmoji key={i} emoji="🎈" size={22} />
             ))}
           </div>
           <span style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 22, color: 'var(--text)' }}>{phaseData.g2}</span>
@@ -82,7 +83,7 @@ export function BaloesdaFesta() {
                   transition: 'transform 0.1s',
                   padding: 2,
                 }}
-              >🎈</button>
+              ><AppleEmoji emoji="🎈" size={22} /></button>
             ))}
           </div>
           <span style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 22, color }}>

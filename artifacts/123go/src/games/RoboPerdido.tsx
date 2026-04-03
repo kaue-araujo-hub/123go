@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { GameShell, useGameEngine, FeedbackOverlay, PhaseCompleteCard } from '../engine/GameEngine';
+import { AppleEmoji } from '../utils/AppleEmoji';
 
 type Direction = 'up' | 'down' | 'left' | 'right';
 
@@ -90,11 +91,10 @@ export function RoboPerdido() {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    fontSize: cellSize * 0.5,
                     transition: 'all 0.15s ease',
                   }}
                 >
-                  {isRobot ? '🤖' : isGoal ? '🏠' : ''}
+                  {isRobot ? <AppleEmoji emoji="🤖" size={cellSize * 0.5} /> : isGoal ? <AppleEmoji emoji="🏠" size={cellSize * 0.5} /> : ''}
                 </div>
               );
             })

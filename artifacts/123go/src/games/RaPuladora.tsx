@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { GameShell, useGameEngine, FeedbackOverlay, PhaseCompleteCard } from '../engine/GameEngine';
+import { AppleEmoji } from '../utils/AppleEmoji';
 
 const PHASES = [
   { lagoas: [{ count: 20, flowers: 20 }, { count: 10, flowers: 10 }], question: 'Qual lagoa tem MAIS flores?', correct: 0 },
@@ -56,7 +57,7 @@ export function RaPuladora() {
     return (
       <GameShell title="Rã Puladora" emoji="🐸" color="var(--c3)" currentPhase={phase} totalPhases={5} score={score} onRestart={restart}>
         <div style={{ textAlign: 'center', padding: 32, background: '#fff', borderRadius: 'var(--radius)', border: '1.5px solid var(--border)' }}>
-          <div style={{ fontSize: 64, marginBottom: 16 }}>🐸</div>
+          <div style={{ marginBottom: 16 }}><AppleEmoji emoji="🐸" size={72} style={{ filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.2))' }} /></div>
           <h2 style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 20, color: 'var(--text)', marginBottom: 12 }}>
             {phaseData.question}
           </h2>
@@ -79,8 +80,8 @@ export function RaPuladora() {
       </div>
 
       {/* Frog */}
-      <div style={{ textAlign: 'center', marginBottom: 16, fontSize: 64, animation: jumping !== null ? 'frogJump 0.4s ease' : 'none' }}>
-        🐸
+      <div style={{ textAlign: 'center', marginBottom: 16, animation: jumping !== null ? 'frogJump 0.4s ease' : 'none' }}>
+        <AppleEmoji emoji="🐸" size={72} style={{ filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.2))' }} />
       </div>
 
       <div style={{ display: 'flex', gap: 16 }}>
@@ -105,7 +106,7 @@ export function RaPuladora() {
           >
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 2, justifyContent: 'center', maxWidth: 100 }}>
               {Array.from({ length: Math.min(lagoa.count, 20) }).map((_, i) => (
-                <span key={i} style={{ fontSize: 12 }}>🌸</span>
+                <AppleEmoji key={i} emoji="🌸" size={14} />
               ))}
             </div>
             <span style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 24, color: '#2E7D32' }}>{lagoa.count}</span>

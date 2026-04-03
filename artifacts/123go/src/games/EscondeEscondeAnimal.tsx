@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { GameShell, useGameEngine, FeedbackOverlay, PhaseCompleteCard } from '../engine/GameEngine';
+import { AppleEmoji } from '../utils/AppleEmoji';
 
 const POSITIONS = ['em cima', 'embaixo', 'à esquerda', 'à direita', 'no meio', 'atrás da árvore', 'na frente da pedra'];
 
@@ -91,7 +92,7 @@ export function EscondeEscondeAnimal() {
               padding: 4,
             }}
           >
-            <span style={{ fontSize: 24 }}>{phaseData.hint}</span>
+            <AppleEmoji emoji={phaseData.hint} size={28} />
             <span style={{ fontSize: 10 }}>{pos}</span>
           </button>
         ))}

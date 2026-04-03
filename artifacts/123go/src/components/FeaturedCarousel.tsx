@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { AppleEmoji } from '../utils/AppleEmoji';
 import useEmblaCarousel from 'embla-carousel-react';
 import { useLocation } from 'wouter';
 import { games } from '../data/games';
@@ -189,9 +190,11 @@ function FeaturedCard({
         }}>
           {medal}
         </div>
-        <span style={{ fontSize: 46, lineHeight: 1, display: 'block', userSelect: 'none' }}>
-          {game.emoji}
-        </span>
+        <AppleEmoji
+          emoji={game.emoji}
+          size={56}
+          style={{ filter: 'drop-shadow(0 6px 16px rgba(0,0,0,0.18))' }}
+        />
       </div>
 
       {/* Content */}

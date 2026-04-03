@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useLocation } from 'wouter';
 import type { Game } from '../data/games';
+import { AppleEmoji } from '../utils/AppleEmoji';
 
 const temaColors: Record<string, string> = {
   numeros: 'var(--c3)',
@@ -139,9 +140,13 @@ export function GameCard({ game, onInfo }: GameCardProps) {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        fontSize: 64,
       }}>
-        {game.emoji}
+        <AppleEmoji
+          emoji={game.emoji}
+          size={72}
+          className="card-emoji"
+          style={{ filter: 'drop-shadow(0 6px 16px rgba(0,0,0,0.18))', transition: 'transform 0.2s ease, filter 0.2s ease' }}
+        />
       </div>
 
       {/* Content */}
@@ -189,7 +194,7 @@ export function GameCard({ game, onInfo }: GameCardProps) {
           onMouseEnter={e => (e.currentTarget.style.opacity = '0.88')}
           onMouseLeave={e => (e.currentTarget.style.opacity = '1')}
         >
-          🎮 Jogar
+          <AppleEmoji emoji="🎮" size={18} style={{ pointerEvents: 'none' }} /> Jogar
         </button>
       </div>
     </div>

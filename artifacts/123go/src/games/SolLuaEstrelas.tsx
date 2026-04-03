@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { GameShell, useGameEngine, FeedbackOverlay, PhaseCompleteCard } from '../engine/GameEngine';
+import { AppleEmoji } from '../utils/AppleEmoji';
 
 const PERIODS = [
   { name: 'Manhã', emoji: '🌅', bg: '#FFF9C4', activities: ['🏫', '☕', '🍳'] },
@@ -55,7 +56,7 @@ export function SolLuaEstrelas() {
         <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
           {PERIODS.map((p, i) => (
             <div key={i} style={{ padding: 20, background: p.bg, borderRadius: 16, border: '2px solid var(--border)', textAlign: 'center', flex: 1, minWidth: 80 }}>
-              <div style={{ fontSize: 40 }}>{p.emoji}</div>
+              <div><AppleEmoji emoji={p.emoji} size={48} /></div>
               <p style={{ fontFamily: 'Nunito', fontWeight: 700, fontSize: 13, marginTop: 6, color: i === 2 ? '#fff' : 'var(--text)' }}>{i + 1}° {p.name}</p>
             </div>
           ))}
@@ -78,7 +79,7 @@ export function SolLuaEstrelas() {
         <h2 style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 17, color: 'var(--text)' }}>
           {phaseData.question}
         </h2>
-        <div style={{ fontSize: 80, marginTop: 12 }}>{phaseData.showEmoji}</div>
+        <div style={{ marginTop: 12 }}><AppleEmoji emoji={phaseData.showEmoji} size={88} /></div>
       </div>
 
       <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
@@ -101,7 +102,7 @@ export function SolLuaEstrelas() {
               minHeight: 90,
             }}
           >
-            <span style={{ fontSize: 32 }}>{p.emoji}</span>
+            <AppleEmoji emoji={p.emoji} size={36} />
             <span style={{ fontFamily: 'Nunito', fontWeight: 700, fontSize: 13, color: i === 2 ? '#fff' : 'var(--text)' }}>{p.name}</span>
           </button>
         ))}

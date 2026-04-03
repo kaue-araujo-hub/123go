@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { GameShell, useGameEngine, FeedbackOverlay, PhaseCompleteCard } from '../engine/GameEngine';
+import { AppleEmoji } from '../utils/AppleEmoji';
 
 const PHASES = [
   { question: 'Qual pote tem MAIS balas?', potes: [{ count: 5, emoji: '🍬' }, { count: 15, emoji: '🍭' }], correct: 1 },
@@ -30,7 +31,7 @@ function BowlVisual({ count, emoji, selected, onClick }: { count: number; emoji:
     >
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, justifyContent: 'center', maxWidth: 120 }}>
         {Array.from({ length: Math.min(count, 20) }).map((_, i) => (
-          <span key={i} style={{ fontSize: 16 }}>{emoji}</span>
+          <AppleEmoji key={i} emoji={emoji} size={20} />
         ))}
       </div>
       <span style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 22, color: 'var(--text)' }}>{count}</span>
@@ -71,7 +72,7 @@ export function LojaDeBala() {
     <GameShell title="Loja de Balas" emoji="🍬" color="var(--c3)" currentPhase={phase} totalPhases={5} score={score} onRestart={restart}>
       <FeedbackOverlay type={feedback} />
       <div style={{ textAlign: 'center', marginBottom: 24 }}>
-        <div style={{ fontSize: 40, marginBottom: 8 }}>🏪</div>
+        <div style={{ marginBottom: 8 }}><AppleEmoji emoji="🏪" size={48} /></div>
         <h2 style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 20, color: 'var(--text)' }}>
           {phaseData.question}
         </h2>

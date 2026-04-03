@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { GameShell, useGameEngine, FeedbackOverlay, PhaseCompleteCard } from '../engine/GameEngine';
+import { AppleEmoji } from '../utils/AppleEmoji';
 
 const PHASES = [
   {
@@ -96,9 +97,8 @@ export function JardimPadroes() {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            fontSize: 32,
           }}>
-            {item}
+            <AppleEmoji emoji={item} size={36} />
           </div>
         ))}
         <div style={{
@@ -113,7 +113,7 @@ export function JardimPadroes() {
           fontSize: 32,
           animation: 'pulseBorder 1.5s ease-in-out infinite',
         }}>
-          {answered ? phaseData.next : '?'}
+          {answered ? <AppleEmoji emoji={phaseData.next} size={36} /> : '?'}
         </div>
       </div>
 
@@ -129,7 +129,6 @@ export function JardimPadroes() {
               borderRadius: 20,
               background: '#fff',
               border: '2px solid var(--border)',
-              fontSize: 44,
               cursor: 'pointer',
               minHeight: 88,
               minWidth: 88,
@@ -139,7 +138,7 @@ export function JardimPadroes() {
               justifyContent: 'center',
               transition: 'all 0.15s',
             }}
-          >{opt}</button>
+          ><AppleEmoji emoji={opt} size={52} /></button>
         ))}
       </div>
 

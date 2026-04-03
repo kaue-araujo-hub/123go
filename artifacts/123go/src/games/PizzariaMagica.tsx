@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { GameShell, useGameEngine, FeedbackOverlay, PhaseCompleteCard } from '../engine/GameEngine';
+import { AppleEmoji } from '../utils/AppleEmoji';
 
 const PHASES = [
   { theme: '🍕 Pizza', total: 5, have: 2, need: 3 },
@@ -78,7 +79,7 @@ export function PizzariaMagica() {
         </div>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, justifyContent: 'center', marginTop: 12 }}>
           {Array.from({ length: Math.min(currentTotal, 20) }).map((_, i) => (
-            <span key={i} style={{ fontSize: 20 }}>{phaseData.theme.split(' ')[0]}</span>
+            <AppleEmoji key={i} emoji={phaseData.theme.split(' ')[0]} size={24} />
           ))}
         </div>
       </div>
@@ -105,7 +106,7 @@ export function PizzariaMagica() {
             gap: 8,
           }}
         >
-          {isSubtraction ? '↩️' : '+'} <span>{phaseData.theme.split(' ')[0]}</span>
+          {isSubtraction ? '↩️' : '+'} <AppleEmoji emoji={phaseData.theme.split(' ')[0]} size={36} />
         </div>
 
         <div

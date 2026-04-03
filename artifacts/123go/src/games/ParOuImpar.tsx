@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { GameShell, useGameEngine, FeedbackOverlay, PhaseCompleteCard } from '../engine/GameEngine';
+import { AppleEmoji } from '../utils/AppleEmoji';
 
 const PHASE_THEMES = [
   { theme: 'meias', items: ['🧦', '🧦', '🧦', '🧦', '🧤'], singles: [4], count: 5 },
@@ -75,7 +76,6 @@ export function ParOuImpar() {
               borderRadius: 16,
               border: '2px solid var(--border)',
               background: phaseData.singles.includes(idx) && answered ? '#E8F5E9' : '#fff',
-              fontSize: 40,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -85,7 +85,7 @@ export function ParOuImpar() {
               minWidth: 72,
             }}
           >
-            {item}
+            <AppleEmoji emoji={item} size={40} />
           </button>
         ))}
       </div>

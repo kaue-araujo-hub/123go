@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { GameShell, useGameEngine, FeedbackOverlay, PhaseCompleteCard } from '../engine/GameEngine';
+import { AppleEmoji } from '../utils/AppleEmoji';
 
 const INSTRUCTIONS = [
   { text: 'Mova o cavaleiro para a DIREITA da torre!', targetZone: 'right' },
@@ -46,7 +47,7 @@ export function CasteloPosicoes() {
     <GameShell title="Castelo das Posições" emoji="🏰" color="var(--c1)" currentPhase={phase} totalPhases={5} score={score} onRestart={restart}>
       <FeedbackOverlay type={feedback} />
       <div style={{ textAlign: 'center', marginBottom: 16 }}>
-        <div style={{ fontSize: 32, marginBottom: 8 }}>👑 O Rei diz:</div>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 8 }}><AppleEmoji emoji="👑" size={36} /><span style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 20, color: 'var(--text)' }}>O Rei diz:</span></div>
         <h2 style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 18, color: 'var(--text)', background: '#FFF9C4', padding: '10px 20px', borderRadius: 'var(--radius-pill)', display: 'inline-block' }}>
           {instruction.text}
         </h2>
@@ -65,7 +66,7 @@ export function CasteloPosicoes() {
         <div/>
       </div>
 
-      <div style={{ textAlign: 'center', fontSize: 48 }}>🗡️ Cavaleiro esperando...</div>
+      <div style={{ textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}><AppleEmoji emoji="🗡️" size={52} /><span style={{ fontFamily: 'Nunito', fontWeight: 700, fontSize: 18, color: 'var(--text3)' }}>Cavaleiro esperando...</span></div>
     </GameShell>
   );
 }

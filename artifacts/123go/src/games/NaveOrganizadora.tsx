@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { GameShell, useGameEngine, FeedbackOverlay, PhaseCompleteCard } from '../engine/GameEngine';
+import { AppleEmoji } from '../utils/AppleEmoji';
 
 const ALIENS = [
   { emoji: '👽', color: 'green', shape: 'circle', id: 'a1' },
@@ -119,8 +120,8 @@ export function NaveOrganizadora() {
             draggable
             onDragStart={() => setDragging(alien)}
             onClick={() => handleTap(alien)}
-            style={{ width: 60, height: 60, fontSize: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'grab', background: 'var(--bg)', borderRadius: 12, border: '1.5px solid var(--border)', minHeight: 60 }}
-          >{alien.emoji}</div>
+            style={{ width: 60, height: 60, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'grab', background: 'var(--bg)', borderRadius: 12, border: '1.5px solid var(--border)', minHeight: 60 }}
+          ><AppleEmoji emoji={alien.emoji} size={40} /></div>
         ))}
       </div>
 
@@ -136,7 +137,7 @@ export function NaveOrganizadora() {
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, justifyContent: 'center' }}>
               {(placed[comp.key] || []).map((id, i) => {
                 const alien = ALIENS.find(a => a.id === id);
-                return <span key={i} style={{ fontSize: 24 }}>{alien?.emoji}</span>;
+                return alien ? <AppleEmoji key={i} emoji={alien.emoji} size={28} /> : null;
               })}
             </div>
           </div>

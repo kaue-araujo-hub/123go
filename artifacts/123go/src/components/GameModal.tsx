@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { useLocation } from 'wouter';
 import type { Game } from '../data/games';
+import { AppleEmoji } from '../utils/AppleEmoji';
 
 const temaColors: Record<string, string> = {
   numeros: 'var(--c3)',
@@ -91,10 +92,9 @@ export function GameModal({ game, onClose }: GameModalProps) {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontSize: 28,
               flexShrink: 0,
             }}>
-              {game.emoji}
+              <AppleEmoji emoji={game.emoji} size={32} />
             </div>
             <div style={{ flex: 1 }}>
               <h2 id="modal-title" style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 17, color: 'var(--text)', marginBottom: 2 }}>
@@ -168,7 +168,7 @@ export function GameModal({ game, onClose }: GameModalProps) {
               border: '1.5px solid var(--border)',
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-                <span style={{ fontSize: 18 }}>🎮</span>
+                <AppleEmoji emoji="🎮" size={18} />
                 <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--text3)', textTransform: 'uppercase', letterSpacing: '0.08em', margin: 0 }}>
                   Como Jogar
                 </p>
@@ -195,7 +195,7 @@ export function GameModal({ game, onClose }: GameModalProps) {
                 minHeight: 52,
               }}
             >
-              🎮 Jogar agora
+              <AppleEmoji emoji="🎮" size={20} style={{ pointerEvents: 'none' }} /> Jogar agora
             </button>
           </div>
         </div>

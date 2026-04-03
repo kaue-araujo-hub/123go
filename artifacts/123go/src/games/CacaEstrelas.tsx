@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { GameShell, useGameEngine, FeedbackOverlay, PhaseCompleteCard } from '../engine/GameEngine';
+import { AppleEmoji } from '../utils/AppleEmoji';
 
 const PHASES = [
   { flashTime: 2000, stars: 3, options: [2, 3, 5] },
@@ -36,7 +37,7 @@ function StarField({ count, visible }: { count: number; visible: boolean }) {
             animation: 'starTwinkle 0.5s ease-in-out infinite alternate',
             animationDelay: `${i * 0.1}s`,
           }}
-        >⭐</div>
+        ><AppleEmoji emoji="⭐" size={28} /></div>
       ))}
       {!visible && (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'rgba(255,255,255,0.4)', fontSize: 14 }}>

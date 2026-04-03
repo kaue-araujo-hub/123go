@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useLocation } from 'wouter';
 import confetti from 'canvas-confetti';
 import { CountdownOverlay } from '../components/CountdownOverlay';
+import { AppleEmoji } from '../utils/AppleEmoji';
 
 interface PhaseConfig {
   speed: number;
@@ -166,7 +167,7 @@ export function GameShell({ title, emoji, color, currentPhase, totalPhases, chil
               flexShrink: 0,
             }}
           >←</button>
-          <span style={{ fontSize: 20, flexShrink: 0 }}>{emoji}</span>
+          <AppleEmoji emoji={emoji} size={22} style={{ flexShrink: 0 }} />
           <h1 style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 15, color: 'var(--text)', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{title}</h1>
         </div>
 

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { GameShell, useGameEngine, FeedbackOverlay, PhaseCompleteCard } from '../engine/GameEngine';
+import { AppleEmoji } from '../utils/AppleEmoji';
 
 interface Phase {
   topic: string;
@@ -118,7 +119,7 @@ export function PesquisaTurma() {
             return (
               <div key={opt.label} style={{ marginBottom: 8 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 3 }}>
-                  <span style={{ fontSize: 13 }}>{opt.emoji} {opt.label}</span>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 13 }}><AppleEmoji emoji={opt.emoji} size={16} /> {opt.label}</span>
                   <span style={{ fontFamily: 'Nunito', fontWeight: 700, fontSize: 13, color: opt.color }}>{count}</span>
                 </div>
                 <div style={{ background: 'var(--bg)', borderRadius: 6, height: 12, overflow: 'hidden' }}>

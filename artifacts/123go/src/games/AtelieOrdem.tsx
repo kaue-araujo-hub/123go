@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { GameShell, useGameEngine, FeedbackOverlay, PhaseCompleteCard } from '../engine/GameEngine';
+import { AppleEmoji } from '../utils/AppleEmoji';
 
 const PHASES = [
   {
@@ -178,7 +179,7 @@ export function AtelieOrdem() {
               minHeight: 56,
               minWidth: 56,
             }}
-          >{obj.emoji}</div>
+          ><AppleEmoji emoji={obj.emoji} size={36} /></div>
         ))}
         {remaining.length === 0 && (
           <p style={{ color: 'var(--c5)', fontWeight: 700 }}>Tudo organizado!</p>
@@ -209,7 +210,7 @@ export function AtelieOrdem() {
             <span style={{ fontSize: 11, fontWeight: 700, color: drawer.color, textAlign: 'center' }}>{drawer.label}</span>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, justifyContent: 'center' }}>
               {(placed[drawer.key] || []).map((emoji, i) => (
-                <span key={i} style={{ fontSize: 20 }}>{emoji}</span>
+                <AppleEmoji key={i} emoji={emoji} size={24} />
               ))}
             </div>
           </div>
