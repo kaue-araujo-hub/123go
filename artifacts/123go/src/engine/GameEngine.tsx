@@ -724,44 +724,44 @@ function ShareModal({ score, totalPhases, onClose }: ShareModalProps) {
         background: '#fff', borderRadius: 24, width: '100%', maxWidth: 440,
         boxShadow: '0 28px 72px rgba(0,0,0,0.28)', position: 'relative',
         animation: 'shareModalIn 0.28s cubic-bezier(.34,1.56,.64,1)',
-        overflow: 'hidden',
+        maxHeight: '90dvh', overflowY: 'auto',
       }}>
         <button
           onClick={onClose}
           aria-label="Fechar"
           style={{
-            position: 'absolute', top: 14, right: 14, width: 32, height: 32,
-            borderRadius: '50%', border: '1.5px solid var(--border)', background: 'rgba(255,255,255,0.9)',
+            position: 'absolute', top: 12, right: 12, width: 30, height: 30,
+            borderRadius: '50%', border: '1.5px solid rgba(255,255,255,0.4)', background: 'rgba(255,255,255,0.2)',
             cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: 15, color: 'var(--text2)', zIndex: 2,
+            fontSize: 14, color: '#fff', zIndex: 2,
           }}
         >✕</button>
 
         {/* Progress card preview */}
         <div style={{
           background: 'linear-gradient(135deg,#4F46E5,#7C3AED)',
-          padding: '28px 28px 24px',
+          padding: '18px 20px 14px',
           textAlign: 'center',
         }}>
-          <div style={{ fontSize: 13, fontWeight: 800, color: 'rgba(255,255,255,0.7)', letterSpacing: '0.1em', marginBottom: 10, fontFamily: 'Nunito' }}>
+          <div style={{ fontSize: 11, fontWeight: 800, color: 'rgba(255,255,255,0.7)', letterSpacing: '0.1em', marginBottom: 8, fontFamily: 'Nunito' }}>
             123GO! — Plataforma de Matemática
           </div>
-          <div style={{ fontFamily: 'Nunito', fontWeight: 900, fontSize: 20, color: '#fff', marginBottom: 14, lineHeight: 1.3 }}>
+          <div style={{ fontFamily: 'Nunito', fontWeight: 900, fontSize: 17, color: '#fff', marginBottom: 12, lineHeight: 1.3 }}>
             {message}
           </div>
-          <div style={{ background: 'rgba(255,255,255,0.15)', borderRadius: 14, padding: '14px 20px' }}>
-            <div style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 16, color: '#fff', marginBottom: 4 }}>{gameTitle}</div>
-            <div style={{ fontSize: 26, color: '#FBBF24', letterSpacing: 2, marginBottom: 6 }}>{stars}</div>
-            <div style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 18, color: '#fff' }}>
+          <div style={{ background: 'rgba(255,255,255,0.15)', borderRadius: 12, padding: '12px 16px' }}>
+            <div style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 14, color: '#fff', marginBottom: 3 }}>{gameTitle}</div>
+            <div style={{ fontSize: 22, color: '#FBBF24', letterSpacing: 2, marginBottom: 4 }}>{stars}</div>
+            <div style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 16, color: '#fff' }}>
               {score} de {totalPhases} acertos
             </div>
-            <div style={{ fontFamily: 'Nunito', fontSize: 12, color: 'rgba(255,255,255,0.65)', marginTop: 4 }}>{date}</div>
+            <div style={{ fontFamily: 'Nunito', fontSize: 11, color: 'rgba(255,255,255,0.65)', marginTop: 3 }}>{date}</div>
           </div>
         </div>
 
         {/* Bottom section */}
-        <div style={{ padding: '20px 24px 24px' }}>
-          <label style={{ display: 'block', fontFamily: 'Nunito', fontWeight: 700, fontSize: 12, color: 'var(--text3)', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '0.07em' }}>
+        <div style={{ padding: '14px 18px 16px' }}>
+          <label style={{ display: 'block', fontFamily: 'Nunito', fontWeight: 700, fontSize: 11, color: 'var(--text2)', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '0.07em' }}>
             Apelido ou primeiro nome (opcional)
           </label>
           <input
@@ -773,7 +773,7 @@ function ShareModal({ score, totalPhases, onClose }: ShareModalProps) {
             maxLength={20}
             autoComplete="off"
             style={{
-              width: '100%', boxSizing: 'border-box', padding: '11px 14px',
+              width: '100%', boxSizing: 'border-box', padding: '10px 14px',
               borderRadius: 12, border: '1.5px solid var(--border)',
               fontFamily: 'Nunito', fontWeight: 700, fontSize: 15, color: 'var(--text)',
               outline: 'none', marginBottom: 6, background: 'var(--bg)',
@@ -781,8 +781,8 @@ function ShareModal({ score, totalPhases, onClose }: ShareModalProps) {
             onFocus={e => (e.currentTarget.style.borderColor = '#4F46E5')}
             onBlur={e => (e.currentTarget.style.borderColor = 'var(--border)')}
           />
-          <p style={{ fontFamily: 'Nunito', fontSize: 11, color: 'var(--text3)', margin: '0 0 16px', display: 'flex', alignItems: 'center', gap: 4 }}>
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <p style={{ fontFamily: 'Nunito', fontSize: 12, color: 'var(--text2)', margin: '0 0 12px', display: 'flex', alignItems: 'center', gap: 4 }}>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
             Apenas apelido ou primeiro nome para proteger sua privacidade
           </p>
 
@@ -790,7 +790,7 @@ function ShareModal({ score, totalPhases, onClose }: ShareModalProps) {
             onClick={handleShare}
             disabled={loading}
             style={{
-              width: '100%', padding: '14px 0', borderRadius: 'var(--radius-pill)',
+              width: '100%', padding: '13px 0', borderRadius: 'var(--radius-pill)',
               background: shareState === 'done' || shareState === 'copied' ? '#22C55E' : 'linear-gradient(135deg,#4F46E5,#7C3AED)',
               color: '#fff', fontFamily: 'Nunito', fontWeight: 800, fontSize: 15,
               border: 'none', cursor: loading ? 'wait' : 'pointer',
@@ -809,7 +809,7 @@ function ShareModal({ score, totalPhases, onClose }: ShareModalProps) {
             )}
           </button>
 
-          <p style={{ textAlign: 'center', color: 'var(--text3)', fontSize: 11, marginTop: 10, marginBottom: 0 }}>
+          <p style={{ textAlign: 'center', color: 'var(--text2)', fontSize: 12, marginTop: 8, marginBottom: 0 }}>
             Uma imagem com o progresso será gerada para compartilhar
           </p>
         </div>
@@ -859,33 +859,33 @@ export function PhaseCompleteCard({ phase, totalPhases, score, isGameComplete, o
         style={{
           background: '#fff',
           borderRadius: 'var(--radius)',
-          padding: 32,
+          padding: 22,
           textAlign: 'center',
           boxShadow: 'var(--shadow-hover)',
           border: '1.5px solid var(--border)',
         }}
       >
-        <div style={{ marginBottom: 16, lineHeight: 1 }}>
+        <div style={{ marginBottom: 12, lineHeight: 1 }}>
           <AppleEmoji
             emoji={isGameComplete ? '🏆' : '⭐'}
             size={80}
-            className="game-character-alive"
+            className="game-character-idle"
           />
         </div>
-        <h2 className="entry-pop" style={{ fontFamily: 'Nunito', fontWeight: 900, fontSize: 24, color: 'var(--text)', marginBottom: 8 }}>
+        <h2 className="entry-pop" style={{ fontFamily: 'Nunito', fontWeight: 900, fontSize: 22, color: 'var(--text)', marginBottom: 6 }}>
           {isGameComplete ? 'Parabéns! Jogo completo!' : `Fase ${phase} completa!`}
         </h2>
-        <p className="entry-pop" style={{ color: 'var(--text2)', fontSize: 14, marginBottom: 24 }}>
+        <p className="entry-pop" style={{ color: 'var(--text2)', fontSize: 14, marginBottom: 18 }}>
           {isGameComplete
             ? `Você completou todas as ${totalPhases} fases com ${score} acertos!`
             : `Continue para a próxima fase!`}
         </p>
-        <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
           <button
-            className="btn-interactive"
+            className="btn-interactive action-btn"
             onClick={onRestart}
             style={{
-              padding: '12px 24px',
+              padding: '12px 22px',
               borderRadius: 'var(--radius-pill)',
               border: '1.5px solid var(--border)',
               background: '#fff',
@@ -894,17 +894,17 @@ export function PhaseCompleteCard({ phase, totalPhases, score, isGameComplete, o
               fontWeight: 700,
               fontSize: 15,
               cursor: 'pointer',
-              minHeight: 48,
+              minHeight: 52,
             }}
           >
             🔄 Recomeçar
           </button>
           {!isGameComplete && (
             <button
-              className="btn-interactive"
+              className="btn-interactive action-btn"
               onClick={onNext}
               style={{
-                padding: '12px 24px',
+                padding: '12px 22px',
                 borderRadius: 'var(--radius-pill)',
                 border: 'none',
                 background: color,
@@ -913,7 +913,7 @@ export function PhaseCompleteCard({ phase, totalPhases, score, isGameComplete, o
                 fontWeight: 700,
                 fontSize: 15,
                 cursor: 'pointer',
-                minHeight: 48,
+                minHeight: 52,
               }}
             >
               Próxima fase →
@@ -922,10 +922,10 @@ export function PhaseCompleteCard({ phase, totalPhases, score, isGameComplete, o
           {isGameComplete && (
             <>
               <button
-                className="btn-interactive"
+                className="btn-interactive action-btn"
                 onClick={() => setShowShare(true)}
                 style={{
-                  padding: '12px 24px',
+                  padding: '12px 22px',
                   borderRadius: 'var(--radius-pill)',
                   border: 'none',
                   background: 'linear-gradient(135deg,#4F46E5,#7C3AED)',
@@ -934,7 +934,7 @@ export function PhaseCompleteCard({ phase, totalPhases, score, isGameComplete, o
                   fontWeight: 800,
                   fontSize: 15,
                   cursor: 'pointer',
-                  minHeight: 48,
+                  minHeight: 52,
                   display: 'flex',
                   alignItems: 'center',
                   gap: 7,
@@ -947,10 +947,10 @@ export function PhaseCompleteCard({ phase, totalPhases, score, isGameComplete, o
                 Compartilhar
               </button>
               <button
-                className="btn-interactive"
+                className="btn-interactive action-btn"
                 onClick={() => setLocation('/catalog')}
                 style={{
-                  padding: '12px 24px',
+                  padding: '12px 22px',
                   borderRadius: 'var(--radius-pill)',
                   border: 'none',
                   background: color,
@@ -959,7 +959,7 @@ export function PhaseCompleteCard({ phase, totalPhases, score, isGameComplete, o
                   fontWeight: 700,
                   fontSize: 15,
                   cursor: 'pointer',
-                  minHeight: 48,
+                  minHeight: 52,
                 }}
               >
                 Ver outros jogos →

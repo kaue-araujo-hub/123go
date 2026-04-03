@@ -80,8 +80,8 @@ export function RaPuladora() {
       </div>
 
       {/* Frog */}
-      <div style={{ textAlign: 'center', marginBottom: 16, animation: jumping !== null ? 'frogJump 0.4s ease' : 'none' }}>
-        <AppleEmoji emoji="🐸" size={72} style={{ filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.2))' }} />
+      <div style={{ textAlign: 'center', marginBottom: 16, animation: jumping !== null ? 'frogJump 0.4s ease' : undefined }}>
+        <AppleEmoji emoji="🐸" size={96} className={jumping === null ? 'game-character-idle' : ''} />
       </div>
 
       <div style={{ display: 'flex', gap: 16 }}>

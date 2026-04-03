@@ -346,13 +346,39 @@ input {
   will-change: transform;
 }
 
+/* ================================================================
+   IDLE BOUNCE — prominent "alive" animation for main game characters
+   More energetic than floatMini: jump, land, squish, rest
+   ================================================================ */
+@keyframes idleBounce {
+  0%, 100% { transform: translateY(0) scale(1, 1); }
+  20%       { transform: translateY(-12px) scale(0.95, 1.08); }
+  40%       { transform: translateY(0) scale(1.08, 0.94); }
+  55%       { transform: translateY(-5px) scale(0.98, 1.04); }
+  70%       { transform: translateY(0) scale(1, 1); }
+}
+
+.game-character-idle {
+  animation: idleBounce 2.4s cubic-bezier(.36,.07,.19,.97) infinite !important;
+  filter: drop-shadow(0 8px 20px rgba(139, 92, 246, 0.45)) !important;
+  transform-origin: bottom center;
+  will-change: transform;
+}
+
+/* Action buttons in PhaseCompleteCard — override the 96px game rule */
+.game-area button.action-btn {
+  min-height: 52px !important;
+  min-width: auto !important;
+  font-size: 15px !important;
+}
+
 /* Gentle float for every Apple emoji image inside the game area */
 @keyframes floatMini {
-  0%, 100% { transform: translateY(0px); }
-  50%       { transform: translateY(-5px); }
+  0%, 100% { transform: translateY(0px) scale(1); }
+  50%       { transform: translateY(-8px) scale(1.03); }
 }
 .game-area .apple-emoji {
-  animation: floatMini 3.4s ease-in-out infinite;
+  animation: floatMini 2.8s ease-in-out infinite;
   animation-delay: var(--float-delay, 0s);
   will-change: transform;
   transition: transform 0.22s ease, filter 0.22s ease;

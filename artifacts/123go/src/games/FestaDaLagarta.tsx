@@ -108,8 +108,8 @@ export function FestaDaLagarta() {
           gap: 8,
         }}
       >
-        <div style={{ animation: folhasColetadas > 0 ? 'wriggle 0.5s ease' : 'none' }}>
-          <AppleEmoji emoji="🐛" size={96} style={{ filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.2))' }} />
+        <div className={folhasColetadas > 0 ? '' : 'game-character-idle'} style={{ animation: folhasColetadas > 0 ? 'wriggle 0.5s ease' : undefined }}>
+          <AppleEmoji emoji="🐛" size={96} />
         </div>
         <div style={{ display: 'flex', gap: 4 }}>
           {Array.from({ length: folhasColetadas }).map((_, i) => (
