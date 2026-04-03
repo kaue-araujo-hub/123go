@@ -3,6 +3,7 @@ import { useLocation } from 'wouter';
 import confetti from 'canvas-confetti';
 import { CountdownOverlay } from '../components/CountdownOverlay';
 import { AppleEmoji } from '../utils/AppleEmoji';
+import { isMuted, setGlobalMuted, playCorrect, playWrong } from '../utils/sounds';
 
 interface PhaseConfig {
   speed: number;
@@ -82,7 +83,14 @@ export function GameShell({ title, emoji, color, currentPhase, totalPhases, chil
   const [, setLocation] = useLocation();
   const [paused, setPaused] = useState(false);
   const [stopped, setStopped] = useState(false);
-  const [muted, setMuted] = useState(false);
+  const [muted, setMuted] = useState(() => isMuted());
+
+  const toggleMuted = useCallback(() => {
+    setMuted(m => {
+      setGlobalMuted(!m);
+      return !m;
+    });
+  }, []);
 
   /* Countdown state */
   const [countdownKey, setCountdownKey]   = useState(0);
@@ -200,7 +208,7 @@ export function GameShell({ title, emoji, color, currentPhase, totalPhases, chil
 
           {/* Sound toggle */}
           <ControlBtn
-            onClick={() => setMuted(m => !m)}
+            onClick={toggleMuted}
             title={muted ? 'Ativar som' : 'Desativar som'}
             active={!muted}
           >
@@ -257,7 +265,7 @@ export function GameShell({ title, emoji, color, currentPhase, totalPhases, chil
 
         {/* Sound toggle */}
         <ControlBtn
-          onClick={() => setMuted(m => !m)}
+          onClick={toggleMuted}
           title={muted ? 'Ativar som' : 'Desativar som'}
           active={!muted}
         >
@@ -456,6 +464,11 @@ interface FeedbackProps {
 }
 
 export function FeedbackOverlay({ type }: FeedbackProps) {
+  useEffect(() => {
+    if (type === 'correct') playCorrect();
+    else if (type === 'wrong') playWrong();
+  }, [type]);
+
   if (!type) return null;
   return (
     <div style={{
