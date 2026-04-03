@@ -39,6 +39,7 @@ interface GameShellProps {
 function ControlBtn({ onClick, title, children, active = true }: { onClick: () => void; title: string; children: React.ReactNode; active?: boolean }) {
   return (
     <button
+      className="btn-interactive"
       onClick={onClick}
       title={title}
       aria-label={title}
@@ -136,7 +137,7 @@ export function GameShell({ title, emoji, color, currentPhase, totalPhases, chil
   };
 
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--bg)', display: 'flex', flexDirection: 'column' }}>
+    <div className="game-shell-bg" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       {/* 123GO! countdown overlay */}
       {!countdownDone && (
         <CountdownOverlay
@@ -177,7 +178,7 @@ export function GameShell({ title, emoji, color, currentPhase, totalPhases, chil
               flexShrink: 0,
             }}
           >←</button>
-          <AppleEmoji emoji={emoji} size={22} style={{ flexShrink: 0 }} />
+          <AppleEmoji emoji={emoji} size={26} className="game-character-alive" style={{ flexShrink: 0 }} />
           <h1 style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 15, color: 'var(--text)', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{title}</h1>
         </div>
 
@@ -221,7 +222,7 @@ export function GameShell({ title, emoji, color, currentPhase, totalPhases, chil
         {/* RIGHT: score */}
         <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
           {score !== undefined && (
-            <span style={{
+            <span className="entry-pop" style={{
               background: color,
               color: '#fff',
               fontFamily: 'Nunito',
@@ -851,27 +852,35 @@ export function PhaseCompleteCard({ phase, totalPhases, score, isGameComplete, o
           onClose={() => setShowShare(false)}
         />
       )}
-      <div style={{
-        background: '#fff',
-        borderRadius: 'var(--radius)',
-        padding: 32,
-        textAlign: 'center',
-        boxShadow: 'var(--shadow-hover)',
-        border: '1.5px solid var(--border)',
-      }}>
-        <div style={{ fontSize: 64, marginBottom: 16 }}>
-          {isGameComplete ? '🏆' : '⭐'}
+      <div
+        className="entry-pop"
+        style={{
+          background: '#fff',
+          borderRadius: 'var(--radius)',
+          padding: 32,
+          textAlign: 'center',
+          boxShadow: 'var(--shadow-hover)',
+          border: '1.5px solid var(--border)',
+        }}
+      >
+        <div style={{ marginBottom: 16, lineHeight: 1 }}>
+          <AppleEmoji
+            emoji={isGameComplete ? '🏆' : '⭐'}
+            size={80}
+            className="game-character-alive"
+          />
         </div>
-        <h2 style={{ fontFamily: 'Nunito', fontWeight: 900, fontSize: 24, color: 'var(--text)', marginBottom: 8 }}>
+        <h2 className="entry-pop" style={{ fontFamily: 'Nunito', fontWeight: 900, fontSize: 24, color: 'var(--text)', marginBottom: 8 }}>
           {isGameComplete ? 'Parabéns! Jogo completo!' : `Fase ${phase} completa!`}
         </h2>
-        <p style={{ color: 'var(--text2)', fontSize: 14, marginBottom: 24 }}>
+        <p className="entry-pop" style={{ color: 'var(--text2)', fontSize: 14, marginBottom: 24 }}>
           {isGameComplete
             ? `Você completou todas as ${totalPhases} fases com ${score} acertos!`
             : `Continue para a próxima fase!`}
         </p>
         <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
           <button
+            className="btn-interactive"
             onClick={onRestart}
             style={{
               padding: '12px 24px',
@@ -890,6 +899,7 @@ export function PhaseCompleteCard({ phase, totalPhases, score, isGameComplete, o
           </button>
           {!isGameComplete && (
             <button
+              className="btn-interactive"
               onClick={onNext}
               style={{
                 padding: '12px 24px',
@@ -910,6 +920,7 @@ export function PhaseCompleteCard({ phase, totalPhases, score, isGameComplete, o
           {isGameComplete && (
             <>
               <button
+                className="btn-interactive"
                 onClick={() => setShowShare(true)}
                 style={{
                   padding: '12px 24px',
@@ -934,6 +945,7 @@ export function PhaseCompleteCard({ phase, totalPhases, score, isGameComplete, o
                 Compartilhar
               </button>
               <button
+                className="btn-interactive"
                 onClick={() => setLocation('/catalog')}
                 style={{
                   padding: '12px 24px',

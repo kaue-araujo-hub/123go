@@ -284,6 +284,90 @@ input {
   50%       { opacity: 0.45; }
 }
 
+/* ================================================================
+   GAME CHARACTER ALIVE
+   ================================================================ */
+
+.game-character-alive {
+  animation: float 2.5s ease-in-out infinite !important;
+  filter: drop-shadow(0 12px 28px rgba(91,79,207,0.32));
+  will-change: transform;
+}
+
+/* Gentle float for every Apple emoji image inside the game area */
+@keyframes floatMini {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-5px); }
+}
+.game-area .apple-emoji {
+  animation: floatMini 3.4s ease-in-out infinite;
+  animation-delay: var(--float-delay, 0s);
+  will-change: transform;
+  transition: transform 0.22s ease, filter 0.22s ease;
+}
+.game-area .apple-emoji.game-character-alive {
+  animation: float 2.5s ease-in-out infinite !important;
+  filter: drop-shadow(0 12px 28px rgba(91,79,207,0.38));
+}
+
+/* ================================================================
+   ENTRY POP — elements that burst onto screen with impact
+   ================================================================ */
+
+.entry-pop {
+  animation: bounceIn 0.48s cubic-bezier(.36,.07,.19,.97) both;
+  will-change: transform, opacity;
+}
+.entry-pop:nth-child(2) { animation-delay: 0.07s; }
+.entry-pop:nth-child(3) { animation-delay: 0.14s; }
+.entry-pop:nth-child(4) { animation-delay: 0.21s; }
+
+/* ================================================================
+   UNIVERSAL GAME-AREA BUTTON SCALE FEEDBACK
+   Applies to ALL buttons in all 21 games automatically
+   ================================================================ */
+
+.game-area button,
+.game-area [role="button"] {
+  transition: transform 0.15s ease, filter 0.15s ease, box-shadow 0.15s ease !important;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+.game-area button:not(:disabled):hover,
+.game-area [role="button"]:hover {
+  transform: scale(1.07) translateY(-2px) !important;
+  filter: brightness(1.1) !important;
+}
+.game-area button:not(:disabled):active,
+.game-area [role="button"]:active {
+  transform: scale(0.90) !important;
+  filter: brightness(0.88) !important;
+  transition-duration: 0.07s !important;
+}
+
+/* ================================================================
+   ANIMATED GRADIENT GAME SHELL BACKGROUND
+   Subtle living gradient that slowly drifts — 60fps, opacity only
+   ================================================================ */
+
+@keyframes bg-drift {
+  0%, 100% { background-position: 0% 60%; }
+  50%       { background-position: 100% 40%; }
+}
+.game-shell-bg {
+  background: linear-gradient(-45deg, #F7F8FC 0%, #EEF0FA 25%, #F0EDFF 55%, #F7FAFC 80%, #F7F8FC 100%);
+  background-size: 400% 400%;
+  animation: bg-drift 22s ease infinite;
+}
+
+/* ================================================================
+   CATALOG HOMEPAGE — cards bounce in on load
+   ================================================================ */
+
+.catalog-card-entry {
+  animation: bounceIn 0.4s cubic-bezier(.36,.07,.19,.97) both;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
