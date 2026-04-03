@@ -130,7 +130,7 @@ function arrowStyle(): React.CSSProperties {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    minHeight: 60,
+    minHeight: 72,
     minWidth: 60,
     boxShadow: 'var(--shadow)',
     transition: 'transform 0.1s',

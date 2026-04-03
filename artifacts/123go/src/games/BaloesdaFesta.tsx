@@ -106,7 +106,7 @@ export function BaloesdaFesta() {
           fontSize: 18,
           border: 'none',
           cursor: popped >= phaseData.pop ? 'default' : 'pointer',
-          minHeight: 56,
+          minHeight: 72,
         }}
       >
         💥 POP!

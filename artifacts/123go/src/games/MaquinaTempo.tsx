@@ -65,7 +65,7 @@ export function MaquinaTempo() {
       </div>
 
       {/* Selected sequence */}
-      <div style={{ display: 'flex', gap: 8, marginBottom: 20, minHeight: 52, background: '#fff', borderRadius: 14, padding: 12, border: '1.5px solid var(--border)', flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', gap: 8, marginBottom: 20, minHeight: 72, background: '#fff', borderRadius: 14, padding: 12, border: '1.5px solid var(--border)', flexWrap: 'wrap' }}>
         {selected.map((s, i) => (
           <span key={i} style={{
             background: 'var(--c4)',
@@ -97,7 +97,7 @@ export function MaquinaTempo() {
               color: selected.includes(item) ? 'var(--text3)' : 'var(--text)',
               cursor: selected.includes(item) ? 'default' : 'pointer',
               opacity: selected.includes(item) ? 0.5 : 1,
-              minHeight: 48,
+              minHeight: 72,
               transition: 'all 0.15s',
             }}
           >{item}</button>

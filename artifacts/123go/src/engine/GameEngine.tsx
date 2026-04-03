@@ -44,9 +44,9 @@ function ControlBtn({ onClick, title, children, active = true }: { onClick: () =
       title={title}
       aria-label={title}
       style={{
-        width: 34,
-        height: 34,
-        borderRadius: 8,
+        width: 44,
+        height: 44,
+        borderRadius: 10,
         border: '1.5px solid var(--border)',
         background: active ? '#fff' : 'var(--bg)',
         color: active ? 'var(--text)' : 'var(--text3)',
@@ -151,7 +151,7 @@ export function GameShell({ title, emoji, color, currentPhase, totalPhases, chil
         background: '#fff',
         borderBottom: '1px solid var(--border)',
         padding: '0 16px',
-        height: 56,
+        height: 64,
         display: 'flex',
         alignItems: 'center',
         position: 'sticky',
@@ -163,9 +163,10 @@ export function GameShell({ title, emoji, color, currentPhase, totalPhases, chil
           <button
             onClick={() => setLocation('/catalog')}
             aria-label="Voltar ao catálogo"
+            className="btn-interactive"
             style={{
-              width: 36,
-              height: 36,
+              width: 44,
+              height: 44,
               borderRadius: '50%',
               border: '1.5px solid var(--border)',
               background: '#fff',
@@ -173,13 +174,13 @@ export function GameShell({ title, emoji, color, currentPhase, totalPhases, chil
               alignItems: 'center',
               justifyContent: 'center',
               cursor: 'pointer',
-              fontSize: 16,
+              fontSize: 18,
               color: 'var(--text2)',
               flexShrink: 0,
             }}
           >←</button>
           <AppleEmoji emoji={emoji} size={26} className="game-character-alive" style={{ flexShrink: 0 }} />
-          <h1 style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 15, color: 'var(--text)', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{title}</h1>
+          <h1 style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 17, color: 'var(--text)', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{title}</h1>
         </div>
 
         {/* CENTER: playback controls — desktop only */}
@@ -227,10 +228,11 @@ export function GameShell({ title, emoji, color, currentPhase, totalPhases, chil
               color: '#fff',
               fontFamily: 'Nunito',
               fontWeight: 800,
-              fontSize: 13,
-              padding: '4px 12px',
+              fontSize: 16,
+              padding: '6px 16px',
               borderRadius: 'var(--radius-pill)',
               flexShrink: 0,
+              letterSpacing: '0.02em',
             }}>
               ★ {score}
             </span>
@@ -242,11 +244,11 @@ export function GameShell({ title, emoji, color, currentPhase, totalPhases, chil
       <div className="game-controls-mobile" style={{
         background: '#fff',
         borderBottom: '1px solid var(--border)',
-        padding: '8px 16px',
+        padding: '10px 16px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: 10,
+        gap: 12,
       }}>
         <ControlBtn onClick={handlePlay} title="Jogar" active={!isPlaying}>
           <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
@@ -278,7 +280,7 @@ export function GameShell({ title, emoji, color, currentPhase, totalPhases, chil
 
       {/* Progress bar */}
       <div style={{ background: '#fff', padding: '12px 16px', borderBottom: '1px solid var(--border)' }}>
-        <div style={{ display: 'flex', gap: 6, justifyContent: 'center' }}>
+        <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
           {Array.from({ length: totalPhases }).map((_, i) => {
             const phaseNum = i + 1;
             const done = phaseNum < currentPhase;
@@ -287,11 +289,11 @@ export function GameShell({ title, emoji, color, currentPhase, totalPhases, chil
               <div
                 key={i}
                 style={{
-                  width: done || current ? 28 : 22,
-                  height: 12,
-                  borderRadius: 6,
+                  width: done || current ? 36 : 28,
+                  height: 16,
+                  borderRadius: 8,
                   background: done ? color : current ? color : 'var(--border)',
-                  opacity: current ? 1 : done ? 0.8 : 0.4,
+                  opacity: current ? 1 : done ? 0.85 : 0.35,
                   transition: 'all 0.3s ease',
                   animation: current && isPlaying ? 'pulseDot 1.2s ease-in-out infinite' : 'none',
                 }}
@@ -299,13 +301,13 @@ export function GameShell({ title, emoji, color, currentPhase, totalPhases, chil
             );
           })}
         </div>
-        <p style={{ textAlign: 'center', color: 'var(--text3)', fontSize: 11, marginTop: 6, fontWeight: 600 }}>
+        <p style={{ textAlign: 'center', color: 'var(--text2)', fontSize: 14, marginTop: 8, fontWeight: 700 }}>
           Fase {currentPhase} de {totalPhases}
         </p>
       </div>
 
       {/* Game content */}
-      <div className="game-area" style={{ flex: 1, padding: '20px 16px', maxWidth: 700, margin: '0 auto', width: '100%', position: 'relative' }}>
+      <div className="game-area" style={{ flex: 1, padding: '24px 20px', maxWidth: 720, margin: '0 auto', width: '100%', position: 'relative' }}>
         {children}
 
         {/* Paused overlay */}

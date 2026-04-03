@@ -78,7 +78,7 @@ export function ZooTabelas() {
               width: '100%',
               alignItems: 'center',
               transition: 'background 0.15s',
-              minHeight: 52,
+              minHeight: 72,
             }}
           >
             <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><AppleEmoji emoji={animal.emoji} size={22} /> {animal.name}</span>

@@ -176,7 +176,7 @@ export function AtelieOrdem() {
               background: 'var(--bg)',
               borderRadius: 12,
               border: '1.5px solid var(--border)',
-              minHeight: 56,
+              minHeight: 72,
               minWidth: 56,
             }}
           ><AppleEmoji emoji={obj.emoji} size={36} /></div>

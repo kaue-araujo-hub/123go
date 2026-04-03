@@ -63,7 +63,7 @@ export function SolLuaEstrelas() {
         </div>
         <button
           onClick={() => { onCorrect(); onPhaseComplete(); }}
-          style={{ width: '100%', marginTop: 20, padding: 14, borderRadius: 'var(--radius-pill)', background: 'var(--c4)', color: '#fff', fontFamily: 'Nunito', fontWeight: 700, fontSize: 15, border: 'none', cursor: 'pointer', minHeight: 52 }}
+          style={{ width: '100%', marginTop: 20, padding: 14, borderRadius: 'var(--radius-pill)', background: 'var(--c4)', color: '#fff', fontFamily: 'Nunito', fontWeight: 700, fontSize: 15, border: 'none', cursor: 'pointer', minHeight: 72 }}
         >
           ✅ Correto! Próxima fase
         </button>

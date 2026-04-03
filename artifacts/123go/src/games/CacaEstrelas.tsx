@@ -123,7 +123,7 @@ export function CacaEstrelas() {
             fontSize: 14,
             cursor: 'pointer',
             border: 'none',
-            minHeight: 44,
+            minHeight: 72,
           }}
         >
           Mostrar de novo ↺

@@ -63,7 +63,7 @@ export function RaPuladora() {
           </h2>
           <p style={{ color: 'var(--text2)', marginBottom: 20 }}>A rã ficou na dúvida... as duas lagoas têm o mesmo número de flores!</p>
           <button onClick={() => { onCorrect(); onPhaseComplete(); }}
-            style={{ padding: '12px 28px', borderRadius: 'var(--radius-pill)', background: 'var(--c3)', color: '#fff', fontFamily: 'Nunito', fontWeight: 700, fontSize: 15, border: 'none', cursor: 'pointer', minHeight: 48 }}>
+            style={{ padding: '12px 28px', borderRadius: 'var(--radius-pill)', background: 'var(--c3)', color: '#fff', fontFamily: 'Nunito', fontWeight: 700, fontSize: 15, border: 'none', cursor: 'pointer', minHeight: 72 }}>
             Entendi! Próxima fase →
           </button>
         </div>

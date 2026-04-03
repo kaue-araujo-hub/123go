@@ -93,7 +93,7 @@ export function CalendarioVivo() {
       </div>
 
       <button onClick={checkOrder}
-        style={{ width: '100%', padding: 14, borderRadius: 'var(--radius-pill)', background: 'var(--c4)', color: '#fff', fontFamily: 'Nunito', fontWeight: 800, fontSize: 16, border: 'none', cursor: 'pointer', minHeight: 52 }}>
+        style={{ width: '100%', padding: 14, borderRadius: 'var(--radius-pill)', background: 'var(--c4)', color: '#fff', fontFamily: 'Nunito', fontWeight: 800, fontSize: 16, border: 'none', cursor: 'pointer', minHeight: 72 }}>
         ✅ Verificar ordem
       </button>
     </GameShell>

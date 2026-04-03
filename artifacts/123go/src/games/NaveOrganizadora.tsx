@@ -120,7 +120,7 @@ export function NaveOrganizadora() {
             draggable
             onDragStart={() => setDragging(alien)}
             onClick={() => handleTap(alien)}
-            style={{ width: 60, height: 60, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'grab', background: 'var(--bg)', borderRadius: 12, border: '1.5px solid var(--border)', minHeight: 60 }}
+            style={{ width: 60, height: 60, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'grab', background: 'var(--bg)', borderRadius: 12, border: '1.5px solid var(--border)', minHeight: 72 }}
           ><AppleEmoji emoji={alien.emoji} size={40} /></div>
         ))}
       </div>
