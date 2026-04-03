@@ -84,34 +84,50 @@ export function RaPuladora() {
         <AppleEmoji emoji="🐸" size={96} className={jumping === null ? 'game-character-idle' : ''} />
       </div>
 
-      <div style={{ display: 'flex', gap: 16 }}>
-        {phaseData.lagoas.map((lagoa, idx) => (
-          <button
-            key={idx}
-            onClick={() => handleJump(idx)}
-            style={{
-              flex: 1,
-              padding: 16,
-              borderRadius: 20,
-              border: '3px solid #81C784',
-              background: '#E8F5E9',
-              cursor: 'pointer',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              gap: 6,
-              minHeight: 120,
-              transition: 'transform 0.2s',
-            }}
-          >
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 2, justifyContent: 'center', maxWidth: 100 }}>
-              {Array.from({ length: Math.min(lagoa.count, 20) }).map((_, i) => (
-                <AppleEmoji key={i} emoji="🌸" size={14} />
-              ))}
-            </div>
-            <span style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 24, color: '#2E7D32' }}>{lagoa.count}</span>
-          </button>
-        ))}
+      <div style={{ display: 'flex', gap: 12 }}>
+        {phaseData.lagoas.map((lagoa, idx) => {
+          const VISIBLE_CAP = 15;
+          const visible = Math.min(lagoa.count, VISIBLE_CAP);
+          const extra   = lagoa.count - visible;
+          return (
+            <button
+              key={idx}
+              onClick={() => handleJump(idx)}
+              style={{
+                flex: 1,
+                padding: '12px 8px',
+                borderRadius: 20,
+                border: '3px solid #81C784',
+                background: '#E8F5E9',
+                cursor: 'pointer',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: 8,
+                minHeight: 100,
+                transition: 'transform 0.15s',
+              }}
+            >
+              {/* Compact grid: 4 cols × auto rows */}
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(4, auto)',
+                gap: 3,
+                justifyContent: 'center',
+              }}>
+                {Array.from({ length: visible }).map((_, i) => (
+                  <AppleEmoji key={i} emoji="🌸" size={13} />
+                ))}
+              </div>
+              {extra > 0 && (
+                <span style={{ fontFamily: 'Nunito', fontSize: 11, color: '#4CAF50', fontWeight: 700 }}>+{extra}</span>
+              )}
+              <span style={{ fontFamily: 'Nunito', fontWeight: 900, fontSize: 26, color: '#2E7D32', lineHeight: 1 }}>
+                {lagoa.count}
+              </span>
+            </button>
+          );
+        })}
       </div>
 
       <style>{`
