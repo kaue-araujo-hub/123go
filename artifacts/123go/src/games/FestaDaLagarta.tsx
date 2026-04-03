@@ -67,17 +67,17 @@ export function FestaDaLagarta() {
     <GameShell title="Festa da Lagarta" emoji="🐛" color="var(--c5)" currentPhase={phase} totalPhases={5} score={score} onRestart={restart}>
       <FeedbackOverlay type={feedback} />
 
-      <div style={{ textAlign: 'center', marginBottom: 24 }}>
+      <div style={{ textAlign: 'center', marginBottom: 10 }}>
         <p style={{ fontFamily: 'Nunito', fontWeight: 700, fontSize: 16, color: 'var(--text)' }}>
           {phaseData.label}
         </p>
-        <p style={{ color: 'var(--text2)', fontSize: 14, marginTop: 4 }}>
+        <p style={{ color: 'var(--text2)', fontSize: 14, marginTop: 2 }}>
           Folhas coletadas: <strong>{folhasColetadas}</strong> / {phaseData.target}
         </p>
       </div>
 
       {/* Progress bar inside game */}
-      <div style={{ background: 'var(--border)', borderRadius: 8, height: 12, marginBottom: 24, overflow: 'hidden' }}>
+      <div style={{ background: 'var(--border)', borderRadius: 8, height: 12, marginBottom: 12, overflow: 'hidden' }}>
         <div style={{
           height: '100%',
           background: 'var(--c5)',
@@ -98,9 +98,9 @@ export function FestaDaLagarta() {
           borderRadius: 20,
           padding: 20,
           textAlign: 'center',
-          marginBottom: 24,
+          marginBottom: 12,
           transition: 'all 0.2s ease',
-          minHeight: 120,
+          minHeight: 140,
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
@@ -109,7 +109,7 @@ export function FestaDaLagarta() {
         }}
       >
         <div style={{ animation: folhasColetadas > 0 ? 'wriggle 0.5s ease' : 'none' }}>
-          <AppleEmoji emoji="🐛" size={72} style={{ filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.2))' }} />
+          <AppleEmoji emoji="🐛" size={96} style={{ filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.2))' }} />
         </div>
         <div style={{ display: 'flex', gap: 4 }}>
           {Array.from({ length: folhasColetadas }).map((_, i) => (
@@ -122,7 +122,7 @@ export function FestaDaLagarta() {
       </div>
 
       {/* Leaves */}
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, justifyContent: 'center' }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, justifyContent: 'center' }}>
         {leaves.filter(l => !l.collected).map(leaf => (
           <div
             key={leaf.id}
@@ -130,19 +130,19 @@ export function FestaDaLagarta() {
             onDragStart={() => handleDragStart(leaf.id)}
             onClick={() => handleTap(leaf.id)}
             style={{
-              width: 64,
-              height: 64,
-              borderRadius: 12,
+              width: 90,
+              height: 90,
+              borderRadius: 18,
               background: leaf.color,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontSize: 32,
+              fontSize: 52,
               cursor: 'grab',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
               transition: 'transform 0.1s ease',
-              minHeight: 64,
-              minWidth: 64,
+              minHeight: 90,
+              minWidth: 90,
             }}
           >
             🍃

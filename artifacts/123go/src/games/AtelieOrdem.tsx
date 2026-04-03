@@ -168,17 +168,18 @@ export function AtelieOrdem() {
             onDragStart={() => setDragging(obj)}
             onClick={() => handleTap(obj.emoji, obj.attr)}
             style={{
-              width: 72,
-              height: 72,
+              width: 100,
+              height: 100,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               cursor: 'grab',
               background: 'var(--bg)',
-              borderRadius: 14,
-              border: '1.5px solid var(--border)',
+              borderRadius: 18,
+              border: '2px solid var(--border)',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
             }}
-          ><AppleEmoji emoji={obj.emoji} size={46} /></div>
+          ><AppleEmoji emoji={obj.emoji} size={66} /></div>
         ))}
         {remaining.length === 0 && (
           <p style={{ color: 'var(--c5)', fontWeight: 700, margin: 0 }}>✅ Tudo organizado!</p>

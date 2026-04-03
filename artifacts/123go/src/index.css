@@ -289,13 +289,18 @@ input {
    Apple HIG + Material Design minimum: 44px. Children's target: 64px+
    ================================================================ */
 
-/* 1. Minimum 64px touch target — guaranteed on ALL buttons in ALL games */
+/* 1. Minimum touch target — ALL game buttons get 96px minimum height */
 .game-area button {
-  min-height: 64px !important;
-  font-size: clamp(16px, 2.2vw, 20px) !important;
+  min-height: 96px !important;
   font-family: 'Nunito', sans-serif !important;
   font-weight: 800 !important;
   letter-spacing: 0.01em;
+}
+
+/* Emojis inside game buttons: scale up proportionally */
+.game-area button img.apple-emoji {
+  width: 56px !important;
+  height: 56px !important;
 }
 
 /* 2. Game headings — readable at arm's length on mobile */

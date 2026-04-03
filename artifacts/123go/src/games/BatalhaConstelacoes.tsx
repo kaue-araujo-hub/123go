@@ -102,18 +102,18 @@ export function BatalhaConstelacoes() {
             key={val}
             onClick={() => handleAnswer(val)}
             style={{
-              width: 80,
-              height: 80,
-              borderRadius: 20,
+              width: 110,
+              height: 110,
+              borderRadius: 24,
               background: '#fff',
-              border: '2px solid var(--border)',
+              border: '3px solid var(--border)',
               fontFamily: 'Nunito',
               fontWeight: 900,
-              fontSize: 32,
+              fontSize: 48,
               color: 'var(--text)',
               cursor: 'pointer',
-              minHeight: 80,
-              minWidth: 80,
+              minHeight: 110,
+              minWidth: 110,
               boxShadow: 'var(--shadow)',
               transition: 'all 0.15s',
             }}

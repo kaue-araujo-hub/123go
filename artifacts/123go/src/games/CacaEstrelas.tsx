@@ -97,8 +97,8 @@ export function CacaEstrelas() {
   return (
     <GameShell title="Caça Estrelas" emoji="⭐" color="var(--c3)" currentPhase={phase} totalPhases={5} score={score} onRestart={restart}>
       <FeedbackOverlay type={feedback} />
-      <div style={{ textAlign: 'center', marginBottom: 16 }}>
-        <h2 style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 18, color: 'var(--text)', marginBottom: 6 }}>
+      <div style={{ textAlign: 'center', marginBottom: 8 }}>
+        <h2 style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 18, color: 'var(--text)', marginBottom: 4 }}>
           Memorize e conte as estrelas!
         </h2>
         <p style={{ color: 'var(--text2)', fontSize: 13 }}>
@@ -130,24 +130,24 @@ export function CacaEstrelas() {
         </button>
       )}
 
-      <div style={{ display: 'flex', gap: 12, justifyContent: 'center', marginTop: 16 }}>
+      <div style={{ display: 'flex', gap: 14, justifyContent: 'center', marginTop: 12 }}>
         {phaseData.options.map(opt => (
           <button
             key={opt}
             onClick={() => handleAnswer(opt)}
             style={{
-              width: 80,
-              height: 80,
-              borderRadius: 20,
-              border: '2px solid var(--border)',
+              width: 110,
+              height: 110,
+              borderRadius: 24,
+              border: '3px solid var(--border)',
               background: '#fff',
               fontFamily: 'Nunito',
               fontWeight: 900,
-              fontSize: 32,
+              fontSize: 52,
               color: 'var(--text)',
               cursor: 'pointer',
-              minHeight: 80,
-              minWidth: 80,
+              minHeight: 110,
+              minWidth: 110,
               transition: 'all 0.15s ease',
             }}
           >

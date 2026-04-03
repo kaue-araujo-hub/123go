@@ -49,8 +49,8 @@ export function ParOuImpar() {
     <GameShell title="Par ou Ímpar?" emoji="🧦" color="var(--c3)" currentPhase={phase} totalPhases={5} score={score} onRestart={restart}>
       <FeedbackOverlay type={feedback} />
 
-      <div style={{ textAlign: 'center', marginBottom: 28 }}>
-        <h2 style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 20, color: 'var(--text)', marginBottom: 8 }}>
+      <div style={{ textAlign: 'center', marginBottom: 10 }}>
+        <h2 style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 20, color: 'var(--text)', marginBottom: 4 }}>
           Toque no item que ficou sozinho!
         </h2>
         <p style={{ color: 'var(--text2)', fontSize: 14 }}>Tema: {phaseData.theme}</p>
@@ -59,9 +59,9 @@ export function ParOuImpar() {
       <div style={{
         display: 'flex',
         flexWrap: 'wrap',
-        gap: 12,
+        gap: 10,
         justifyContent: 'center',
-        padding: 16,
+        padding: 12,
         background: '#fff',
         borderRadius: 'var(--radius)',
         border: '1.5px solid var(--border)',
@@ -71,21 +71,21 @@ export function ParOuImpar() {
             key={idx}
             onClick={() => handleTap(idx)}
             style={{
-              width: 72,
-              height: 72,
-              borderRadius: 16,
-              border: '2px solid var(--border)',
+              width: 96,
+              height: 96,
+              borderRadius: 20,
+              border: '2.5px solid var(--border)',
               background: phaseData.singles.includes(idx) && answered ? '#E8F5E9' : '#fff',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               cursor: 'pointer',
               transition: 'all 0.2s ease',
-              minHeight: 72,
-              minWidth: 72,
+              minHeight: 96,
+              minWidth: 96,
             }}
           >
-            <AppleEmoji emoji={item} size={40} />
+            <AppleEmoji emoji={item} size={62} />
           </button>
         ))}
       </div>

@@ -121,22 +121,22 @@ export function TremDosNumeros() {
             onDragStart={() => setDraggingVal(val)}
             onClick={() => handleTap(val)}
             style={{
-              width: 72,
-              height: 72,
-              borderRadius: 16,
+              width: 96,
+              height: 96,
+              borderRadius: 20,
               background: '#fff',
-              border: '2px solid var(--border)',
+              border: '2.5px solid var(--border)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               fontFamily: 'Nunito',
               fontWeight: 900,
-              fontSize: 32,
+              fontSize: 48,
               color: 'var(--text)',
               cursor: 'grab',
               boxShadow: 'var(--shadow)',
-              minHeight: 72,
-              minWidth: 72,
+              minHeight: 96,
+              minWidth: 96,
               transition: 'all 0.15s',
             }}
           >{val}</div>
