@@ -25,6 +25,14 @@ export function SorveteriaDados() {
 
   useEffect(() => { setAnswered(false); setFeedback(null); }, [phase]);
 
+  if (phaseComplete || !phaseData) {
+    return (
+      <GameShell title="Sorveteria dos Dados" emoji="🍦" color="var(--c5)" currentPhase={phase} totalPhases={5} score={score} onRestart={restart}>
+        <PhaseCompleteCard phase={phase} totalPhases={5} score={score} isGameComplete={gameComplete} onNext={nextPhase} onRestart={restart} color="var(--c5)" />
+      </GameShell>
+    );
+  }
+
   const displayFlavors = phaseData.compare
     ? phaseData.compare.map(i => FLAVORS[i])
     : FLAVORS;
@@ -42,14 +50,6 @@ export function SorveteriaDados() {
       setTimeout(() => { setFeedback(null); setAnswered(false); }, 800);
     }
   };
-
-  if (phaseComplete) {
-    return (
-      <GameShell title="Sorveteria dos Dados" emoji="🍦" color="var(--c5)" currentPhase={phase} totalPhases={5} score={score} onRestart={restart}>
-        <PhaseCompleteCard phase={phase} totalPhases={5} score={score} isGameComplete={gameComplete} onNext={nextPhase} onRestart={restart} color="var(--c5)" />
-      </GameShell>
-    );
-  }
 
   return (
     <GameShell title="Sorveteria dos Dados" emoji="🍦" color="var(--c5)" currentPhase={phase} totalPhases={5} score={score} onRestart={restart}>

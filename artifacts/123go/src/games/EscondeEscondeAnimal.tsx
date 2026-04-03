@@ -20,10 +20,19 @@ export function EscondeEscondeAnimal() {
   const phaseData = PHASES[phase - 1];
 
   useEffect(() => {
+    if (!phaseData) return;
     setAnswered(false);
     setFeedback(null);
     setCurrentPosition(Math.floor(Math.random() * phaseData.positions.length));
   }, [phase]);
+
+  if (phaseComplete || !phaseData) {
+    return (
+      <GameShell title="Esconde-esconde Animal" emoji="🦊" color="var(--c1)" currentPhase={phase} totalPhases={5} score={score} onRestart={restart}>
+        <PhaseCompleteCard phase={phase} totalPhases={5} score={score} isGameComplete={gameComplete} onNext={nextPhase} onRestart={restart} color="var(--c1)" />
+      </GameShell>
+    );
+  }
 
   const correctPos = phaseData.positions[currentPosition];
 
@@ -39,14 +48,6 @@ export function EscondeEscondeAnimal() {
       setTimeout(() => { setFeedback(null); setAnswered(false); }, 800);
     }
   };
-
-  if (phaseComplete) {
-    return (
-      <GameShell title="Esconde-esconde Animal" emoji="🦊" color="var(--c1)" currentPhase={phase} totalPhases={5} score={score} onRestart={restart}>
-        <PhaseCompleteCard phase={phase} totalPhases={5} score={score} isGameComplete={gameComplete} onNext={nextPhase} onRestart={restart} color="var(--c1)" />
-      </GameShell>
-    );
-  }
 
   return (
     <GameShell title="Esconde-esconde Animal" emoji="🦊" color="var(--c1)" currentPhase={phase} totalPhases={5} score={score} onRestart={restart}>

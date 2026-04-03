@@ -18,7 +18,17 @@ export function BatalhaConstelacoes() {
 
   useEffect(() => { setOpIdx(0); setFeedback(null); setAnswer(''); }, [phase]);
 
+  if (phaseComplete || !phaseData) {
+    return (
+      <GameShell title="Batalha de Constelações" emoji="🌌" color="var(--c3)" currentPhase={phase} totalPhases={5} score={score} onRestart={restart}>
+        <PhaseCompleteCard phase={phase} totalPhases={5} score={score} isGameComplete={gameComplete} onNext={nextPhase} onRestart={restart} color="var(--c3)" />
+      </GameShell>
+    );
+  }
+
   const currentOp = phaseData.ops[opIdx];
+  if (!currentOp) return null;
+
   const options = [currentOp.ans - 1, currentOp.ans, currentOp.ans + 2].sort(() => Math.random() - 0.5);
 
   const handleAnswer = (val: number) => {
@@ -38,14 +48,6 @@ export function BatalhaConstelacoes() {
       setTimeout(() => setFeedback(null), 800);
     }
   };
-
-  if (phaseComplete) {
-    return (
-      <GameShell title="Batalha de Constelações" emoji="🌌" color="var(--c3)" currentPhase={phase} totalPhases={5} score={score} onRestart={restart}>
-        <PhaseCompleteCard phase={phase} totalPhases={5} score={score} isGameComplete={gameComplete} onNext={nextPhase} onRestart={restart} color="var(--c3)" />
-      </GameShell>
-    );
-  }
 
   return (
     <GameShell title="Batalha de Constelações" emoji="🌌" color="var(--c3)" currentPhase={phase} totalPhases={5} score={score} onRestart={restart}>

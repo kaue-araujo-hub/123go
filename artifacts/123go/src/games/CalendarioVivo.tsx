@@ -27,7 +27,7 @@ export function CalendarioVivo() {
   const phaseData = PHASES[phase - 1];
 
   useEffect(() => {
-    // Shuffle the days
+    if (!phaseData) return;
     setOrder([...phaseData.days].sort(() => Math.random() - 0.5));
     setFeedback(null);
   }, [phase]);

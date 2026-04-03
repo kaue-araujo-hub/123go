@@ -19,11 +19,13 @@ export function RoboPerdido() {
   const phaseData = PHASES[phase - 1];
 
   useEffect(() => {
+    if (!phaseData) return;
     setRobotPos([...phaseData.robotStart]);
     setFeedback(null);
   }, [phase]);
 
   useEffect(() => {
+    if (!phaseData) return;
     if (robotPos[0] === phaseData.goal[0] && robotPos[1] === phaseData.goal[1]) {
       setFeedback('correct');
       onCorrect();
