@@ -4,6 +4,7 @@ import confetti from 'canvas-confetti';
 import { CountdownOverlay } from '../components/CountdownOverlay';
 import { AppleEmoji } from '../utils/AppleEmoji';
 import { isMuted, setGlobalMuted, playCorrect, playWrong } from '../utils/sounds';
+import { burstParticles } from '../utils/particles';
 import { games } from '../data/games';
 
 interface PhaseConfig {
@@ -303,7 +304,7 @@ export function GameShell({ title, emoji, color, currentPhase, totalPhases, chil
       </div>
 
       {/* Game content */}
-      <div style={{ flex: 1, padding: '20px 16px', maxWidth: 700, margin: '0 auto', width: '100%', position: 'relative' }}>
+      <div className="game-area" style={{ flex: 1, padding: '20px 16px', maxWidth: 700, margin: '0 auto', width: '100%', position: 'relative' }}>
         {children}
 
         {/* Paused overlay */}
@@ -410,16 +411,6 @@ export function GameShell({ title, emoji, color, currentPhase, totalPhases, chil
           0%, 100% { opacity: 1; }
           50% { opacity: 0.5; }
         }
-        /* Desktop: show centered controls in header, hide mobile bar */
-        @media (min-width: 600px) {
-          .game-controls-mobile  { display: none !important; }
-          .game-controls-desktop { display: flex !important; }
-        }
-        /* Mobile: hide centered controls in header, show bar below */
-        @media (max-width: 599px) {
-          .game-controls-desktop { display: none !important; }
-          .game-controls-mobile  { display: flex !important; }
-        }
       `}</style>
     </div>
   );
@@ -466,32 +457,68 @@ interface FeedbackProps {
 
 export function FeedbackOverlay({ type }: FeedbackProps) {
   useEffect(() => {
-    if (type === 'correct') playCorrect();
-    else if (type === 'wrong') playWrong();
+    if (type === 'correct') {
+      playCorrect();
+      burstParticles(window.innerWidth / 2, window.innerHeight / 2, 22);
+    } else if (type === 'wrong') {
+      playWrong();
+    }
   }, [type]);
 
   if (!type) return null;
+
+  const isCorrect = type === 'correct';
+
   return (
-    <div style={{
-      position: 'fixed',
-      top: '50%',
-      left: '50%',
-      transform: 'translate(-50%, -50%)',
-      fontSize: 80,
-      zIndex: 500,
-      animation: 'feedbackPop 0.6s ease-out forwards',
-      pointerEvents: 'none',
-    }}>
-      {type === 'correct' ? '✅' : '❌'}
+    <>
+      {/* Screen flash */}
+      <div style={{
+        position: 'fixed',
+        inset: 0,
+        background: isCorrect ? '#22C55E' : '#EF4444',
+        zIndex: 498,
+        pointerEvents: 'none',
+        animation: isCorrect ? 'flash-correct 0.5s ease-out forwards' : 'flash-wrong 0.45s ease-out forwards',
+      }} />
+
+      {/* Main emoji */}
+      <div style={{
+        position: 'fixed',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        fontSize: 90,
+        zIndex: 500,
+        animation: isCorrect
+          ? 'feedbackBounce 0.65s cubic-bezier(.36,.07,.19,.97) forwards'
+          : 'feedbackShake 0.55s ease-in-out forwards',
+        pointerEvents: 'none',
+        lineHeight: 1,
+      }}>
+        {isCorrect ? '✅' : '❌'}
+      </div>
+
       <style>{`
-        @keyframes feedbackPop {
-          0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
-          30% { opacity: 1; transform: translate(-50%, -50%) scale(1.3); }
-          70% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-          100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+        @keyframes feedbackBounce {
+          0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.3); }
+          40%  { opacity: 1; transform: translate(-50%, -50%) scale(1.45); }
+          65%  { transform: translate(-50%, -50%) scale(0.88); }
+          82%  { opacity: 1; transform: translate(-50%, -50%) scale(1.12); }
+          100% { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+        }
+        @keyframes feedbackShake {
+          0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+          12%  { opacity: 1; transform: translate(calc(-50% - 14px), -50%) scale(1.15) rotate(-6deg); }
+          24%  { transform: translate(calc(-50% + 14px), -50%) scale(1.15) rotate(6deg); }
+          36%  { transform: translate(calc(-50% - 10px), -50%) scale(1.05) rotate(-3deg); }
+          48%  { transform: translate(calc(-50% + 10px), -50%) scale(1.05) rotate(3deg); }
+          60%  { transform: translate(calc(-50% - 5px), -50%) scale(1); }
+          72%  { transform: translate(calc(-50% + 5px), -50%) scale(1); }
+          85%  { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+          100% { opacity: 0; transform: translate(-50%, -50%) scale(0.85); }
         }
       `}</style>
-    </div>
+    </>
   );
 }
 

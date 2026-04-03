@@ -194,6 +194,7 @@ export function GameModal({ game, onClose }: GameModalProps) {
                 border: 'none',
                 minHeight: 52,
               }}
+              className="btn-interactive"
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style={{ pointerEvents: 'none', flexShrink: 0, marginRight: 6, verticalAlign: 'middle' }}><polygon points="5,3 19,12 5,21"/></svg>Jogar agora
             </button>

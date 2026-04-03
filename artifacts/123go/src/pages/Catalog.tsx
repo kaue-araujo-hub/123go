@@ -219,7 +219,7 @@ export function Catalog() {
                     gap: 16,
                     marginBottom: 8,
                   }}
-                  className="games-grid"
+                  className="games-grid stagger-grid"
                 >
                   {pagedGames.map(game => (
                     <GameCard key={game.id} game={game} onInfo={setSelectedGame} />

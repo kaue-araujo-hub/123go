@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useLocation } from 'wouter';
 import type { Game } from '../data/games';
 import { AppleEmoji } from '../utils/AppleEmoji';
@@ -25,6 +25,8 @@ const periodoLabels: Record<number, string> = {
   3: '3º Bimestre',
 };
 
+const FLOAT_DELAYS = ['0s','0.4s','0.8s','1.2s','1.6s','2s','0.2s','0.6s','1s','1.4s'];
+
 interface GameCardProps {
   game: Game;
   onInfo: (game: Game) => void;
@@ -32,31 +34,20 @@ interface GameCardProps {
 
 export function GameCard({ game, onInfo }: GameCardProps) {
   const [, setLocation] = useLocation();
-  const [hovered, setHovered] = useState(false);
+  const floatDelay = FLOAT_DELAYS[(game.id as number) % FLOAT_DELAYS.length] ?? '0s';
 
-  const handleCardClick = (e: React.MouseEvent) => {
-    // Navigate to game
-    setLocation(game.path);
-  };
-
-  const handleInfoClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    onInfo(game);
-  };
+  const handleCardClick = () => setLocation(game.path);
+  const handleInfoClick = (e: React.MouseEvent) => { e.stopPropagation(); onInfo(game); };
 
   return (
     <div
       onClick={handleCardClick}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
+      className="card-interactive"
       style={{
         background: '#fff',
         borderRadius: 'var(--radius)',
-        border: hovered ? '1.5px solid var(--border)' : '1.5px solid var(--border)',
-        boxShadow: hovered ? 'var(--shadow-hover)' : 'var(--shadow)',
-        transform: hovered ? 'translateY(-2px)' : 'translateY(0)',
-        transition: 'all 0.2s ease',
-        cursor: 'pointer',
+        border: '1.5px solid var(--border)',
+        boxShadow: 'var(--shadow)',
         overflow: 'hidden',
         position: 'relative',
       }}
@@ -111,6 +102,7 @@ export function GameCard({ game, onInfo }: GameCardProps) {
       <button
         onClick={handleInfoClick}
         aria-label={`Informações sobre ${game.title}`}
+        className="btn-interactive"
         style={{
           position: 'absolute',
           top: 10,
@@ -124,7 +116,6 @@ export function GameCard({ game, onInfo }: GameCardProps) {
           alignItems: 'center',
           justifyContent: 'center',
           zIndex: 3,
-          cursor: 'pointer',
           fontSize: 12,
           fontWeight: 700,
           color: 'var(--text2)',
@@ -140,12 +131,16 @@ export function GameCard({ game, onInfo }: GameCardProps) {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
+        overflow: 'hidden',
       }}>
         <AppleEmoji
           emoji={game.emoji}
           size={72}
           className="card-emoji"
-          style={{ filter: 'drop-shadow(0 6px 16px rgba(0,0,0,0.18))', transition: 'transform 0.2s ease, filter 0.2s ease' }}
+          style={{
+            filter: 'drop-shadow(0 6px 16px rgba(0,0,0,0.18))',
+            '--float-delay': floatDelay,
+          } as React.CSSProperties}
         />
       </div>
 
@@ -173,6 +168,7 @@ export function GameCard({ game, onInfo }: GameCardProps) {
         {/* Play button */}
         <button
           onClick={handleCardClick}
+          className="btn-interactive"
           style={{
             width: '100%',
             padding: '10px 0',
@@ -183,16 +179,12 @@ export function GameCard({ game, onInfo }: GameCardProps) {
             fontWeight: 800,
             fontSize: 14,
             border: 'none',
-            cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             gap: 6,
             minHeight: 40,
-            transition: 'opacity 0.15s ease',
           }}
-          onMouseEnter={e => (e.currentTarget.style.opacity = '0.88')}
-          onMouseLeave={e => (e.currentTarget.style.opacity = '1')}
         >
           <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" style={{ pointerEvents: 'none', flexShrink: 0 }}><polygon points="5,3 19,12 5,21"/></svg> Jogar
         </button>

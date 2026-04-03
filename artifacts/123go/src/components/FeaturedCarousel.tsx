@@ -242,8 +242,7 @@ function FeaturedCard({
             cursor: 'pointer',
             transition: 'opacity 0.15s',
           }}
-          onMouseEnter={e => (e.currentTarget.style.opacity = '0.88')}
-          onMouseLeave={e => (e.currentTarget.style.opacity = '1')}
+          className="btn-interactive"
         >
           ▶ Jogar
         </button>
