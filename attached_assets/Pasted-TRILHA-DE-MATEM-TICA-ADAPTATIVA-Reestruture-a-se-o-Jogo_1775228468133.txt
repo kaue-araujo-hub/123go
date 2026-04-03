@@ -1,0 +1,48 @@
+TRILHA DE MATEMÁTICA ADAPTATIVA
+"Reestruture a seção 'Jogos mais jogados' para o novo sistema de Trilha de Matemática e implemente a lógica adaptativa de fases. Siga estas diretrizes:
+
+1. Nova UI de Trilha (Substituição do Carrossel):
+
+Substitua o carrossel de 5 jogos por uma seção fixa com 5 Cards Grandes e Coloridos, representando as unidades temáticas:
+
+Números 🔢 | Álgebra ➗ | Geometria 📐 | Grandezas e Medidas ⚖️ | Probabilidade e Estatística 📊
+
+Cada card deve ter um design convidativo, ícones grandes e uma barra de progresso visual da trilha.
+
+2. Lógica de Progressão Adaptativa (Engine do Jogo):
+
+Ao clicar em uma unidade, o sistema deve carregar uma Trilha Dinâmica baseada no desempenho:
+
+Base (Obrigatório): Sequência de 3 jogos (1. Conceito Básico -> 2. Aplicação -> 3. Problema Simples).
+
+Caminho de Reforço (Jogo 4): Se o usuário tiver erros frequentes nos jogos 1 a 3, libere automaticamente um jogo de reforço focado na dificuldade detectada.
+
+Caminho de Desafio (Jogo 5): Se o usuário acertar tudo rapidamente (alta performance), libere um jogo de 'Desafio Expert'.
+
+3. Estrutura de Conteúdo (Exemplo Geometria):
+
+Configure a trilha para seguir a hierarquia:
+
+Jogo 1: Identificar e nomear formas.
+
+Jogo 2: Reconhecer formas no cotidiano.
+
+Jogo 3: Resolver situações-problema simples.
+
+Aplique essa mesma estrutura lógica para as outras 4 unidades temáticas.
+
+4. Modal de Compartilhamento Personalizado:
+
+Ao final de cada trilha concluída, exiba um Modal de Sucesso que varia conforme a pontuação:
+
+Excelente: 'Mestre da Geometria! Você completou o desafio!'
+
+Bom: 'Muito bem! Você dominou o básico, continue praticando!'
+
+O modal deve conter um botão de 'Compartilhar Progresso' (corrigindo o layout para mobile) e uma lista das habilidades conquistadas.
+
+5. Performance e Mobile:
+
+Garanta que a transição entre os jogos da trilha seja fluida, sem recarregar a página, mantendo o estado do progresso do aluno.
+
+Implemente essa estrutura de Trilha Adaptativa agora, priorizando a lógica de liberação dos jogos 4 e 5."
