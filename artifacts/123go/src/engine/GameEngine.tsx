@@ -4,6 +4,7 @@ import confetti from 'canvas-confetti';
 import { CountdownOverlay } from '../components/CountdownOverlay';
 import { AppleEmoji } from '../utils/AppleEmoji';
 import { isMuted, setGlobalMuted, playCorrect, playWrong } from '../utils/sounds';
+import { games } from '../data/games';
 
 interface PhaseConfig {
   speed: number;
@@ -494,6 +495,257 @@ export function FeedbackOverlay({ type }: FeedbackProps) {
   );
 }
 
+function drawRoundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+
+async function generateShareImage(
+  playerName: string,
+  gameTitle: string,
+  score: number,
+  totalPhases: number,
+  siteUrl: string,
+): Promise<Blob> {
+  const W = 1080, H = 1080;
+  const canvas = document.createElement('canvas');
+  canvas.width = W;
+  canvas.height = H;
+  const ctx = canvas.getContext('2d')!;
+
+  const grad = ctx.createLinearGradient(0, 0, W, H);
+  grad.addColorStop(0, '#4F46E5');
+  grad.addColorStop(1, '#7C3AED');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, W, H);
+
+  ctx.globalAlpha = 0.12;
+  ctx.fillStyle = '#fff';
+  ctx.beginPath(); ctx.arc(120, 120, 240, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.arc(W - 90, H - 90, 200, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.arc(W - 60, 200, 100, 0, Math.PI * 2); ctx.fill();
+  ctx.globalAlpha = 1;
+
+  const cX = 80, cY = 90, cW = W - 160, cH = H - 180;
+  ctx.shadowColor = 'rgba(0,0,0,0.25)';
+  ctx.shadowBlur = 40;
+  ctx.shadowOffsetY = 12;
+  ctx.fillStyle = '#fff';
+  drawRoundRect(ctx, cX, cY, cW, cH, 40);
+  ctx.fill();
+  ctx.shadowColor = 'transparent'; ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
+
+  ctx.textAlign = 'center';
+
+  const brandColors = ['#F97316','#6366F1','#22C55E','#EF4444','#F97316','#6366F1'];
+  const brand = '123GO!';
+  ctx.font = 'bold 58px Nunito, system-ui, sans-serif';
+  const bw = ctx.measureText(brand).width;
+  let bx = W / 2 - bw / 2;
+  for (let i = 0; i < brand.length; i++) {
+    ctx.fillStyle = brandColors[i % brandColors.length];
+    ctx.fillText(brand[i], bx + ctx.measureText(brand.slice(0, i)).width + ctx.measureText(brand[i]).width / 2, cY + 76);
+  }
+
+  ctx.fillStyle = '#E5E7EB';
+  ctx.fillRect(cX + 60, cY + 98, cW - 120, 2);
+
+  ctx.font = '120px serif';
+  ctx.fillStyle = '#000';
+  ctx.fillText('🏆', W / 2, cY + 255);
+
+  ctx.font = 'bold 52px Nunito, system-ui, sans-serif';
+  ctx.fillStyle = '#1F2937';
+  const displayName = (playerName.trim() || 'Você').slice(0, 24);
+  ctx.fillText(`🎉 Parabéns, ${displayName}!`, W / 2, cY + 345);
+
+  ctx.font = '34px Nunito, system-ui, sans-serif';
+  ctx.fillStyle = '#6B7280';
+  const shortTitle = gameTitle.length > 28 ? gameTitle.slice(0, 26) + '…' : gameTitle;
+  ctx.fillText(shortTitle, W / 2, cY + 400);
+
+  const starFilled = Math.round(score);
+  const starEmpty = totalPhases - starFilled;
+  ctx.font = '54px serif';
+  ctx.fillStyle = '#F59E0B';
+  ctx.fillText('★'.repeat(starFilled) + '☆'.repeat(Math.max(0, starEmpty)), W / 2, cY + 478);
+
+  ctx.font = 'bold 36px Nunito, system-ui, sans-serif';
+  ctx.fillStyle = '#374151';
+  ctx.fillText(`${score} de ${totalPhases} acertos`, W / 2, cY + 535);
+
+  const date = new Date().toLocaleDateString('pt-BR', { day: 'numeric', month: 'long', year: 'numeric' });
+  ctx.font = '28px Nunito, system-ui, sans-serif';
+  ctx.fillStyle = '#9CA3AF';
+  ctx.fillText(`📅 ${date}`, W / 2, cY + 588);
+
+  ctx.fillStyle = '#E5E7EB';
+  ctx.fillRect(cX + 60, cY + 618, cW - 120, 2);
+
+  ctx.font = '26px Nunito, system-ui, sans-serif';
+  ctx.fillStyle = '#9CA3AF';
+  ctx.fillText('Jogue também em:', W / 2, cY + 660);
+
+  ctx.font = 'bold 30px Nunito, system-ui, sans-serif';
+  ctx.fillStyle = '#4F46E5';
+  ctx.fillText(siteUrl, W / 2, cY + 702);
+
+  ctx.font = '22px Nunito, system-ui, sans-serif';
+  ctx.fillStyle = '#D1D5DB';
+  ctx.fillText('Plataforma de Jogos de Matemática — 1º Ano EF', W / 2, cY + 750);
+
+  return new Promise(resolve => canvas.toBlob(blob => resolve(blob!), 'image/png'));
+}
+
+interface ShareModalProps {
+  score: number;
+  totalPhases: number;
+  onClose: () => void;
+}
+
+function ShareModal({ score, totalPhases, onClose }: ShareModalProps) {
+  const [name, setName] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [done, setDone] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => { inputRef.current?.focus(); }, []);
+
+  const path = typeof window !== 'undefined' ? window.location.pathname : '/';
+  const game = games.find(g => g.path === path);
+  const gameTitle = game?.title ?? '123GO!';
+  const siteUrl = typeof window !== 'undefined' ? window.location.origin : '';
+
+  const handleShare = async () => {
+    setLoading(true);
+    try {
+      const blob = await generateShareImage(name, gameTitle, score, totalPhases, siteUrl);
+      const file = new File([blob], '123go-pontuacao.png', { type: 'image/png' });
+      if (navigator.canShare?.({ files: [file] })) {
+        await navigator.share({
+          title: '123GO! — Minha pontuação',
+          text: `Olha minha pontuação no jogo "${gameTitle}"! 🎉`,
+          url: siteUrl,
+          files: [file],
+        });
+      } else {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = '123go-pontuacao.png'; a.click();
+        URL.revokeObjectURL(url);
+      }
+      setDone(true);
+    } catch (err) {
+      if ((err as Error).name !== 'AbortError') console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div
+      onClick={e => { if (e.target === e.currentTarget) onClose(); }}
+      style={{
+        position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(4px)',
+        zIndex: 900, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20,
+      }}
+    >
+      <div style={{
+        background: '#fff', borderRadius: 20, padding: '32px 28px', width: '100%', maxWidth: 420,
+        boxShadow: '0 24px 64px rgba(0,0,0,0.25)', position: 'relative',
+        animation: 'shareModalIn 0.25s ease-out',
+      }}>
+        <button
+          onClick={onClose}
+          aria-label="Fechar"
+          style={{
+            position: 'absolute', top: 16, right: 16, width: 30, height: 30,
+            borderRadius: '50%', border: '1.5px solid var(--border)', background: '#fff',
+            cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: 16, color: 'var(--text2)',
+          }}
+        >✕</button>
+
+        <div style={{ textAlign: 'center', marginBottom: 24 }}>
+          <div style={{ fontSize: 52, marginBottom: 8 }}>🏆</div>
+          <h2 style={{ fontFamily: 'Nunito', fontWeight: 900, fontSize: 22, color: 'var(--text)', margin: '0 0 4px' }}>
+            Compartilhar pontuação
+          </h2>
+          <p style={{ color: 'var(--text2)', fontSize: 13, margin: 0 }}>
+            {score} de {totalPhases} acertos em <strong>{gameTitle}</strong>
+          </p>
+        </div>
+
+        <label style={{ display: 'block', fontFamily: 'Nunito', fontWeight: 700, fontSize: 13, color: 'var(--text2)', marginBottom: 6 }}>
+          Seu nome (opcional)
+        </label>
+        <input
+          ref={inputRef}
+          type="text"
+          value={name}
+          onChange={e => { setName(e.target.value); setDone(false); }}
+          placeholder="Ex: Maria"
+          maxLength={30}
+          style={{
+            width: '100%', boxSizing: 'border-box', padding: '12px 14px',
+            borderRadius: 12, border: '1.5px solid var(--border)',
+            fontFamily: 'Nunito', fontWeight: 700, fontSize: 16, color: 'var(--text)',
+            outline: 'none', marginBottom: 16, background: 'var(--bg)',
+          }}
+          onFocus={e => (e.currentTarget.style.borderColor = '#4F46E5')}
+          onBlur={e => (e.currentTarget.style.borderColor = 'var(--border)')}
+        />
+
+        <button
+          onClick={handleShare}
+          disabled={loading}
+          style={{
+            width: '100%', padding: '14px 0', borderRadius: 'var(--radius-pill)',
+            background: done ? '#22C55E' : 'linear-gradient(135deg,#4F46E5,#7C3AED)',
+            color: '#fff', fontFamily: 'Nunito', fontWeight: 800, fontSize: 16,
+            border: 'none', cursor: loading ? 'wait' : 'pointer',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+            opacity: loading ? 0.75 : 1, transition: 'all 0.2s ease', minHeight: 52,
+          }}
+        >
+          {loading ? (
+            <>Gerando imagem…</>
+          ) : done ? (
+            <>✅ Compartilhado!</>
+          ) : (
+            <>
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+              </svg>
+              Compartilhar pontuação
+            </>
+          )}
+        </button>
+
+        <p style={{ textAlign: 'center', color: 'var(--text3)', fontSize: 11, marginTop: 12, marginBottom: 0 }}>
+          Uma imagem será gerada e salva no seu dispositivo
+        </p>
+      </div>
+      <style>{`
+        @keyframes shareModalIn {
+          from { opacity: 0; transform: scale(0.92) translateY(16px); }
+          to   { opacity: 1; transform: scale(1) translateY(0); }
+        }
+      `}</style>
+    </div>
+  );
+}
+
 interface PhaseCompleteCardProps {
   phase: number;
   totalPhases: number;
@@ -506,54 +758,45 @@ interface PhaseCompleteCardProps {
 
 export function PhaseCompleteCard({ phase, totalPhases, score, isGameComplete, onNext, onRestart, color }: PhaseCompleteCardProps) {
   const [, setLocation] = useLocation();
+  const [showShare, setShowShare] = useState(false);
 
   return (
-    <div style={{
-      background: '#fff',
-      borderRadius: 'var(--radius)',
-      padding: 32,
-      textAlign: 'center',
-      boxShadow: 'var(--shadow-hover)',
-      border: '1.5px solid var(--border)',
-    }}>
-      <div style={{ fontSize: 64, marginBottom: 16 }}>
-        {isGameComplete ? '🏆' : '⭐'}
-      </div>
-      <h2 style={{ fontFamily: 'Nunito', fontWeight: 900, fontSize: 24, color: 'var(--text)', marginBottom: 8 }}>
-        {isGameComplete ? 'Parabéns! Jogo completo!' : `Fase ${phase} completa!`}
-      </h2>
-      <p style={{ color: 'var(--text2)', fontSize: 14, marginBottom: 24 }}>
-        {isGameComplete
-          ? `Você completou todas as ${totalPhases} fases com ${score} acertos!`
-          : `Continue para a próxima fase!`}
-      </p>
-      <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
-        <button
-          onClick={onRestart}
-          style={{
-            padding: '12px 24px',
-            borderRadius: 'var(--radius-pill)',
-            border: '1.5px solid var(--border)',
-            background: '#fff',
-            color: 'var(--text)',
-            fontFamily: 'Nunito',
-            fontWeight: 700,
-            fontSize: 15,
-            cursor: 'pointer',
-            minHeight: 48,
-          }}
-        >
-          🔄 Recomeçar
-        </button>
-        {!isGameComplete && (
+    <>
+      {showShare && (
+        <ShareModal
+          score={score}
+          totalPhases={totalPhases}
+          onClose={() => setShowShare(false)}
+        />
+      )}
+      <div style={{
+        background: '#fff',
+        borderRadius: 'var(--radius)',
+        padding: 32,
+        textAlign: 'center',
+        boxShadow: 'var(--shadow-hover)',
+        border: '1.5px solid var(--border)',
+      }}>
+        <div style={{ fontSize: 64, marginBottom: 16 }}>
+          {isGameComplete ? '🏆' : '⭐'}
+        </div>
+        <h2 style={{ fontFamily: 'Nunito', fontWeight: 900, fontSize: 24, color: 'var(--text)', marginBottom: 8 }}>
+          {isGameComplete ? 'Parabéns! Jogo completo!' : `Fase ${phase} completa!`}
+        </h2>
+        <p style={{ color: 'var(--text2)', fontSize: 14, marginBottom: 24 }}>
+          {isGameComplete
+            ? `Você completou todas as ${totalPhases} fases com ${score} acertos!`
+            : `Continue para a próxima fase!`}
+        </p>
+        <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
           <button
-            onClick={onNext}
+            onClick={onRestart}
             style={{
               padding: '12px 24px',
               borderRadius: 'var(--radius-pill)',
-              border: 'none',
-              background: color,
-              color: '#fff',
+              border: '1.5px solid var(--border)',
+              background: '#fff',
+              color: 'var(--text)',
               fontFamily: 'Nunito',
               fontWeight: 700,
               fontSize: 15,
@@ -561,29 +804,74 @@ export function PhaseCompleteCard({ phase, totalPhases, score, isGameComplete, o
               minHeight: 48,
             }}
           >
-            Próxima fase →
+            🔄 Recomeçar
           </button>
-        )}
-        {isGameComplete && (
-          <button
-            onClick={() => setLocation('/catalog')}
-            style={{
-              padding: '12px 24px',
-              borderRadius: 'var(--radius-pill)',
-              border: 'none',
-              background: color,
-              color: '#fff',
-              fontFamily: 'Nunito',
-              fontWeight: 700,
-              fontSize: 15,
-              cursor: 'pointer',
-              minHeight: 48,
-            }}
-          >
-            Ver outros jogos →
-          </button>
-        )}
+          {!isGameComplete && (
+            <button
+              onClick={onNext}
+              style={{
+                padding: '12px 24px',
+                borderRadius: 'var(--radius-pill)',
+                border: 'none',
+                background: color,
+                color: '#fff',
+                fontFamily: 'Nunito',
+                fontWeight: 700,
+                fontSize: 15,
+                cursor: 'pointer',
+                minHeight: 48,
+              }}
+            >
+              Próxima fase →
+            </button>
+          )}
+          {isGameComplete && (
+            <>
+              <button
+                onClick={() => setShowShare(true)}
+                style={{
+                  padding: '12px 24px',
+                  borderRadius: 'var(--radius-pill)',
+                  border: 'none',
+                  background: 'linear-gradient(135deg,#4F46E5,#7C3AED)',
+                  color: '#fff',
+                  fontFamily: 'Nunito',
+                  fontWeight: 800,
+                  fontSize: 15,
+                  cursor: 'pointer',
+                  minHeight: 48,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 7,
+                }}
+              >
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+                  <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+                </svg>
+                Compartilhar
+              </button>
+              <button
+                onClick={() => setLocation('/catalog')}
+                style={{
+                  padding: '12px 24px',
+                  borderRadius: 'var(--radius-pill)',
+                  border: 'none',
+                  background: color,
+                  color: '#fff',
+                  fontFamily: 'Nunito',
+                  fontWeight: 700,
+                  fontSize: 15,
+                  cursor: 'pointer',
+                  minHeight: 48,
+                }}
+              >
+                Ver outros jogos →
+              </button>
+            </>
+          )}
+        </div>
       </div>
-    </div>
+    </>
   );
 }
