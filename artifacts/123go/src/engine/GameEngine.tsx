@@ -23,6 +23,26 @@ export function getPhaseConfig(phase: number): PhaseConfig {
   };
 }
 
+/* ── Difficulty helpers ─────────────────────────────────────────────── */
+interface DifficultyInfo {
+  label: string;
+  emoji: string;
+  color: string;
+  bg: string;
+  level: 'easy' | 'medium' | 'hard';
+}
+
+export function getDifficulty(phase: number): DifficultyInfo {
+  if (phase <= 2) return { label: 'Fácil',  emoji: '🟢', color: '#15803D', bg: '#DCFCE7', level: 'easy'   };
+  if (phase <= 4) return { label: 'Média',  emoji: '🟡', color: '#B45309', bg: '#FEF9C3', level: 'medium' };
+  return             { label: 'Difícil', emoji: '🔴', color: '#DC2626', bg: '#FEE2E2', level: 'hard'   };
+}
+
+const DIFFICULTY_TOAST: Record<number, string> = {
+  3: 'Nível Médio! 🟡',
+  5: 'Nível Difícil! 🔴',
+};
+
 interface GameShellProps {
   title: string;
   emoji: string;
@@ -87,6 +107,19 @@ export function GameShell({ title, emoji, color, currentPhase, totalPhases, chil
   const [paused, setPaused] = useState(false);
   const [stopped, setStopped] = useState(false);
   const [muted, setMuted] = useState(() => isMuted());
+  const [diffToast, setDiffToast] = useState<string | null>(null);
+  const prevPhaseRef = useRef<number>(currentPhase);
+
+  useEffect(() => {
+    const prev = prevPhaseRef.current;
+    prevPhaseRef.current = currentPhase;
+    if (prev !== currentPhase && DIFFICULTY_TOAST[currentPhase]) {
+      setDiffToast(DIFFICULTY_TOAST[currentPhase]);
+      const t = setTimeout(() => setDiffToast(null), 2200);
+      return () => clearTimeout(t);
+    }
+    return undefined;
+  }, [currentPhase]);
 
   const toggleMuted = useCallback(() => {
     setMuted(m => {
@@ -278,33 +311,75 @@ export function GameShell({ title, emoji, color, currentPhase, totalPhases, chil
         </ControlBtn>
       </div>
 
-      {/* Progress bar */}
-      <div style={{ background: '#fff', padding: '6px 16px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
-        <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-          {Array.from({ length: totalPhases }).map((_, i) => {
-            const phaseNum = i + 1;
-            const done = phaseNum < currentPhase;
-            const current = phaseNum === currentPhase;
-            return (
-              <div
-                key={i}
-                style={{
-                  width: done || current ? 28 : 20,
-                  height: 10,
-                  borderRadius: 5,
-                  background: done ? color : current ? color : 'var(--border)',
-                  opacity: current ? 1 : done ? 0.85 : 0.3,
-                  transition: 'all 0.3s ease',
-                  animation: current && isPlaying ? 'pulseDot 1.2s ease-in-out infinite' : 'none',
-                }}
-              />
-            );
-          })}
+      {/* Progress bar + difficulty chip */}
+      {(() => {
+        const diff = getDifficulty(currentPhase);
+        return (
+          <div style={{ background: '#fff', padding: '5px 16px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
+            <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+              {Array.from({ length: totalPhases }).map((_, i) => {
+                const phaseNum = i + 1;
+                const dotDiff = getDifficulty(phaseNum);
+                const done = phaseNum < currentPhase;
+                const current = phaseNum === currentPhase;
+                return (
+                  <div
+                    key={i}
+                    style={{
+                      width: done || current ? 28 : 20,
+                      height: 10,
+                      borderRadius: 5,
+                      background: done ? dotDiff.color : current ? dotDiff.color : 'var(--border)',
+                      opacity: current ? 1 : done ? 0.8 : 0.25,
+                      transition: 'all 0.35s ease',
+                      animation: current && isPlaying ? 'pulseDot 1.2s ease-in-out infinite' : 'none',
+                    }}
+                  />
+                );
+              })}
+            </div>
+            {/* Difficulty chip — remounts on phase change to retrigger popIn */}
+            <span
+              key={`diff-chip-${currentPhase}`}
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: 4,
+                background: diff.bg,
+                color: diff.color,
+                border: `1.5px solid ${diff.color}`,
+                borderRadius: 'var(--radius-pill)',
+                fontFamily: 'Nunito', fontWeight: 800,
+                fontSize: 13,
+                padding: '2px 10px',
+                whiteSpace: 'nowrap',
+                animation: 'popIn 0.35s cubic-bezier(.34,1.56,.64,1)',
+              }}
+            >
+              {diff.emoji} {diff.label}
+            </span>
+            <span style={{ color: 'var(--text2)', fontSize: 12, fontWeight: 700, fontFamily: 'Nunito', whiteSpace: 'nowrap' }}>
+              {currentPhase}/{totalPhases}
+            </span>
+          </div>
+        );
+      })()}
+
+      {/* Difficulty level-up toast */}
+      {diffToast && (
+        <div
+          key={diffToast}
+          style={{
+            position: 'fixed', top: 80, left: '50%', transform: 'translateX(-50%)',
+            background: 'rgba(0,0,0,0.82)', color: '#fff',
+            padding: '12px 28px', borderRadius: 'var(--radius-pill)',
+            fontFamily: 'Nunito', fontWeight: 800, fontSize: 18,
+            zIndex: 300, pointerEvents: 'none',
+            animation: 'popIn 0.35s cubic-bezier(.34,1.56,.64,1)',
+            letterSpacing: '0.01em',
+          }}
+        >
+          {diffToast}
         </div>
-        <span style={{ color: 'var(--text2)', fontSize: 12, fontWeight: 700, fontFamily: 'Nunito', whiteSpace: 'nowrap' }}>
-          {currentPhase}/{totalPhases}
-        </span>
-      </div>
+      )}
 
       {/* Game content */}
       <div className="game-area" style={{ flex: 1, padding: '14px 14px', maxWidth: 720, margin: '0 auto', width: '100%', position: 'relative' }}>
@@ -843,6 +918,7 @@ export function PhaseCompleteCard({ phase, totalPhases, score, isGameComplete, o
       const t = setTimeout(() => setShowShare(true), 900);
       return () => clearTimeout(t);
     }
+    return undefined;
   }, [isGameComplete]);
 
   return (
