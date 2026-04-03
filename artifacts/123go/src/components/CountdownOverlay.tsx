@@ -8,8 +8,8 @@ const STEPS = [
   { char: 'GO!', color: '#10B981' },
 ];
 
-const STEP_MS = 700;
-const GO_MS   = 550;
+const STEP_MS = 1100;
+const GO_MS   = 900;
 
 interface Props {
   countdownKey: number;
