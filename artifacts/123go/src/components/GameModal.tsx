@@ -156,17 +156,35 @@ export function GameModal({ game, onClose }: GameModalProps) {
               <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--text3)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>
                 Habilidade
               </p>
-              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 8 }}>
+              {/* Pedagogical code badge */}
+              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 10, alignItems: 'center' }}>
                 <span style={{
-                  background: temaColor,
-                  color: '#fff',
-                  fontSize: 12,
+                  display: 'inline-flex', alignItems: 'center', gap: 5,
+                  background: '#EEF2FF',
+                  color: '#4338CA',
+                  fontSize: 13,
                   fontWeight: 800,
-                  padding: '4px 12px',
-                  borderRadius: 'var(--radius-pill)',
+                  padding: '5px 12px',
+                  borderRadius: 8,
                   fontFamily: 'Nunito',
+                  border: '1.5px solid #C7D2FE',
+                  letterSpacing: '0.04em',
                 }}>
+                  <span style={{ fontSize: 14 }}>📑</span>
                   {game.codigo}
+                </span>
+                <span style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 4,
+                  background: `${temaColor}15`,
+                  color: temaColor,
+                  fontSize: 11,
+                  fontWeight: 700,
+                  padding: '4px 10px',
+                  borderRadius: 8,
+                  fontFamily: 'Nunito',
+                  border: `1.5px solid ${temaColor}30`,
+                }}>
+                  Currículo Paulista · 1º Ano
                 </span>
               </div>
               <p style={{ color: 'var(--text)', fontSize: 13, lineHeight: 1.6 }}>{game.habilidade}</p>

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { useLocation } from 'wouter';
 import { games } from '../data/games';
 import { temaLabels, temaColors } from '../data/games';
@@ -12,13 +12,39 @@ const PLACEHOLDERS = [
   'Busque por números, formas ou mais! 🎈',
 ];
 
-const QUICK_CHIPS = [
-  { label: '🔢 Números',  query: 'numeros'   },
-  { label: '📐 Geometria', query: 'geometria' },
-  { label: '🎨 Ateliê',   query: 'ateliê'    },
-  { label: '➕ Soma',     query: 'soma'       },
-  { label: '📊 Gráfico',  query: 'gráfico'   },
-];
+/* Match skill codes like EF01MA02 or partial EF01 */
+const SKILL_CODE_RE = /EF\d{2}MA\d{2}/i;
+const SKILL_PREFIX_RE = /^EF\d+/i;
+
+function isSkillCodeQuery(q: string) {
+  return SKILL_CODE_RE.test(q.trim()) || SKILL_PREFIX_RE.test(q.trim());
+}
+
+/* Build unique skill-code index from games */
+const skillIndex = (() => {
+  const map = new Map<string, { codigo: string; habilidade: string; count: number }>();
+  for (const g of games) {
+    if (!map.has(g.codigo)) {
+      map.set(g.codigo, { codigo: g.codigo, habilidade: g.habilidade, count: 0 });
+    }
+    map.get(g.codigo)!.count++;
+  }
+  return Array.from(map.values()).sort((a, b) => a.codigo.localeCompare(b.codigo));
+})();
+
+/* Group skill index by year prefix (EF01 / EF02 …) */
+const skillsByYear = skillIndex.reduce<Record<string, typeof skillIndex>>((acc, s) => {
+  const match = s.codigo.match(/^(EF\d{2})/i);
+  const key = match ? match[1].toUpperCase() : 'Outros';
+  (acc[key] ??= []).push(s);
+  return acc;
+}, {});
+
+const yearLabels: Record<string, string> = {
+  EF01: '1º Ano (EF01)',
+  EF02: '2º Ano (EF02)',
+  EF03: '3º Ano (EF03)',
+};
 
 /* ── Helpers ────────────────────────────────────────────────────────── */
 
@@ -60,13 +86,37 @@ function MicIcon({ active }: { active: boolean }) {
   );
 }
 
+/* ── Pedagogical code badge ─────────────────────────────────────────── */
+
+function CodigoBadge({ codigo, small = false }: { codigo: string; small?: boolean }) {
+  return (
+    <span style={{
+      display: 'inline-flex', alignItems: 'center', gap: 3,
+      background: '#EEF2FF',
+      color: '#4338CA',
+      fontFamily: 'Nunito',
+      fontWeight: 800,
+      fontSize: small ? 10 : 11,
+      padding: small ? '1px 6px' : '2px 8px',
+      borderRadius: 6,
+      border: '1px solid #C7D2FE',
+      letterSpacing: '0.03em',
+      whiteSpace: 'nowrap',
+      verticalAlign: 'middle',
+    }}>
+      <span style={{ fontSize: small ? 9 : 10 }}>📑</span>
+      {codigo}
+    </span>
+  );
+}
+
 /* ── Props ──────────────────────────────────────────────────────────── */
 
 interface HeaderProps {
   onSearch: (query: string) => void;
 }
 
-/* ── Inline SearchBar component ─────────────────────────────────────── */
+/* ── Inline SearchBar ───────────────────────────────────────────────── */
 
 function SearchBar({
   query,
@@ -81,10 +131,12 @@ function SearchBar({
   inputRef?: React.RefObject<HTMLInputElement | null>;
   compact?: boolean;
 }) {
+  const [, setLocation]        = useLocation();
   const [focused,      setFocused]      = useState(false);
   const [placeholderIdx, setIdx]        = useState(0);
   const [voiceActive,  setVoiceActive]  = useState(false);
   const [shadowFocus,  setShadowFocus]  = useState(false);
+  const [showSkills,   setShowSkills]   = useState(false);
   const wrapRef = useRef<HTMLDivElement>(null);
 
   /* Rotate placeholder when idle */
@@ -99,6 +151,7 @@ function SearchBar({
     const handleOutside = (e: MouseEvent) => {
       if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) {
         setFocused(false);
+        setShowSkills(false);
       }
     };
     document.addEventListener('mousedown', handleOutside);
@@ -108,18 +161,29 @@ function SearchBar({
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setQuery(e.target.value);
     onSearch(e.target.value);
+    setShowSkills(false);
   };
 
-  const handleChip = (chipQuery: string) => {
+  const handleChipClick = (chipQuery: string) => {
+    if (chipQuery === '__habilidades__') {
+      setShowSkills(prev => !prev);
+      return;
+    }
     setQuery(chipQuery);
     onSearch(chipQuery);
     setFocused(false);
+    setShowSkills(false);
+  };
+
+  const handleSkillCode = (codigo: string) => {
+    setQuery(codigo);
+    onSearch(codigo);
+    setShowSkills(false);
   };
 
   const handleVoice = () => {
     const SR = getSpeechRecognition();
     if (!SR) {
-      /* Graceful fallback: pulse animation only */
       setVoiceActive(true);
       setTimeout(() => setVoiceActive(false), 1200);
       return;
@@ -140,22 +204,44 @@ function SearchBar({
     recognition.onend   = () => setVoiceActive(false);
   };
 
-  /* Filtered results for dropdown */
-  const results = query.trim().length > 0
-    ? games.filter(g => {
-        const q = query.toLowerCase();
-        return [g.title, g.desc, g.unidade, g.habilidade, g.tema].join(' ').toLowerCase().includes(q);
-      }).slice(0, 6)
-    : [];
+  /* Filtered results — skill codes prioritised when query looks like a code */
+  const results = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return [];
+    const codeSearch = isSkillCodeQuery(q);
+    const filtered = games.filter(g =>
+      [g.title, g.desc, g.unidade, g.habilidade, g.tema, g.codigo, g.objeto]
+        .join(' ').toLowerCase().includes(q)
+    );
+    if (codeSearch) {
+      filtered.sort((a, b) => {
+        const aExact = a.codigo.toLowerCase() === q ? -2 : a.codigo.toLowerCase().startsWith(q) ? -1 : 0;
+        const bExact = b.codigo.toLowerCase() === q ? -2 : b.codigo.toLowerCase().startsWith(q) ? -1 : 0;
+        return aExact - bExact;
+      });
+    }
+    return filtered.slice(0, 6);
+  }, [query]);
 
-  const showDropdown = focused && (query.trim().length > 0 || true); /* chips always show when focused */
-  const showResults  = focused && query.trim().length > 0;
-  const showChips    = focused && query.trim().length === 0;
+  const isSingleResult = results.length === 1;
+  const showDropdown   = focused;
+  const showResults    = focused && query.trim().length > 0;
+  const showChips      = focused && query.trim().length === 0 && !showSkills;
+  const showHint       = focused && query.trim().length === 0;
+  const accentColor    = compact ? 'var(--c3)' : 'var(--c2)';
 
-  const accentColor = compact ? 'var(--c3)' : 'var(--c2)';
+  const QUICK_CHIPS = [
+    { label: '🔢 Números',   query: 'numeros'         },
+    { label: '📐 Geometria', query: 'geometria'        },
+    { label: '🎨 Ateliê',   query: 'ateliê'           },
+    { label: '➕ Soma',     query: 'soma'              },
+    { label: '📊 Gráfico',  query: 'gráfico'          },
+    { label: '📑 Habilidades', query: '__habilidades__' },
+  ];
 
   return (
     <div ref={wrapRef} style={{ width: '100%', maxWidth: compact ? undefined : 500, position: 'relative' }}>
+
       {/* ── Input pill ── */}
       <div style={{
         display: 'flex', alignItems: 'center',
@@ -163,19 +249,17 @@ function SearchBar({
         border: `2px solid ${focused ? accentColor : 'var(--border)'}`,
         borderRadius: 9999,
         boxShadow: shadowFocus
-          ? `0 4px 20px rgba(99,102,241,0.18), 0 1px 4px rgba(0,0,0,0.06)`
+          ? '0 4px 20px rgba(99,102,241,0.18), 0 1px 4px rgba(0,0,0,0.06)'
           : '0 1px 4px rgba(0,0,0,0.07)',
         transition: 'border-color 0.2s ease, box-shadow 0.25s ease',
         overflow: 'hidden',
         padding: '0 12px 0 14px',
         gap: 8,
       }}>
-        {/* Search icon */}
         <span style={{ color: focused ? accentColor : 'var(--text3)', flexShrink: 0, transition: 'color 0.2s' }}>
           <SearchIcon size={compact ? 15 : 17} />
         </span>
 
-        {/* Input */}
         <input
           ref={inputRef}
           type="search"
@@ -187,28 +271,20 @@ function SearchBar({
           aria-label="Buscar jogos"
           autoComplete="off"
           style={{
-            flex: 1,
-            border: 'none',
-            outline: 'none',
-            background: 'transparent',
-            color: 'var(--text)',
-            fontFamily: 'Nunito',
-            fontWeight: 600,
+            flex: 1, border: 'none', outline: 'none',
+            background: 'transparent', color: 'var(--text)',
+            fontFamily: 'Nunito', fontWeight: 600,
             fontSize: compact ? 14 : 15,
             padding: compact ? '9px 0' : '11px 0',
             minWidth: 0,
           }}
         />
 
-        {/* Clear button — shown when typing */}
+        {/* Clear button */}
         {query.length > 0 && (
           <button
-            onMouseDown={e => { e.preventDefault(); setQuery(''); onSearch(''); }}
-            style={{
-              flexShrink: 0, border: 'none', background: 'none',
-              color: 'var(--text3)', cursor: 'pointer',
-              padding: '0 2px', fontSize: 16, lineHeight: 1,
-            }}
+            onMouseDown={e => { e.preventDefault(); setQuery(''); onSearch(''); setShowSkills(false); }}
+            style={{ flexShrink: 0, border: 'none', background: 'none', color: 'var(--text3)', cursor: 'pointer', padding: '0 2px', fontSize: 16, lineHeight: 1 }}
             aria-label="Limpar busca"
           >✕</button>
         )}
@@ -242,66 +318,138 @@ function SearchBar({
           zIndex: 200,
           overflow: 'hidden',
           animation: 'slideDown 0.18s ease',
+          maxHeight: 420,
+          overflowY: 'auto',
         }}>
 
-          {/* Quick chips (shown when input is empty) */}
+          {/* ── Micro-copy hint ── */}
+          {showHint && (
+            <div style={{ padding: '10px 14px 0', display: 'flex', alignItems: 'center', gap: 6 }}>
+              <span style={{ fontSize: 13 }}>💡</span>
+              <span style={{ fontFamily: 'Nunito', fontSize: 12, color: 'var(--text3)', fontStyle: 'italic' }}>
+                Busque por nome ou código da habilidade (ex: EF01...)
+              </span>
+            </div>
+          )}
+
+          {/* ── Quick chips ── */}
           {showChips && (
-            <div style={{ padding: '12px 14px 10px' }}>
+            <div style={{ padding: showHint ? '10px 14px 12px' : '12px 14px 12px' }}>
               <div style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 11, color: 'var(--text3)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 10 }}>
                 Busca rápida
               </div>
               <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                {QUICK_CHIPS.map(chip => (
-                  <button
-                    key={chip.label}
-                    onMouseDown={e => { e.preventDefault(); handleChip(chip.query); }}
-                    style={{
-                      padding: '7px 14px',
-                      borderRadius: 9999,
-                      border: '1.5px solid var(--border)',
-                      background: '#F9FAFB',
-                      fontFamily: 'Nunito', fontWeight: 700, fontSize: 13,
-                      color: 'var(--text)',
-                      cursor: 'pointer',
-                      transition: 'transform 0.15s ease, background 0.15s, border-color 0.15s',
-                      whiteSpace: 'nowrap',
-                    }}
-                    onMouseEnter={e => {
-                      (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1.1)';
-                      (e.currentTarget as HTMLButtonElement).style.background = 'var(--c2)';
-                      (e.currentTarget as HTMLButtonElement).style.color = '#fff';
-                      (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--c2)';
-                    }}
-                    onMouseLeave={e => {
-                      (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1)';
-                      (e.currentTarget as HTMLButtonElement).style.background = '#F9FAFB';
-                      (e.currentTarget as HTMLButtonElement).style.color = 'var(--text)';
-                      (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--border)';
-                    }}
-                  >
-                    {chip.label}
-                  </button>
-                ))}
+                {QUICK_CHIPS.map(chip => {
+                  const isSkillChip = chip.query === '__habilidades__';
+                  const isActive = isSkillChip && showSkills;
+                  return (
+                    <button
+                      key={chip.label}
+                      onMouseDown={e => { e.preventDefault(); handleChipClick(chip.query); }}
+                      style={{
+                        padding: '7px 14px',
+                        borderRadius: 9999,
+                        border: `1.5px solid ${isActive ? '#4338CA' : 'var(--border)'}`,
+                        background: isActive ? '#4338CA' : '#F9FAFB',
+                        fontFamily: 'Nunito', fontWeight: 700, fontSize: 13,
+                        color: isActive ? '#fff' : 'var(--text)',
+                        cursor: 'pointer',
+                        transition: 'transform 0.15s ease, background 0.15s, border-color 0.15s',
+                        whiteSpace: 'nowrap',
+                      }}
+                      onMouseEnter={e => {
+                        if (isActive) return;
+                        (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1.1)';
+                        (e.currentTarget as HTMLButtonElement).style.background = isSkillChip ? '#4338CA' : 'var(--c2)';
+                        (e.currentTarget as HTMLButtonElement).style.color = '#fff';
+                        (e.currentTarget as HTMLButtonElement).style.borderColor = isSkillChip ? '#4338CA' : 'var(--c2)';
+                      }}
+                      onMouseLeave={e => {
+                        if (isActive) return;
+                        (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1)';
+                        (e.currentTarget as HTMLButtonElement).style.background = '#F9FAFB';
+                        (e.currentTarget as HTMLButtonElement).style.color = 'var(--text)';
+                        (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--border)';
+                      }}
+                    >
+                      {chip.label}
+                    </button>
+                  );
+                })}
               </div>
             </div>
           )}
 
-          {/* Results */}
+          {/* ── Habilidades sub-panel ── */}
+          {focused && showSkills && (
+            <div style={{ borderTop: '1px solid var(--border)', padding: '12px 14px 14px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+                <div style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 11, color: 'var(--text3)', textTransform: 'uppercase', letterSpacing: '0.07em' }}>
+                  📑 Códigos de Habilidades
+                </div>
+                <button
+                  onMouseDown={e => { e.preventDefault(); setShowSkills(false); }}
+                  style={{ border: 'none', background: 'none', cursor: 'pointer', color: 'var(--text3)', fontSize: 13 }}
+                >✕</button>
+              </div>
+              {Object.entries(skillsByYear).map(([year, skills]) => (
+                <div key={year} style={{ marginBottom: 14 }}>
+                  <div style={{ fontFamily: 'Nunito', fontWeight: 700, fontSize: 12, color: 'var(--text2)', marginBottom: 8 }}>
+                    {yearLabels[year] ?? year}
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                    {skills.map(s => (
+                      <button
+                        key={s.codigo}
+                        onMouseDown={e => { e.preventDefault(); handleSkillCode(s.codigo); }}
+                        style={{
+                          display: 'flex', alignItems: 'flex-start', gap: 10,
+                          padding: '8px 10px', borderRadius: 10,
+                          border: '1px solid var(--border)',
+                          background: '#FAFAFA',
+                          cursor: 'pointer', textAlign: 'left',
+                          transition: 'background 0.12s',
+                        }}
+                        onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = '#EEF2FF'; (e.currentTarget as HTMLButtonElement).style.borderColor = '#C7D2FE'; }}
+                        onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = '#FAFAFA'; (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--border)'; }}
+                      >
+                        <CodigoBadge codigo={s.codigo} />
+                        <span style={{ fontFamily: 'Nunito', fontSize: 12, color: 'var(--text2)', flex: 1, lineHeight: 1.45 }}>
+                          {s.habilidade.length > 90 ? s.habilidade.slice(0, 90) + '…' : s.habilidade}
+                        </span>
+                        <span style={{ fontSize: 10, color: 'var(--text3)', flexShrink: 0, marginTop: 1 }}>
+                          {s.count} jogo{s.count !== 1 ? 's' : ''}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* ── Results ── */}
           {showResults && (
             results.length > 0 ? (
               <div style={{ padding: '8px 0' }}>
-                <div style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 11, color: 'var(--text3)', textTransform: 'uppercase', letterSpacing: '0.07em', padding: '0 14px 8px' }}>
-                  {results.length} resultado{results.length !== 1 ? 's' : ''}
+                <div style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 11, color: 'var(--text3)', textTransform: 'uppercase', letterSpacing: '0.07em', padding: '0 14px 6px', display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span>{results.length} resultado{results.length !== 1 ? 's' : ''}</span>
+                  {isSkillCodeQuery(query) && (
+                    <span style={{ background: '#EEF2FF', color: '#4338CA', fontSize: 10, padding: '1px 6px', borderRadius: 4, border: '1px solid #C7D2FE', fontWeight: 700 }}>
+                      busca por código
+                    </span>
+                  )}
                 </div>
+
                 {results.map(game => {
                   const accent = temaColors[game.tema] ?? '#10B981';
                   const tLabel = temaLabels[game.tema] ?? game.tema;
                   return (
                     <button
                       key={game.id}
-                      onMouseDown={e => { e.preventDefault(); setQuery(game.title); onSearch(game.title); setFocused(false); }}
+                      onMouseDown={e => { e.preventDefault(); setQuery(game.title); onSearch(game.title); setFocused(false); setShowSkills(false); }}
                       style={{
-                        width: '100%', padding: '10px 14px',
+                        width: '100%', padding: '9px 14px',
                         display: 'flex', alignItems: 'center', gap: 12,
                         border: 'none', background: 'transparent',
                         cursor: 'pointer', textAlign: 'left',
@@ -325,13 +473,16 @@ function SearchBar({
                         <div style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 14, color: 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                           {game.title}
                         </div>
-                        <div style={{
-                          display: 'inline-block',
-                          background: `${accent}18`, color: accent,
-                          fontFamily: 'Nunito', fontWeight: 700, fontSize: 11,
-                          padding: '1px 8px', borderRadius: 6, marginTop: 2,
-                        }}>
-                          {tLabel}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 3, flexWrap: 'wrap' }}>
+                          <span style={{
+                            display: 'inline-block',
+                            background: `${accent}18`, color: accent,
+                            fontFamily: 'Nunito', fontWeight: 700, fontSize: 11,
+                            padding: '1px 8px', borderRadius: 6,
+                          }}>
+                            {tLabel}
+                          </span>
+                          <CodigoBadge codigo={game.codigo} small />
                         </div>
                       </div>
 
@@ -339,6 +490,32 @@ function SearchBar({
                     </button>
                   );
                 })}
+
+                {/* Single result → "Iniciar Jogo Agora" CTA */}
+                {isSingleResult && (
+                  <div style={{ padding: '8px 14px 12px' }}>
+                    <button
+                      onMouseDown={e => { e.preventDefault(); setLocation(results[0].path); setFocused(false); }}
+                      style={{
+                        width: '100%',
+                        background: 'linear-gradient(135deg, var(--c3), var(--c2))',
+                        color: '#fff',
+                        fontFamily: 'Nunito', fontWeight: 800, fontSize: 14,
+                        padding: '11px 20px',
+                        borderRadius: 9999,
+                        border: 'none', cursor: 'pointer',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                        boxShadow: '0 4px 14px rgba(99,102,241,0.3)',
+                        transition: 'opacity 0.15s',
+                      }}
+                      onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.opacity = '0.9'; }}
+                      onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.opacity = '1'; }}
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
+                      Iniciar Jogo Agora
+                    </button>
+                  </div>
+                )}
               </div>
             ) : (
               /* Empty state */
@@ -372,8 +549,7 @@ export function Header({ onSearch }: HeaderProps) {
     onSearch(v);
   }, [onSearch]);
 
-  const openMobileSearch = () => setMobileSearchOpen(true);
-
+  const openMobileSearch  = () => setMobileSearchOpen(true);
   const closeMobileSearch = () => {
     setMobileSearchOpen(false);
     setQuery('');
@@ -384,31 +560,22 @@ export function Header({ onSearch }: HeaderProps) {
     if (mobileSearchOpen) mobileInputRef.current?.focus();
   }, [mobileSearchOpen]);
 
+  /* Suppress unused setLocation warning */
+  void setLocation;
+
   return (
     <header style={{
-      position: 'sticky',
-      top: 0,
-      zIndex: 100,
-      background: '#fff',
-      borderBottom: '1px solid var(--border)',
-      height: 60,
-      display: 'flex',
-      alignItems: 'center',
-      padding: '0 16px',
-      gap: 12,
+      position: 'sticky', top: 0, zIndex: 100,
+      background: '#fff', borderBottom: '1px solid var(--border)',
+      height: 60, display: 'flex', alignItems: 'center',
+      padding: '0 16px', gap: 12,
     }}>
 
       {/* ── MOBILE SEARCH OPEN STATE ── */}
       {mobileSearchOpen && (
         <div className="header-mobile-search" style={{ display: 'flex', alignItems: 'center', gap: 10, flex: 1 }}>
           <div style={{ flex: 1 }}>
-            <SearchBar
-              query={query}
-              setQuery={handleSetQuery}
-              onSearch={onSearch}
-              inputRef={mobileInputRef}
-              compact
-            />
+            <SearchBar query={query} setQuery={handleSetQuery} onSearch={onSearch} inputRef={mobileInputRef} compact />
           </div>
           <button
             onClick={closeMobileSearch}
@@ -426,7 +593,6 @@ export function Header({ onSearch }: HeaderProps) {
       {/* ── DEFAULT STATE ── */}
       {!mobileSearchOpen && (
         <>
-          {/* Logo */}
           <div
             onClick={() => setLocation('/')}
             role="link" tabIndex={0}
@@ -445,12 +611,10 @@ export function Header({ onSearch }: HeaderProps) {
             <span style={{ color: 'var(--c2)' }}>!</span>
           </div>
 
-          {/* Desktop search bar */}
           <div className="header-search-desktop" style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
             <SearchBar query={query} setQuery={handleSetQuery} onSearch={onSearch} />
           </div>
 
-          {/* Mobile search icon */}
           <button
             className="header-search-icon"
             onClick={openMobileSearch}
@@ -477,7 +641,6 @@ export function Header({ onSearch }: HeaderProps) {
           .header-search-icon    { display: none !important; }
           .header-mobile-search  { display: none !important; }
         }
-        /* Remove browser default search-cancel button */
         input[type="search"]::-webkit-search-cancel-button { display: none; }
         input[type="search"]::-webkit-search-decoration     { display: none; }
       `}</style>
