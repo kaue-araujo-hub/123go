@@ -6,6 +6,7 @@ import { AppleEmoji } from '../utils/AppleEmoji';
 import { isMuted, setGlobalMuted, playCorrect, playWrong } from '../utils/sounds';
 import { burstParticles } from '../utils/particles';
 import { games } from '../data/games';
+import { addStar } from '../utils/progress';
 
 interface PhaseConfig {
   speed: number;
@@ -506,6 +507,7 @@ export function useGameEngine(totalPhases = 5) {
 
   const onPhaseComplete = useCallback(() => {
     setPhaseComplete(true);
+    addStar();
     if (phase >= totalPhases) {
       setGameComplete(true);
       confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
