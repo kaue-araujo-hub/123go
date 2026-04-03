@@ -509,11 +509,27 @@ function drawRoundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: n
   ctx.closePath();
 }
 
+const FRIENDLY_MESSAGES: Record<number, string[]> = {
+  5: ['Incrível! Você acertou tudo!', 'Perfeito! Nota 10!', 'Campeão! Acertos em cheio!'],
+  4: ['Muito bom! Quase perfeito!', 'Excelente! Continue assim!', 'Arrasou! Só faltou um!'],
+  3: ['Bom trabalho! Você está evoluindo!', 'Continue assim, está indo bem!', 'Metade do caminho! Vai lá!'],
+  2: ['Não desista, continue tentando!', 'Bom esforço! Pratique mais!', 'Cada tentativa te deixa mais forte!'],
+  1: ['Continue tentando, você consegue!', 'A prática leva à perfeição!', 'Não desanime, tente de novo!'],
+  0: ['Que tal tentar mais uma vez?', 'Todo começo tem um primeiro passo!', 'Tente de novo, você vai melhorar!'],
+};
+
+function getFriendlyMessage(score: number, total: number): string {
+  const pct = total > 0 ? Math.round((score / total) * 5) : 0;
+  const msgs = FRIENDLY_MESSAGES[Math.max(0, Math.min(5, pct))] ?? FRIENDLY_MESSAGES[3];
+  return msgs[Math.floor(Math.random() * msgs.length)];
+}
+
 async function generateShareImage(
   playerName: string,
   gameTitle: string,
   score: number,
   totalPhases: number,
+  message: string,
   siteUrl: string,
 ): Promise<Blob> {
   const W = 1080, H = 1080;
@@ -528,17 +544,17 @@ async function generateShareImage(
   ctx.fillStyle = grad;
   ctx.fillRect(0, 0, W, H);
 
-  ctx.globalAlpha = 0.12;
+  ctx.globalAlpha = 0.1;
   ctx.fillStyle = '#fff';
-  ctx.beginPath(); ctx.arc(120, 120, 240, 0, Math.PI * 2); ctx.fill();
-  ctx.beginPath(); ctx.arc(W - 90, H - 90, 200, 0, Math.PI * 2); ctx.fill();
-  ctx.beginPath(); ctx.arc(W - 60, 200, 100, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.arc(120, 130, 230, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.arc(W - 80, H - 80, 200, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.arc(W - 50, 190, 110, 0, Math.PI * 2); ctx.fill();
   ctx.globalAlpha = 1;
 
-  const cX = 80, cY = 90, cW = W - 160, cH = H - 180;
-  ctx.shadowColor = 'rgba(0,0,0,0.25)';
-  ctx.shadowBlur = 40;
-  ctx.shadowOffsetY = 12;
+  const cX = 70, cY = 80, cW = W - 140, cH = H - 160;
+  ctx.shadowColor = 'rgba(0,0,0,0.22)';
+  ctx.shadowBlur = 44;
+  ctx.shadowOffsetY = 14;
   ctx.fillStyle = '#fff';
   drawRoundRect(ctx, cX, cY, cW, cH, 40);
   ctx.fill();
@@ -548,60 +564,67 @@ async function generateShareImage(
 
   const brandColors = ['#F97316','#6366F1','#22C55E','#EF4444','#F97316','#6366F1'];
   const brand = '123GO!';
-  ctx.font = 'bold 58px Nunito, system-ui, sans-serif';
+  ctx.font = 'bold 60px Nunito, system-ui, sans-serif';
   const bw = ctx.measureText(brand).width;
   let bx = W / 2 - bw / 2;
   for (let i = 0; i < brand.length; i++) {
     ctx.fillStyle = brandColors[i % brandColors.length];
-    ctx.fillText(brand[i], bx + ctx.measureText(brand.slice(0, i)).width + ctx.measureText(brand[i]).width / 2, cY + 76);
+    const prev = ctx.measureText(brand.slice(0, i)).width;
+    const cur = ctx.measureText(brand[i]).width;
+    ctx.fillText(brand[i], bx + prev + cur / 2, cY + 78);
   }
 
   ctx.fillStyle = '#E5E7EB';
-  ctx.fillRect(cX + 60, cY + 98, cW - 120, 2);
+  ctx.fillRect(cX + 60, cY + 100, cW - 120, 2);
 
-  ctx.font = '120px serif';
-  ctx.fillStyle = '#000';
-  ctx.fillText('🏆', W / 2, cY + 255);
+  ctx.font = 'bold 46px Nunito, system-ui, sans-serif';
+  ctx.fillStyle = '#4F46E5';
+  ctx.fillText(message, W / 2, cY + 190);
 
-  ctx.font = 'bold 52px Nunito, system-ui, sans-serif';
+  ctx.fillStyle = '#E5E7EB';
+  ctx.fillRect(cX + 60, cY + 218, cW - 120, 2);
+
+  const titleLine = gameTitle.length > 30 ? gameTitle.slice(0, 28) + '…' : gameTitle;
+  ctx.font = 'bold 40px Nunito, system-ui, sans-serif';
   ctx.fillStyle = '#1F2937';
-  const displayName = (playerName.trim() || 'Você').slice(0, 24);
-  ctx.fillText(`🎉 Parabéns, ${displayName}!`, W / 2, cY + 345);
+  ctx.fillText(titleLine, W / 2, cY + 295);
 
-  ctx.font = '34px Nunito, system-ui, sans-serif';
+  ctx.font = '32px Nunito, system-ui, sans-serif';
   ctx.fillStyle = '#6B7280';
-  const shortTitle = gameTitle.length > 28 ? gameTitle.slice(0, 26) + '…' : gameTitle;
-  ctx.fillText(shortTitle, W / 2, cY + 400);
+  ctx.fillText('Plataforma 123GO! — Matemática 1º Ano', W / 2, cY + 345);
 
-  const starFilled = Math.round(score);
-  const starEmpty = totalPhases - starFilled;
-  ctx.font = '54px serif';
+  const starsText = '★'.repeat(score) + '☆'.repeat(Math.max(0, totalPhases - score));
+  ctx.font = '64px serif';
   ctx.fillStyle = '#F59E0B';
-  ctx.fillText('★'.repeat(starFilled) + '☆'.repeat(Math.max(0, starEmpty)), W / 2, cY + 478);
+  ctx.fillText(starsText, W / 2, cY + 450);
 
-  ctx.font = 'bold 36px Nunito, system-ui, sans-serif';
+  ctx.font = 'bold 38px Nunito, system-ui, sans-serif';
   ctx.fillStyle = '#374151';
-  ctx.fillText(`${score} de ${totalPhases} acertos`, W / 2, cY + 535);
+  ctx.fillText(`${score} de ${totalPhases} acertos`, W / 2, cY + 510);
+
+  const displayName = playerName.trim();
+  if (displayName) {
+    ctx.font = '30px Nunito, system-ui, sans-serif';
+    ctx.fillStyle = '#9CA3AF';
+    ctx.fillText(`Jogador(a): ${displayName.slice(0, 20)}`, W / 2, cY + 560);
+  }
 
   const date = new Date().toLocaleDateString('pt-BR', { day: 'numeric', month: 'long', year: 'numeric' });
   ctx.font = '28px Nunito, system-ui, sans-serif';
   ctx.fillStyle = '#9CA3AF';
-  ctx.fillText(`📅 ${date}`, W / 2, cY + 588);
+  ctx.fillText(date, W / 2, displayName ? cY + 605 : cY + 570);
 
   ctx.fillStyle = '#E5E7EB';
-  ctx.fillRect(cX + 60, cY + 618, cW - 120, 2);
+  const divY = displayName ? cY + 635 : cY + 600;
+  ctx.fillRect(cX + 60, divY, cW - 120, 2);
 
   ctx.font = '26px Nunito, system-ui, sans-serif';
   ctx.fillStyle = '#9CA3AF';
-  ctx.fillText('Jogue também em:', W / 2, cY + 660);
+  ctx.fillText('Acesse e jogue também:', W / 2, divY + 50);
 
-  ctx.font = 'bold 30px Nunito, system-ui, sans-serif';
+  ctx.font = 'bold 32px Nunito, system-ui, sans-serif';
   ctx.fillStyle = '#4F46E5';
-  ctx.fillText(siteUrl, W / 2, cY + 702);
-
-  ctx.font = '22px Nunito, system-ui, sans-serif';
-  ctx.fillStyle = '#D1D5DB';
-  ctx.fillText('Plataforma de Jogos de Matemática — 1º Ano EF', W / 2, cY + 750);
+  ctx.fillText(siteUrl, W / 2, divY + 94);
 
   return new Promise(resolve => canvas.toBlob(blob => resolve(blob!), 'image/png'));
 }
@@ -615,35 +638,41 @@ interface ShareModalProps {
 function ShareModal({ score, totalPhases, onClose }: ShareModalProps) {
   const [name, setName] = useState('');
   const [loading, setLoading] = useState(false);
-  const [done, setDone] = useState(false);
+  const [shareState, setShareState] = useState<'idle' | 'done' | 'copied'>('idle');
   const inputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => { inputRef.current?.focus(); }, []);
 
   const path = typeof window !== 'undefined' ? window.location.pathname : '/';
   const game = games.find(g => g.path === path);
   const gameTitle = game?.title ?? '123GO!';
   const siteUrl = typeof window !== 'undefined' ? window.location.origin : '';
+  const [message] = useState(() => getFriendlyMessage(score, totalPhases));
+  const date = new Date().toLocaleDateString('pt-BR', { day: 'numeric', month: 'long', year: 'numeric' });
 
   const handleShare = async () => {
     setLoading(true);
     try {
-      const blob = await generateShareImage(name, gameTitle, score, totalPhases, siteUrl);
-      const file = new File([blob], '123go-pontuacao.png', { type: 'image/png' });
+      const blob = await generateShareImage(name, gameTitle, score, totalPhases, message, siteUrl);
+      const file = new File([blob], '123go-progresso.png', { type: 'image/png' });
       if (navigator.canShare?.({ files: [file] })) {
         await navigator.share({
-          title: '123GO! — Minha pontuação',
-          text: `Olha minha pontuação no jogo "${gameTitle}"! 🎉`,
+          title: `123GO! — ${gameTitle}`,
+          text: `${message} Joguei "${gameTitle}" e fiz ${score} de ${totalPhases} acertos! Acesse e jogue também:`,
           url: siteUrl,
           files: [file],
         });
+        setShareState('done');
       } else {
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
-        a.href = url; a.download = '123go-pontuacao.png'; a.click();
+        a.href = url; a.download = '123go-progresso.png'; a.click();
         URL.revokeObjectURL(url);
+        try {
+          await navigator.clipboard.writeText(siteUrl);
+          setShareState('copied');
+        } catch {
+          setShareState('done');
+        }
       }
-      setDone(true);
     } catch (err) {
       if ((err as Error).name !== 'AbortError') console.error(err);
     } finally {
@@ -651,94 +680,113 @@ function ShareModal({ score, totalPhases, onClose }: ShareModalProps) {
     }
   };
 
+  const stars = '★'.repeat(score) + '☆'.repeat(Math.max(0, totalPhases - score));
+
   return (
     <div
       onClick={e => { if (e.target === e.currentTarget) onClose(); }}
       style={{
-        position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(4px)',
-        zIndex: 900, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20,
+        position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(6px)',
+        zIndex: 900, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16,
       }}
     >
       <div style={{
-        background: '#fff', borderRadius: 20, padding: '32px 28px', width: '100%', maxWidth: 420,
-        boxShadow: '0 24px 64px rgba(0,0,0,0.25)', position: 'relative',
-        animation: 'shareModalIn 0.25s ease-out',
+        background: '#fff', borderRadius: 24, width: '100%', maxWidth: 440,
+        boxShadow: '0 28px 72px rgba(0,0,0,0.28)', position: 'relative',
+        animation: 'shareModalIn 0.28s cubic-bezier(.34,1.56,.64,1)',
+        overflow: 'hidden',
       }}>
         <button
           onClick={onClose}
           aria-label="Fechar"
           style={{
-            position: 'absolute', top: 16, right: 16, width: 30, height: 30,
-            borderRadius: '50%', border: '1.5px solid var(--border)', background: '#fff',
+            position: 'absolute', top: 14, right: 14, width: 32, height: 32,
+            borderRadius: '50%', border: '1.5px solid var(--border)', background: 'rgba(255,255,255,0.9)',
             cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: 16, color: 'var(--text2)',
+            fontSize: 15, color: 'var(--text2)', zIndex: 2,
           }}
         >✕</button>
 
-        <div style={{ textAlign: 'center', marginBottom: 24 }}>
-          <div style={{ fontSize: 52, marginBottom: 8 }}>🏆</div>
-          <h2 style={{ fontFamily: 'Nunito', fontWeight: 900, fontSize: 22, color: 'var(--text)', margin: '0 0 4px' }}>
-            Compartilhar pontuação
-          </h2>
-          <p style={{ color: 'var(--text2)', fontSize: 13, margin: 0 }}>
-            {score} de {totalPhases} acertos em <strong>{gameTitle}</strong>
-          </p>
+        {/* Progress card preview */}
+        <div style={{
+          background: 'linear-gradient(135deg,#4F46E5,#7C3AED)',
+          padding: '28px 28px 24px',
+          textAlign: 'center',
+        }}>
+          <div style={{ fontSize: 13, fontWeight: 800, color: 'rgba(255,255,255,0.7)', letterSpacing: '0.1em', marginBottom: 10, fontFamily: 'Nunito' }}>
+            123GO! — Plataforma de Matemática
+          </div>
+          <div style={{ fontFamily: 'Nunito', fontWeight: 900, fontSize: 20, color: '#fff', marginBottom: 14, lineHeight: 1.3 }}>
+            {message}
+          </div>
+          <div style={{ background: 'rgba(255,255,255,0.15)', borderRadius: 14, padding: '14px 20px' }}>
+            <div style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 16, color: '#fff', marginBottom: 4 }}>{gameTitle}</div>
+            <div style={{ fontSize: 26, color: '#FBBF24', letterSpacing: 2, marginBottom: 6 }}>{stars}</div>
+            <div style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 18, color: '#fff' }}>
+              {score} de {totalPhases} acertos
+            </div>
+            <div style={{ fontFamily: 'Nunito', fontSize: 12, color: 'rgba(255,255,255,0.65)', marginTop: 4 }}>{date}</div>
+          </div>
         </div>
 
-        <label style={{ display: 'block', fontFamily: 'Nunito', fontWeight: 700, fontSize: 13, color: 'var(--text2)', marginBottom: 6 }}>
-          Seu nome (opcional)
-        </label>
-        <input
-          ref={inputRef}
-          type="text"
-          value={name}
-          onChange={e => { setName(e.target.value); setDone(false); }}
-          placeholder="Ex: Maria"
-          maxLength={30}
-          style={{
-            width: '100%', boxSizing: 'border-box', padding: '12px 14px',
-            borderRadius: 12, border: '1.5px solid var(--border)',
-            fontFamily: 'Nunito', fontWeight: 700, fontSize: 16, color: 'var(--text)',
-            outline: 'none', marginBottom: 16, background: 'var(--bg)',
-          }}
-          onFocus={e => (e.currentTarget.style.borderColor = '#4F46E5')}
-          onBlur={e => (e.currentTarget.style.borderColor = 'var(--border)')}
-        />
+        {/* Bottom section */}
+        <div style={{ padding: '20px 24px 24px' }}>
+          <label style={{ display: 'block', fontFamily: 'Nunito', fontWeight: 700, fontSize: 12, color: 'var(--text3)', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '0.07em' }}>
+            Apelido ou primeiro nome (opcional)
+          </label>
+          <input
+            ref={inputRef}
+            type="text"
+            value={name}
+            onChange={e => { setName(e.target.value); setShareState('idle'); }}
+            placeholder="Ex: Mia, João, Bela…"
+            maxLength={20}
+            autoComplete="off"
+            style={{
+              width: '100%', boxSizing: 'border-box', padding: '11px 14px',
+              borderRadius: 12, border: '1.5px solid var(--border)',
+              fontFamily: 'Nunito', fontWeight: 700, fontSize: 15, color: 'var(--text)',
+              outline: 'none', marginBottom: 6, background: 'var(--bg)',
+            }}
+            onFocus={e => (e.currentTarget.style.borderColor = '#4F46E5')}
+            onBlur={e => (e.currentTarget.style.borderColor = 'var(--border)')}
+          />
+          <p style={{ fontFamily: 'Nunito', fontSize: 11, color: 'var(--text3)', margin: '0 0 16px', display: 'flex', alignItems: 'center', gap: 4 }}>
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            Apenas apelido ou primeiro nome para proteger sua privacidade
+          </p>
 
-        <button
-          onClick={handleShare}
-          disabled={loading}
-          style={{
-            width: '100%', padding: '14px 0', borderRadius: 'var(--radius-pill)',
-            background: done ? '#22C55E' : 'linear-gradient(135deg,#4F46E5,#7C3AED)',
-            color: '#fff', fontFamily: 'Nunito', fontWeight: 800, fontSize: 16,
-            border: 'none', cursor: loading ? 'wait' : 'pointer',
-            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-            opacity: loading ? 0.75 : 1, transition: 'all 0.2s ease', minHeight: 52,
-          }}
-        >
-          {loading ? (
-            <>Gerando imagem…</>
-          ) : done ? (
-            <>✅ Compartilhado!</>
-          ) : (
-            <>
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
-                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
-              </svg>
-              Compartilhar pontuação
-            </>
-          )}
-        </button>
+          <button
+            onClick={handleShare}
+            disabled={loading}
+            style={{
+              width: '100%', padding: '14px 0', borderRadius: 'var(--radius-pill)',
+              background: shareState === 'done' || shareState === 'copied' ? '#22C55E' : 'linear-gradient(135deg,#4F46E5,#7C3AED)',
+              color: '#fff', fontFamily: 'Nunito', fontWeight: 800, fontSize: 15,
+              border: 'none', cursor: loading ? 'wait' : 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+              opacity: loading ? 0.75 : 1, transition: 'background 0.25s ease', minHeight: 50,
+            }}
+          >
+            {loading ? 'Gerando imagem…' : shareState === 'done' ? '✅ Compartilhado!' : shareState === 'copied' ? '✅ Imagem salva + link copiado!' : (
+              <>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+                  <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+                </svg>
+                Compartilhar progresso
+              </>
+            )}
+          </button>
 
-        <p style={{ textAlign: 'center', color: 'var(--text3)', fontSize: 11, marginTop: 12, marginBottom: 0 }}>
-          Uma imagem será gerada e salva no seu dispositivo
-        </p>
+          <p style={{ textAlign: 'center', color: 'var(--text3)', fontSize: 11, marginTop: 10, marginBottom: 0 }}>
+            Uma imagem com o progresso será gerada para compartilhar
+          </p>
+        </div>
       </div>
       <style>{`
         @keyframes shareModalIn {
-          from { opacity: 0; transform: scale(0.92) translateY(16px); }
+          from { opacity: 0; transform: scale(0.88) translateY(20px); }
           to   { opacity: 1; transform: scale(1) translateY(0); }
         }
       `}</style>
@@ -759,6 +807,13 @@ interface PhaseCompleteCardProps {
 export function PhaseCompleteCard({ phase, totalPhases, score, isGameComplete, onNext, onRestart, color }: PhaseCompleteCardProps) {
   const [, setLocation] = useLocation();
   const [showShare, setShowShare] = useState(false);
+
+  useEffect(() => {
+    if (isGameComplete) {
+      const t = setTimeout(() => setShowShare(true), 900);
+      return () => clearTimeout(t);
+    }
+  }, [isGameComplete]);
 
   return (
     <>
