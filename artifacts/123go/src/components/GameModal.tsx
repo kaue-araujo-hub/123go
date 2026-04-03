@@ -168,7 +168,7 @@ export function GameModal({ game, onClose }: GameModalProps) {
               border: '1.5px solid var(--border)',
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-                <AppleEmoji emoji="🎮" size={18} />
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--text3)', flexShrink: 0 }}><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
                 <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--text3)', textTransform: 'uppercase', letterSpacing: '0.08em', margin: 0 }}>
                   Como Jogar
                 </p>
@@ -195,7 +195,7 @@ export function GameModal({ game, onClose }: GameModalProps) {
                 minHeight: 52,
               }}
             >
-              <AppleEmoji emoji="🎮" size={20} style={{ pointerEvents: 'none' }} /> Jogar agora
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style={{ pointerEvents: 'none', flexShrink: 0, marginRight: 6, verticalAlign: 'middle' }}><polygon points="5,3 19,12 5,21"/></svg>Jogar agora
             </button>
           </div>
         </div>

@@ -194,7 +194,7 @@ export function GameCard({ game, onInfo }: GameCardProps) {
           onMouseEnter={e => (e.currentTarget.style.opacity = '0.88')}
           onMouseLeave={e => (e.currentTarget.style.opacity = '1')}
         >
-          <AppleEmoji emoji="🎮" size={18} style={{ pointerEvents: 'none' }} /> Jogar
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" style={{ pointerEvents: 'none', flexShrink: 0 }}><polygon points="5,3 19,12 5,21"/></svg> Jogar
         </button>
       </div>
     </div>

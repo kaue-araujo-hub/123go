@@ -171,7 +171,7 @@ export function GameListRow({ game, onInfo }: GameListRowProps) {
           onMouseEnter={e => (e.currentTarget.style.opacity = '0.88')}
           onMouseLeave={e => (e.currentTarget.style.opacity = '1')}
         >
-          🎮 Jogar
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" style={{ pointerEvents: 'none', flexShrink: 0, marginRight: 5 }}><polygon points="5,3 19,12 5,21"/></svg>Jogar
         </button>
       </div>
     </div>
