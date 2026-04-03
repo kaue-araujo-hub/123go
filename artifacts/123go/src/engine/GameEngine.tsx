@@ -150,8 +150,8 @@ export function GameShell({ title, emoji, color, currentPhase, totalPhases, chil
       <div style={{
         background: '#fff',
         borderBottom: '1px solid var(--border)',
-        padding: '0 16px',
-        height: 64,
+        padding: '0 12px',
+        height: 52,
         display: 'flex',
         alignItems: 'center',
         position: 'sticky',
@@ -159,14 +159,14 @@ export function GameShell({ title, emoji, color, currentPhase, totalPhases, chil
         zIndex: 50,
       }}>
         {/* LEFT: back + title */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, flex: 1, minWidth: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1, minWidth: 0 }}>
           <button
             onClick={() => setLocation('/catalog')}
             aria-label="Voltar ao catálogo"
             className="btn-interactive"
             style={{
-              width: 44,
-              height: 44,
+              width: 40,
+              height: 40,
               borderRadius: '50%',
               border: '1.5px solid var(--border)',
               background: '#fff',
@@ -174,13 +174,13 @@ export function GameShell({ title, emoji, color, currentPhase, totalPhases, chil
               alignItems: 'center',
               justifyContent: 'center',
               cursor: 'pointer',
-              fontSize: 18,
+              fontSize: 16,
               color: 'var(--text2)',
               flexShrink: 0,
             }}
           >←</button>
-          <AppleEmoji emoji={emoji} size={26} className="game-character-alive" style={{ flexShrink: 0 }} />
-          <h1 style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 17, color: 'var(--text)', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{title}</h1>
+          <AppleEmoji emoji={emoji} size={22} className="game-character-alive" style={{ flexShrink: 0 }} />
+          <h1 style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 14, color: 'var(--text)', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{title}</h1>
         </div>
 
         {/* CENTER: playback controls — desktop only */}
@@ -228,8 +228,8 @@ export function GameShell({ title, emoji, color, currentPhase, totalPhases, chil
               color: '#fff',
               fontFamily: 'Nunito',
               fontWeight: 800,
-              fontSize: 16,
-              padding: '6px 16px',
+              fontSize: 14,
+              padding: '4px 12px',
               borderRadius: 'var(--radius-pill)',
               flexShrink: 0,
               letterSpacing: '0.02em',
@@ -279,8 +279,8 @@ export function GameShell({ title, emoji, color, currentPhase, totalPhases, chil
       </div>
 
       {/* Progress bar */}
-      <div style={{ background: '#fff', padding: '12px 16px', borderBottom: '1px solid var(--border)' }}>
-        <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
+      <div style={{ background: '#fff', padding: '6px 16px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
+        <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
           {Array.from({ length: totalPhases }).map((_, i) => {
             const phaseNum = i + 1;
             const done = phaseNum < currentPhase;
@@ -289,11 +289,11 @@ export function GameShell({ title, emoji, color, currentPhase, totalPhases, chil
               <div
                 key={i}
                 style={{
-                  width: done || current ? 36 : 28,
-                  height: 16,
-                  borderRadius: 8,
+                  width: done || current ? 28 : 20,
+                  height: 10,
+                  borderRadius: 5,
                   background: done ? color : current ? color : 'var(--border)',
-                  opacity: current ? 1 : done ? 0.85 : 0.35,
+                  opacity: current ? 1 : done ? 0.85 : 0.3,
                   transition: 'all 0.3s ease',
                   animation: current && isPlaying ? 'pulseDot 1.2s ease-in-out infinite' : 'none',
                 }}
@@ -301,13 +301,13 @@ export function GameShell({ title, emoji, color, currentPhase, totalPhases, chil
             );
           })}
         </div>
-        <p style={{ textAlign: 'center', color: 'var(--text2)', fontSize: 14, marginTop: 8, fontWeight: 700 }}>
-          Fase {currentPhase} de {totalPhases}
-        </p>
+        <span style={{ color: 'var(--text2)', fontSize: 12, fontWeight: 700, fontFamily: 'Nunito', whiteSpace: 'nowrap' }}>
+          {currentPhase}/{totalPhases}
+        </span>
       </div>
 
       {/* Game content */}
-      <div className="game-area" style={{ flex: 1, padding: '24px 20px', maxWidth: 720, margin: '0 auto', width: '100%', position: 'relative' }}>
+      <div className="game-area" style={{ flex: 1, padding: '14px 14px', maxWidth: 720, margin: '0 auto', width: '100%', position: 'relative' }}>
         {children}
 
         {/* Paused overlay */}

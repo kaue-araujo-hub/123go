@@ -137,57 +137,56 @@ export function AtelieOrdem() {
     <GameShell title="Ateliê da Ordem" emoji="🎨" color="var(--c2)" currentPhase={phase} totalPhases={5} score={score} onRestart={restart}>
       <FeedbackOverlay type={feedback} />
 
-      <div style={{ textAlign: 'center', marginBottom: 16 }}>
-        <h2 style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 18, color: 'var(--text)' }}>
+      {/* Title — compact */}
+      <div style={{ textAlign: 'center', marginBottom: 8 }}>
+        <h2 style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 18, color: 'var(--text)', margin: 0 }}>
           {phaseData.label}
         </h2>
         {(phaseData as any).hint && (
-          <p style={{ color: 'var(--text2)', fontSize: 13, marginTop: 4 }}>{(phaseData as any).hint}</p>
+          <p style={{ color: 'var(--text2)', fontSize: 13, marginTop: 2 }}>{(phaseData as any).hint}</p>
         )}
       </div>
 
-      {/* Objects to sort */}
+      {/* Objects to sort — large tap targets */}
       <div style={{
         background: '#fff',
         borderRadius: 'var(--radius)',
         border: '1.5px solid var(--border)',
-        padding: 16,
-        marginBottom: 16,
-        minHeight: 80,
+        padding: '10px 8px',
+        marginBottom: 10,
         display: 'flex',
         flexWrap: 'wrap',
-        gap: 8,
+        gap: 10,
         justifyContent: 'center',
+        alignItems: 'center',
+        minHeight: 90,
       }}>
-        {remaining.map((obj, i) => (
+        {remaining.map((obj) => (
           <div
             key={obj.emoji}
             draggable
             onDragStart={() => setDragging(obj)}
             onClick={() => handleTap(obj.emoji, obj.attr)}
             style={{
-              width: 56,
-              height: 56,
-              fontSize: 32,
+              width: 72,
+              height: 72,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               cursor: 'grab',
               background: 'var(--bg)',
-              borderRadius: 12,
+              borderRadius: 14,
               border: '1.5px solid var(--border)',
-              minHeight: 72,
-              minWidth: 56,
             }}
-          ><AppleEmoji emoji={obj.emoji} size={36} /></div>
+          ><AppleEmoji emoji={obj.emoji} size={46} /></div>
         ))}
         {remaining.length === 0 && (
-          <p style={{ color: 'var(--c5)', fontWeight: 700 }}>Tudo organizado!</p>
+          <p style={{ color: 'var(--c5)', fontWeight: 700, margin: 0 }}>✅ Tudo organizado!</p>
         )}
       </div>
 
-      {/* Drawers */}
-      <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+      {/* Drawers — maximize remaining vertical space */}
+      <div style={{ display: 'flex', gap: 8 }}>
         {phaseData.drawers.map(drawer => (
           <div
             key={drawer.key}
@@ -195,29 +194,28 @@ export function AtelieOrdem() {
             onDrop={() => handleDrop(drawer.key)}
             style={{
               flex: 1,
-              minWidth: 90,
-              padding: 12,
+              padding: '10px 8px',
               borderRadius: 16,
               border: `3px solid ${drawer.color}`,
-              background: `${drawer.color}15`,
-              minHeight: 90,
+              background: `${drawer.color}18`,
+              minHeight: 130,
               display: 'flex',
               flexDirection: 'column',
               gap: 6,
               alignItems: 'center',
             }}
           >
-            <span style={{ fontSize: 11, fontWeight: 700, color: drawer.color, textAlign: 'center' }}>{drawer.label}</span>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, justifyContent: 'center' }}>
+            <span style={{ fontSize: 13, fontWeight: 800, color: drawer.color, textAlign: 'center', fontFamily: 'Nunito', lineHeight: 1.2 }}>{drawer.label}</span>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, justifyContent: 'center', flex: 1, alignContent: 'center' }}>
               {(placed[drawer.key] || []).map((emoji, i) => (
-                <AppleEmoji key={i} emoji={emoji} size={24} />
+                <AppleEmoji key={i} emoji={emoji} size={32} />
               ))}
             </div>
           </div>
         ))}
       </div>
-      <p style={{ textAlign: 'center', color: 'var(--text3)', fontSize: 12, marginTop: 10 }}>
-        Toque nos objetos ou arraste para as gavetas
+      <p style={{ textAlign: 'center', color: 'var(--text3)', fontSize: 11, marginTop: 6 }}>
+        Toque nos objetos para organizar
       </p>
     </GameShell>
   );
