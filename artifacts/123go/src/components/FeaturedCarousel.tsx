@@ -33,7 +33,8 @@ export function FeaturedCarousel() {
 
   const [canPrev, setCanPrev] = useState(false);
   const [canNext, setCanNext] = useState(true);
-  const [dragging, setDragging] = useState(false);
+  // useRef so click handlers always read the live value (no stale closure)
+  const draggingRef = useRef(false);
 
   const onSelect = useCallback(() => {
     if (!emblaApi) return;
@@ -46,8 +47,8 @@ export function FeaturedCarousel() {
     onSelect();
     emblaApi.on('select', onSelect);
     emblaApi.on('reInit', onSelect);
-    emblaApi.on('pointerDown', () => setDragging(true));
-    emblaApi.on('pointerUp', () => setTimeout(() => setDragging(false), 50));
+    emblaApi.on('pointerDown', () => { draggingRef.current = true; });
+    emblaApi.on('pointerUp',   () => { setTimeout(() => { draggingRef.current = false; }, 80); });
     return () => { emblaApi.off('select', onSelect); };
   }, [emblaApi, onSelect]);
 
@@ -87,7 +88,7 @@ export function FeaturedCarousel() {
         ref={emblaRef}
         style={{
           overflow: 'hidden',
-          cursor: dragging ? 'grabbing' : 'grab',
+          cursor: 'grab',
           userSelect: 'none',
           WebkitUserSelect: 'none',
         }}
@@ -101,7 +102,7 @@ export function FeaturedCarousel() {
                 game={game}
                 rank={i}
                 medal={medals[i]}
-                onClick={() => { if (!dragging) setLocation(game.path); }}
+                onClick={() => { if (!draggingRef.current) setLocation(game.path); }}
               />
             </div>
           ))}
