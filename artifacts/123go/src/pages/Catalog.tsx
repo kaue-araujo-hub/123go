@@ -38,7 +38,7 @@ function ListIcon({ active }: { active: boolean }) {
 
 export function Catalog() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [filters, setFilters] = useState<FilterState>({ ano: null, periodo: null, tema: null });
+  const [filters, setFilters] = useState<FilterState>({ ano: null, periodo: null, tema: null, age: null });
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedGame, setSelectedGame] = useState<Game | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
@@ -46,9 +46,10 @@ export function Catalog() {
 
   const filteredGames = useMemo(() => {
     return games.filter(game => {
-      if (filters.ano !== null && game.ano !== filters.ano) return false;
+      if (filters.ano    !== null && game.ano    !== filters.ano)    return false;
       if (filters.periodo !== null && game.periodo !== filters.periodo) return false;
-      if (filters.tema !== null && game.tema !== filters.tema) return false;
+      if (filters.tema   !== null && game.tema   !== filters.tema)   return false;
+      if (filters.age !== null && !(game.ageMin <= filters.age && filters.age <= game.ageMax)) return false;
 
       if (searchQuery) {
         const q = searchQuery.toLowerCase();

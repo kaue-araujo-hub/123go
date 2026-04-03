@@ -133,6 +133,25 @@ export function GameModal({ game, onClose }: GameModalProps) {
               <p style={{ color: 'var(--text)', fontSize: 14, fontWeight: 600 }}>{game.unidade}</p>
             </div>
 
+            {/* Público-alvo */}
+            <div style={{ marginBottom: 16 }}>
+              <div style={{
+                display: 'flex', alignItems: 'center', gap: 10,
+                background: '#EFF6FF', borderRadius: 10, padding: '10px 14px',
+                border: '1.5px solid #BFDBFE',
+              }}>
+                <span style={{ fontSize: 20 }}>👧</span>
+                <div>
+                  <p style={{ fontSize: 10, fontWeight: 700, color: '#1E40AF', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 2 }}>
+                    Público-alvo
+                  </p>
+                  <p style={{ fontFamily: 'Nunito', fontWeight: 700, fontSize: 14, color: '#1E3A8A' }}>
+                    Crianças de {game.ageMin} a {game.ageMax} anos
+                  </p>
+                </div>
+              </div>
+            </div>
+
             <div style={{ marginBottom: 16 }}>
               <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--text3)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>
                 Habilidade
