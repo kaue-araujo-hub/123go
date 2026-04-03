@@ -57,33 +57,29 @@ export function GameModal({ game, onClose }: GameModalProps) {
         inset: 0,
         zIndex: 1000,
         display: 'flex',
-        alignItems: 'flex-end',
+        alignItems: 'center',
         justifyContent: 'center',
         background: 'rgba(26,26,46,0.5)',
+        padding: '16px',
       }}
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      {/* Desktop centering wrapper */}
-      <div className="modal-wrapper" style={{ width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'flex-end' }}>
         <div
           ref={dialogRef}
-          className="modal-content"
           style={{
             background: '#fff',
-            borderRadius: '20px 20px 0 0',
+            borderRadius: '20px',
             width: '100%',
             maxWidth: 520,
-            maxHeight: '85vh',
+            maxHeight: '88vh',
             overflowY: 'auto',
             padding: 0,
           }}
         >
-          {/* Handle (mobile) */}
-          <div className="modal-handle" style={{ display: 'flex', justifyContent: 'center', padding: '12px 0 0' }}>
-            <div style={{ width: 40, height: 4, background: '#E8E8F0', borderRadius: 2 }}/>
-          </div>
+          {/* spacer top */}
+          <div style={{ height: 8 }} />
 
           {/* Header */}
           <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: 14 }}>
@@ -203,22 +199,6 @@ export function GameModal({ game, onClose }: GameModalProps) {
             </button>
           </div>
         </div>
-      </div>
-
-      <style>{`
-        @media (min-width: 600px) {
-          .modal-wrapper {
-            align-items: center !important;
-            height: 100%;
-          }
-          .modal-content {
-            border-radius: 20px !important;
-          }
-          .modal-handle {
-            display: none !important;
-          }
-        }
-      `}</style>
     </div>
   );
 }
