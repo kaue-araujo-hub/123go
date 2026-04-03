@@ -47,9 +47,28 @@ export function FeaturedCarousel() {
     onSelect();
     emblaApi.on('select', onSelect);
     emblaApi.on('reInit', onSelect);
-    emblaApi.on('pointerDown', () => { draggingRef.current = true; });
-    emblaApi.on('pointerUp',   () => { setTimeout(() => { draggingRef.current = false; }, 80); });
-    return () => { emblaApi.off('select', onSelect); };
+
+    // Only mark as dragging when the carousel actually scrolled — not on plain taps/clicks
+    let scrolledDuringPointer = false;
+    const onScroll    = () => { scrolledDuringPointer = true; };
+    const onPtrDown   = () => { scrolledDuringPointer = false; };
+    const onPtrUp     = () => {
+      if (scrolledDuringPointer) {
+        draggingRef.current = true;
+        setTimeout(() => { draggingRef.current = false; }, 150);
+      }
+    };
+
+    emblaApi.on('scroll',      onScroll);
+    emblaApi.on('pointerDown', onPtrDown);
+    emblaApi.on('pointerUp',   onPtrUp);
+
+    return () => {
+      emblaApi.off('select',      onSelect);
+      emblaApi.off('scroll',      onScroll);
+      emblaApi.off('pointerDown', onPtrDown);
+      emblaApi.off('pointerUp',   onPtrUp);
+    };
   }, [emblaApi, onSelect]);
 
   const scrollPrev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
