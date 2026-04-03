@@ -110,6 +110,7 @@ export function TrailModal({ trail, onClose }: Props) {
       onClick={e => { if (e.target === e.currentTarget) onClose(); }}
     >
       <div
+        className="trail-modal-body"
         style={{
           width: '100%', maxWidth: 520,
           maxHeight: '92dvh',

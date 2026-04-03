@@ -18,8 +18,8 @@ export function TrailSection() {
           </span>
         </div>
 
-        {/* 5 trail cards — horizontal scroll on mobile */}
-        <div style={{ display: 'flex', gap: 12, overflowX: 'auto', paddingBottom: 4, WebkitOverflowScrolling: 'touch' }}>
+        {/* 5 trail cards — horizontal scroll, bar hidden */}
+        <div className="scroll-x-hidden" style={{ display: 'flex', gap: 12, paddingBottom: 4 }}>
           {trails.map(trail => (
             <TrailCard
               key={trail.tema}

@@ -451,6 +451,70 @@ input {
   animation: bounceIn 0.4s cubic-bezier(.36,.07,.19,.97) both;
 }
 
+/* ================================================================
+   SCROLLBAR POLISH — 123GO! brand-matched, thin & modern
+   ================================================================ */
+
+/* ── Global page scrollbar (Webkit) ── */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(107, 114, 128, 0.25);   /* neutral gray, low opacity */
+  border-radius: 10px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  transition: background 0.2s ease;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(99, 102, 241, 0.55);    /* brand indigo on hover */
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* ── Global page scrollbar (Firefox) ── */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(107, 114, 128, 0.25) transparent;
+}
+
+/* ── Horizontal scroll containers (trail cards, carousels)
+      Hide the visible bar but keep touch/mouse scroll active ── */
+.scroll-x-hidden {
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;       /* Firefox */
+  overflow-x: auto;
+}
+.scroll-x-hidden::-webkit-scrollbar {
+  display: none;               /* Webkit */
+}
+
+/* ── Trail modal inner scroll — stays within rounded corners ── */
+.trail-modal-body {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(107, 114, 128, 0.2) transparent;
+}
+.trail-modal-body::-webkit-scrollbar {
+  width: 5px;
+}
+.trail-modal-body::-webkit-scrollbar-track {
+  background: transparent;
+  margin: 12px 0;             /* keeps thumb away from rounded edges */
+}
+.trail-modal-body::-webkit-scrollbar-thumb {
+  background: rgba(107, 114, 128, 0.22);
+  border-radius: 10px;
+}
+.trail-modal-body::-webkit-scrollbar-thumb:hover {
+  background: rgba(99, 102, 241, 0.45);
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
