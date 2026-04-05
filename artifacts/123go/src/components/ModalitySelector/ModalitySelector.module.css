@@ -1,0 +1,169 @@
+/* ─── Seção principal ──────────────────────────────────────────────────────── */
+.section {
+  display:        flex;
+  flex-direction: column;
+  gap:            20px;
+  padding:        24px 20px;
+  background:     #ffffff;
+  border-radius:  20px;
+  border:         1.5px solid #E8E8F0;
+  margin-bottom:  28px;
+  animation:      sectionAppear 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  will-change:    transform, opacity;
+}
+
+@keyframes sectionAppear {
+  from { transform: translateY(-12px) translateZ(0); opacity: 0; }
+  to   { transform: translateY(0) translateZ(0); opacity: 1; }
+}
+
+/* ─── Header ───────────────────────────────────────────────────────────────── */
+.header {
+  display:     flex;
+  align-items: flex-start;
+  gap:         12px;
+}
+
+.headerIcon {
+  font-size:   28px;
+  flex-shrink: 0;
+  animation:   iconFloat 3s ease-in-out infinite;
+  will-change: transform;
+}
+
+@keyframes iconFloat {
+  0%, 100% { transform: translateY(0) translateZ(0); }
+  50%      { transform: translateY(-5px) translateZ(0); }
+}
+
+.headerTitle {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  font-size:   18px;
+  color:       #1A1A2E;
+  margin:      0 0 3px;
+}
+
+.headerSub {
+  font-size: 13px;
+  color:     #5A5A7A;
+  margin:    0;
+}
+
+/* ─── Carrossel de modalidades ─────────────────────────────────────────────── */
+.carousel {
+  display:               grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap:                   12px;
+}
+
+@media (max-width: 600px) {
+  .carousel {
+    grid-template-columns:      repeat(3, minmax(150px, 1fr));
+    overflow-x:                 auto;
+    scroll-snap-type:           x mandatory;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom:             6px;
+  }
+}
+
+/* ─── Dificuldade ──────────────────────────────────────────────────────────── */
+.difficultySection { display: flex; flex-direction: column; gap: 10px; }
+
+.difficultyLabel {
+  font-family:    'Nunito', sans-serif;
+  font-weight:    700;
+  font-size:      13px;
+  color:          #9090B0;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin:         0;
+}
+
+.difficultyPills {
+  display:   flex;
+  gap:       8px;
+  flex-wrap: wrap;
+}
+
+.diffPill {
+  display:       flex;
+  align-items:   center;
+  gap:           6px;
+  padding:       8px 18px;
+  border-radius: 50px;
+  border:        1.5px solid #E8E8F0;
+  background:    #F7F8FC;
+  font-family:   'Nunito', sans-serif;
+  font-weight:   700;
+  font-size:     14px;
+  color:         #5A5A7A;
+  cursor:        pointer;
+  transition:    transform 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  will-change:   transform;
+  touch-action:  manipulation;
+  min-height:    44px;
+}
+
+.diffPill:hover  { border-color: #5B4FCF; color: #5B4FCF; }
+.diffPill:active { transform: scale(0.96) translateZ(0); }
+
+.diffActive {
+  background:   #1A1A2E;
+  color:        #ffffff;
+  border-color: #1A1A2E;
+  animation:    pillPop 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  will-change:  transform;
+}
+
+@keyframes pillPop {
+  from { transform: scale(0.88) translateZ(0); }
+  to   { transform: scale(1) translateZ(0); }
+}
+
+/* ─── Dica do professor ────────────────────────────────────────────────────── */
+.teacherTip {
+  display:       flex;
+  align-items:   flex-start;
+  gap:           10px;
+  padding:       14px 16px;
+  background:    rgba(91,79,207,0.06);
+  border-radius: 12px;
+  border-left:   3px solid #5B4FCF;
+  animation:     tipFadeIn 0.3s ease;
+  will-change:   opacity;
+}
+
+@keyframes tipFadeIn {
+  from { opacity: 0; transform: translateX(-6px) translateZ(0); }
+  to   { opacity: 1; transform: translateX(0) translateZ(0); }
+}
+
+.tipIcon { font-size: 18px; flex-shrink: 0; }
+.tipText { font-size: 13px; color: #5A5A7A; line-height: 1.5; margin: 0; }
+
+/* ─── Botão iniciar aula ───────────────────────────────────────────────────── */
+.btnStart {
+  width:         100%;
+  min-height:    52px;
+  border-radius: 50px;
+  border:        none;
+  background:    linear-gradient(135deg, #5B4FCF, #E91E8C);
+  color:         #ffffff;
+  font-family:   'Nunito', sans-serif;
+  font-weight:   800;
+  font-size:     16px;
+  cursor:        pointer;
+  transition:    transform 0.15s ease, opacity 0.15s ease;
+  will-change:   transform;
+  touch-action:  manipulation;
+}
+
+.btnStart:hover  { opacity: 0.92; }
+.btnStart:active { transform: scale(0.97) translateZ(0); opacity: 0.88; }
+
+@media (prefers-reduced-motion: reduce) {
+  .section, .headerIcon, .teacherTip, .diffActive, .btnStart {
+    animation: none !important; transition: none !important;
+  }
+}

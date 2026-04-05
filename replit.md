@@ -34,9 +34,27 @@ See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and pa
 - Aligned with the Currículo Paulista / BNCC
 - Catalog page with filtering by bimestre, tema, search, and pagination
 - GameShell + useGameEngine system for all game pages (5 phases each)
-- Dependencies: `canvas-confetti`, `gsap`, `wouter`
+- Dependencies: `canvas-confetti`, `gsap`, `wouter`, `framer-motion`
 - Game files in `artifacts/123go/src/games/`
 - Data in `artifacts/123go/src/data/games.ts`
 - Engine in `artifacts/123go/src/engine/GameEngine.tsx`
 - Components in `artifacts/123go/src/components/`
 - Router wired in `artifacts/123go/src/App.tsx`
+
+**Timer System (complete)**
+- `src/engine/TimerSystem.ts` — pure class, `performance.now()` precision
+- `src/engine/TimerStore.ts` — localStorage persistence, analytics singleton
+- `src/hooks/useTimer.ts` — React hook for phase/game timing
+- `src/components/TimerDisplay.tsx` — child-friendly `⏱ mm:ss` with spring-tick animation + lowTime urgency styling (red shake when < 10s)
+- `src/components/PhaseResults.tsx` — end-of-game overlay with phase breakdown and personal best badge
+
+**Modalidades de Aula (complete) — route `/professor`**
+- `src/auth/SessionManager.ts` — PIN auth (default: `1234`), role/mode/session management
+- `src/engine/ModeConfig.ts` — MODE_META, CHALLENGE_CONFIG, TIME_CONFIG, PRACTICE_CONFIG; `getModeConfig()`, `randomInRange()`
+- `src/hooks/useGameMode.ts` — reactive hook, cross-tab via StorageEvent
+- `src/components/ModalitySelector/ModalitySelector.tsx` — teacher panel with animated mode carousel + difficulty pills
+- `src/components/ModalitySelector/ModalityCard.tsx` — 3D tilt on hover, CSS vars `--mode-color`/`--mode-bg`
+- `src/components/ModeBadge.tsx` — pulsing dot badge in game top bar; hidden in practice mode (default)
+- `src/pages/TeacherDashboard.tsx` — PIN login + ModalitySelector + session export panel
+- **Countdown timer in Modo Tempo**: game top bar shows countdown (counting down from timeLimitSeconds) instead of stopwatch; turns red + shakes at ≤ 10s
+- **Events**: `123go:mode-changed`, `123go:difficulty-changed`, `123go:role-changed`, `123go:session-started`

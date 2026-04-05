@@ -10,6 +10,8 @@ import { addStar } from '../utils/progress';
 import { useTimer } from '../hooks/useTimer';
 import { TimerDisplay } from '../components/TimerDisplay';
 import { PhaseResults } from '../components/PhaseResults';
+import { ModeBadge } from '../components/ModeBadge';
+import { useGameMode } from '../hooks/useGameMode';
 
 interface PhaseConfig {
   speed: number;
@@ -167,10 +169,29 @@ export function GameShell({ title, emoji, color, currentPhase, totalPhases, chil
     });
   }, []);
 
-  /* Countdown state */
+  /* 3-2-1 intro overlay state */
   const [countdownKey, setCountdownKey]   = useState(0);
   const [countdownDone, setCountdownDone] = useState(false);
   const pendingRestartRef = useRef(false);
+
+  /* Mode (Modalidades de Aula) */
+  const { isTime, config: modeConfig } = useGameMode();
+
+  /* Modo Tempo — regressivo total para toda a sessão de jogo */
+  const timeLimitSeconds = isTime ? (modeConfig.timeLimitSeconds ?? 90) : 0;
+  const [gameCountdown, setGameCountdown] = useState<number>(timeLimitSeconds);
+  const gameCountdownFmt = `${String(Math.floor(gameCountdown / 60)).padStart(2, '0')}:${String(gameCountdown % 60).padStart(2, '0')}`;
+
+  useEffect(() => {
+    if (!isTime) return;
+    setGameCountdown(timeLimitSeconds);
+  }, [isTime, timeLimitSeconds]);
+
+  useEffect(() => {
+    if (!isTime || paused || stopped || !countdownDone || gameCountdown <= 0) return;
+    const id = setTimeout(() => setGameCountdown(n => Math.max(0, n - 1)), 1000);
+    return () => clearTimeout(id);
+  }, [isTime, paused, stopped, countdownDone, gameCountdown]);
 
   const handleCountdownComplete = useCallback(() => {
     setCountdownDone(true);
@@ -303,13 +324,17 @@ export function GameShell({ title, emoji, color, currentPhase, totalPhases, chil
           </ControlBtn>
         </div>
 
-        {/* RIGHT: timer + score */}
+        {/* RIGHT: mode badge + timer + score */}
         <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 8 }}>
-          {/* Timer display — compact in top bar */}
+          {/* Mode badge — visible to students (practice mode hidden) */}
+          <ModeBadge />
+
+          {/* Timer display — countdown in Modo Tempo, stopwatch otherwise */}
           <TimerDisplay
-            formatted={formatted}
-            isRunning={isRunning}
+            formatted={isTime ? gameCountdownFmt : formatted}
+            isRunning={isTime ? (countdownDone && !paused && !stopped) : isRunning}
             compact
+            lowTime={isTime && gameCountdown <= 10 && gameCountdown > 0}
           />
           {score !== undefined && (
             <span className="entry-pop" style={{

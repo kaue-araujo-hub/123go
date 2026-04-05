@@ -102,6 +102,25 @@
   color:        #5B4FCF;
 }
 
+/* ─── Modo Tempo: pouco tempo restante (< 10s) ──────────────────────────────── */
+@keyframes urgentShake {
+  0%, 100% { transform: translateX(0) translateZ(0); }
+  20%      { transform: translateX(-3px) translateZ(0); }
+  40%      { transform: translateX(3px) translateZ(0); }
+  60%      { transform: translateX(-2px) translateZ(0); }
+  80%      { transform: translateX(2px) translateZ(0); }
+}
+
+.lowTime {
+  background:   rgba(220, 38, 38, 0.08);
+  border-color: rgba(220, 38, 38, 0.4);
+  color:        #DC2626;
+  animation:    urgentShake 0.5s ease infinite;
+  will-change:  transform;
+}
+
+.lowTime .icon { filter: none; }
+
 /* ─── Parado com fadeout ─────────────────────────────────────────────────────── */
 @keyframes timerStop {
   0%   { transform: scale(1) translateZ(0);    opacity: 1;    }

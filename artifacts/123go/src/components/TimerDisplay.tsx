@@ -11,9 +11,10 @@ interface TimerDisplayProps {
   formatted:  string;
   isRunning:  boolean;
   compact?:   boolean;
+  lowTime?:   boolean;
 }
 
-export function TimerDisplay({ formatted, isRunning, compact = false }: TimerDisplayProps) {
+export function TimerDisplay({ formatted, isRunning, compact = false, lowTime = false }: TimerDisplayProps) {
   const ref = useRef<HTMLSpanElement>(null);
 
   /* Pulsa suavemente quando o segundo muda */
@@ -32,9 +33,10 @@ export function TimerDisplay({ formatted, isRunning, compact = false }: TimerDis
         styles.wrapper,
         compact    ? styles.compact  : '',
         isRunning  ? styles.running  : '',
+        lowTime    ? styles.lowTime  : '',
       ].join(' ')}
       role="timer"
-      aria-label={`Tempo decorrido: ${formatted}`}
+      aria-label={`Tempo: ${formatted}`}
       aria-live="off"
     >
       <span className={styles.icon} aria-hidden="true">⏱</span>
