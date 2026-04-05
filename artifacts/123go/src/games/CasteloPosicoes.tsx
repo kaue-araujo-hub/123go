@@ -1,35 +1,81 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { GameShell, useGameEngine, FeedbackOverlay, PhaseCompleteCard } from '../engine/GameEngine';
 import { AppleEmoji } from '../utils/AppleEmoji';
 
-const INSTRUCTIONS = [
-  { text: 'Mova o cavaleiro para a DIREITA da torre!', targetZone: 'right' },
-  { text: 'Coloque o cavaleiro EMBAIXO do dragão!', targetZone: 'bottom' },
-  { text: 'Posicione o cavaleiro À ESQUERDA do castelo!', targetZone: 'left' },
-  { text: 'Leve o cavaleiro para EM CIMA da bandeira!', targetZone: 'top' },
-  { text: 'Mova o cavaleiro para o CENTRO do castelo!', targetZone: 'center' },
-];
+type Zone = 'top' | 'bottom' | 'left' | 'right' | 'center';
 
-const ZONES = ['top', 'left', 'center', 'right', 'bottom'];
+interface Instruction {
+  text: string;
+  targetZone: Zone;
+  secondZone?: Zone;
+}
+
+const INSTRUCTIONS_BY_PHASE: Instruction[][] = [
+  [
+    { text: 'Coloque o cavaleiro EM CIMA do castelo!', targetZone: 'top' },
+    { text: 'Coloque o cavaleiro EMBAIXO do castelo!', targetZone: 'bottom' },
+    { text: 'Coloque o cavaleiro À ESQUERDA do castelo!', targetZone: 'left' },
+  ],
+  [
+    { text: 'Coloque o cavaleiro EM CIMA E À DIREITA!', targetZone: 'right', secondZone: 'top' },
+    { text: 'Coloque o cavaleiro EMBAIXO E À ESQUERDA!', targetZone: 'left', secondZone: 'bottom' },
+  ],
+  [
+    { text: 'O rei diz: NO CENTRO!', targetZone: 'center' },
+    { text: 'O rei diz: À DIREITA!', targetZone: 'right' },
+    { text: 'O rei diz: EM CIMA!', targetZone: 'top' },
+  ],
+  [
+    { text: 'Dois passos à DIREITA!', targetZone: 'right' },
+    { text: 'Dois passos para CIMA!', targetZone: 'top' },
+    { text: 'Para o CENTRO!', targetZone: 'center' },
+  ],
+  [
+    { text: 'O dragão está À ESQUERDA — fuja para a DIREITA!', targetZone: 'right' },
+    { text: 'O dragão está EMBAIXO — fuja para CIMA!', targetZone: 'top' },
+    { text: 'Chegou ao CENTRO do castelo!', targetZone: 'center' },
+  ],
+];
 
 export function CasteloPosicoes() {
   const { phase, score, phaseComplete, gameComplete, onCorrect, onPhaseComplete, nextPhase, restart } = useGameEngine(5);
   const [feedback, setFeedback] = useState<'correct' | 'wrong' | null>(null);
   const [answered, setAnswered] = useState(false);
   const [instrIdx, setInstrIdx] = useState(0);
+  const phaseCompletedRef = useRef(false);
+  const instrIdxRef = useRef(0);
 
-  useEffect(() => { setAnswered(false); setFeedback(null); setInstrIdx(phase - 1); }, [phase]);
+  const instructions = INSTRUCTIONS_BY_PHASE[phase - 1] ?? INSTRUCTIONS_BY_PHASE[0];
+  const instruction = instructions[instrIdx] ?? instructions[0];
 
-  const instruction = INSTRUCTIONS[instrIdx % INSTRUCTIONS.length];
+  useEffect(() => {
+    phaseCompletedRef.current = false;
+    instrIdxRef.current = 0;
+    setInstrIdx(0);
+    setAnswered(false);
+    setFeedback(null);
+  }, [phase]);
 
-  const handleZone = (zone: string) => {
-    if (answered) return;
-    const correct = zone === instruction.targetZone;
+  const handleZone = (zone: Zone) => {
+    if (answered || phaseCompletedRef.current) return;
+    const correct = zone === instruction.targetZone ||
+      (instruction.secondZone !== undefined && zone === instruction.secondZone);
     setFeedback(correct ? 'correct' : 'wrong');
     setAnswered(true);
     if (correct) {
       onCorrect();
-      setTimeout(() => { setFeedback(null); onPhaseComplete(); }, 1000);
+      const next = instrIdxRef.current + 1;
+      setTimeout(() => {
+        setFeedback(null);
+        if (next >= instructions.length) {
+          phaseCompletedRef.current = true;
+          onPhaseComplete();
+        } else {
+          instrIdxRef.current = next;
+          setInstrIdx(next);
+          setAnswered(false);
+        }
+      }, 900);
     } else {
       setTimeout(() => { setFeedback(null); setAnswered(false); }, 800);
     }
@@ -43,49 +89,54 @@ export function CasteloPosicoes() {
     );
   }
 
+  const zones: Zone[] = ['top', 'center', 'bottom', 'left', 'right'];
+
   return (
     <GameShell title="Castelo das Posições" emoji="🏰" color="var(--c1)" currentPhase={phase} totalPhases={5} score={score} onRestart={restart}>
       <FeedbackOverlay type={feedback} />
-      <div style={{ textAlign: 'center', marginBottom: 16 }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 8 }}><AppleEmoji emoji="👑" size={36} /><span style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 20, color: 'var(--text)' }}>O Rei diz:</span></div>
-        <h2 style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 18, color: 'var(--text)', background: '#FFF9C4', padding: '10px 20px', borderRadius: 'var(--radius-pill)', display: 'inline-block' }}>
-          {instruction.text}
-        </h2>
+
+      <div style={{ textAlign: 'center', marginBottom: 12 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 8 }}>
+          <AppleEmoji emoji="👑" size={34} />
+          <span style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 18, color: 'var(--text)' }}>O Rei diz:</span>
+        </div>
+        <div style={{ background: '#FFF9C4', border: '2px solid #F9A825', borderRadius: 16, padding: '10px 18px', display: 'inline-block' }}>
+          <h2 style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 16, color: 'var(--text)', margin: 0 }}>
+            {instruction.text}
+          </h2>
+        </div>
+        <p style={{ color: 'var(--text2)', fontSize: 12, marginTop: 6 }}>
+          Instrução {instrIdx + 1}/{instructions.length}
+        </p>
       </div>
 
-      {/* Castle grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gridTemplateRows: '1fr 1fr 1fr', gap: 8, height: 240, marginBottom: 16 }}>
-        <div/>
-        <button onClick={() => handleZone('top')} style={zoneStyle('top', instruction.targetZone === 'top' && answered)}>⬆️<br/>Em cima</button>
-        <div/>
-        <button onClick={() => handleZone('left')} style={zoneStyle('left', instruction.targetZone === 'left' && answered)}>⬅️<br/>Esquerda</button>
-        <button onClick={() => handleZone('center')} style={zoneStyle('center', instruction.targetZone === 'center' && answered)}>🏰<br/>Centro</button>
-        <button onClick={() => handleZone('right')} style={zoneStyle('right', instruction.targetZone === 'right' && answered)}>➡️<br/>Direita</button>
-        <div/>
-        <button onClick={() => handleZone('bottom')} style={zoneStyle('bottom', instruction.targetZone === 'bottom' && answered)}>⬇️<br/>Embaixo</button>
-        <div/>
+      {/* Castle grid - 3×3 */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gridTemplateRows: '1fr 1fr 1fr', gap: 8, height: 230, marginBottom: 14 }}>
+        <div />
+        <button onPointerUp={() => handleZone('top')}    style={zoneStyle('top',    instruction.targetZone === 'top'    || instruction.secondZone === 'top',    answered)}>⬆️<br/>Em cima</button>
+        <div />
+        <button onPointerUp={() => handleZone('left')}   style={zoneStyle('left',   instruction.targetZone === 'left'   || instruction.secondZone === 'left',   answered)}>⬅️<br/>Esquerda</button>
+        <button onPointerUp={() => handleZone('center')} style={zoneStyle('center', instruction.targetZone === 'center' || instruction.secondZone === 'center', answered)}>🏰<br/>Centro</button>
+        <button onPointerUp={() => handleZone('right')}  style={zoneStyle('right',  instruction.targetZone === 'right'  || instruction.secondZone === 'right',  answered)}>➡️<br/>Direita</button>
+        <div />
+        <button onPointerUp={() => handleZone('bottom')} style={zoneStyle('bottom', instruction.targetZone === 'bottom' || instruction.secondZone === 'bottom', answered)}>⬇️<br/>Embaixo</button>
+        <div />
       </div>
 
-      <div style={{ textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}><AppleEmoji emoji="🗡️" size={52} /><span style={{ fontFamily: 'Nunito', fontWeight: 700, fontSize: 18, color: 'var(--text3)' }}>Cavaleiro esperando...</span></div>
+      <div style={{ textAlign: 'center' }}>
+        <AppleEmoji emoji="🗡️" size={48} className="game-character-idle" />
+      </div>
     </GameShell>
   );
 }
 
-function zoneStyle(zone: string, active: boolean): React.CSSProperties {
+function zoneStyle(zone: string, active: boolean, answered: boolean): React.CSSProperties {
   return {
-    borderRadius: 16,
-    border: `3px solid ${active ? 'var(--c5)' : 'var(--border)'}`,
-    background: active ? '#E8F5E9' : '#fff',
-    fontSize: 13,
-    fontWeight: 700,
-    color: 'var(--text2)',
-    cursor: 'pointer',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 4,
-    minHeight: 70,
-    transition: 'all 0.15s',
+    borderRadius: 16, border: `3px solid ${active && answered ? 'var(--c5)' : 'var(--border)'}`,
+    background: active && answered ? '#E8F5E9' : '#fff',
+    fontSize: 12, fontWeight: 700, color: 'var(--text2)', cursor: 'pointer',
+    display: 'flex', flexDirection: 'column', alignItems: 'center',
+    justifyContent: 'center', gap: 3, minHeight: 60, transition: 'all 0.15s',
+    touchAction: 'manipulation',
   };
 }

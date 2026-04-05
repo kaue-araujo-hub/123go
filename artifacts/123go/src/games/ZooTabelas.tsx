@@ -1,96 +1,234 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { GameShell, useGameEngine, FeedbackOverlay, PhaseCompleteCard } from '../engine/GameEngine';
 import { AppleEmoji } from '../utils/AppleEmoji';
 
 const ZOO_DATA = [
-  { name: 'Leão', emoji: '🦁', count: 5 },
-  { name: 'Elefante', emoji: '🐘', count: 3 },
-  { name: 'Girafa', emoji: '🦒', count: 7 },
-  { name: 'Zebra', emoji: '🦓', count: 2 },
-  { name: 'Macaco', emoji: '🐒', count: 9 },
+  { animal: 'Leão',    emoji: '🦁', count: 4,  area: 'Savana' },
+  { animal: 'Elefante',emoji: '🐘', count: 7,  area: 'Savana' },
+  { animal: 'Pinguim', emoji: '🐧', count: 12, area: 'Ártico' },
+  { animal: 'Golfinho',emoji: '🐬', count: 3,  area: 'Oceano' },
+  { animal: 'Urso',    emoji: '🐻', count: 5,  area: 'Floresta' },
 ];
 
 const PHASES = [
-  { data: ZOO_DATA.slice(0, 3), question: 'Qual animal tem MAIS?', correctIdx: 2 },
-  { data: ZOO_DATA.slice(0, 4), question: 'Qual animal tem MENOS?', correctIdx: 3 },
-  { data: ZOO_DATA.slice(0, 3), question: 'Quantos Leão + Elefante no total? (8)', correctIdx: 0, multiAnswer: 8 },
-  { data: ZOO_DATA, question: 'Qual animal tem MAIS?', correctIdx: 4 },
-  { data: ZOO_DATA, question: 'Qual animal tem MENOS?', correctIdx: 3 },
+  {
+    label: 'Qual animal tem MAIS?', type: 'most',
+    correct: 2,
+  },
+  {
+    label: 'Qual animal tem MENOS?', type: 'least',
+    correct: 3,
+  },
+  {
+    label: 'Quantos animais ao todo?', type: 'total',
+    correctVal: 4 + 7 + 12 + 3 + 5,
+  },
+  {
+    label: 'Quais animais têm MAIS de 5?', type: 'moreThan5',
+    correctIdxs: [1, 2],
+  },
+  {
+    label: 'Adicione novos animais à tabela!', type: 'add',
+  },
 ];
+
+function genTotalOptions(correct: number): number[] {
+  const opts = new Set<number>([correct]);
+  opts.add(correct - 2); opts.add(correct + 3);
+  return [...opts].sort(() => Math.random() - 0.5);
+}
 
 export function ZooTabelas() {
   const { phase, score, phaseComplete, gameComplete, onCorrect, onPhaseComplete, nextPhase, restart } = useGameEngine(5);
   const [feedback, setFeedback] = useState<'correct' | 'wrong' | null>(null);
   const [answered, setAnswered] = useState(false);
+  const [selectedIdxs, setSelectedIdxs] = useState<Set<number>>(new Set());
+  const [totalOptions, setTotalOptions] = useState<number[]>([]);
+  const [newCounts, setNewCounts] = useState<number[]>([2, 2]);
+  const phaseCompletedRef = useRef(false);
   const phaseData = PHASES[phase - 1];
 
-  useEffect(() => { setAnswered(false); setFeedback(null); }, [phase]);
+  useEffect(() => {
+    phaseCompletedRef.current = false;
+    setAnswered(false);
+    setFeedback(null);
+    setSelectedIdxs(new Set());
+    setNewCounts([2, 2]);
+    if (phaseData.type === 'total') {
+      setTotalOptions(genTotalOptions(phaseData.correctVal ?? 0));
+    }
+  }, [phase]);
 
-  const handleChoice = (idx: number) => {
-    if (answered) return;
-    const globalIdx = ZOO_DATA.findIndex(z => z.name === phaseData.data[idx].name);
-    const correct = globalIdx === phaseData.correctIdx;
+  const handleAnimalTap = (idx: number) => {
+    if (answered || phaseCompletedRef.current) return;
+
+    if (phaseData.type === 'most') {
+      const maxCount = Math.max(...ZOO_DATA.map(a => a.count));
+      const correct = ZOO_DATA[idx].count === maxCount;
+      setFeedback(correct ? 'correct' : 'wrong');
+      setAnswered(true);
+      if (correct) { phaseCompletedRef.current = true; onCorrect(); setTimeout(() => { setFeedback(null); onPhaseComplete(); }, 1000); }
+      else { setTimeout(() => { setFeedback(null); setAnswered(false); }, 800); }
+
+    } else if (phaseData.type === 'least') {
+      const minCount = Math.min(...ZOO_DATA.map(a => a.count));
+      const correct = ZOO_DATA[idx].count === minCount;
+      setFeedback(correct ? 'correct' : 'wrong');
+      setAnswered(true);
+      if (correct) { phaseCompletedRef.current = true; onCorrect(); setTimeout(() => { setFeedback(null); onPhaseComplete(); }, 1000); }
+      else { setTimeout(() => { setFeedback(null); setAnswered(false); }, 800); }
+
+    } else if (phaseData.type === 'moreThan5') {
+      const ns = new Set(selectedIdxs);
+      if (ns.has(idx)) ns.delete(idx); else ns.add(idx);
+      setSelectedIdxs(ns);
+    }
+  };
+
+  const checkMoreThan5 = () => {
+    if (phaseCompletedRef.current) return;
+    const expected = ZOO_DATA.map((a, i) => a.count > 5 ? i : -1).filter(i => i >= 0);
+    const correct = expected.length === selectedIdxs.size && expected.every(i => selectedIdxs.has(i));
     setFeedback(correct ? 'correct' : 'wrong');
     setAnswered(true);
-    if (correct) {
-      onCorrect();
-      setTimeout(() => { setFeedback(null); onPhaseComplete(); }, 1000);
-    } else {
-      setTimeout(() => { setFeedback(null); setAnswered(false); }, 800);
-    }
+    if (correct) { phaseCompletedRef.current = true; onCorrect(); setTimeout(() => { setFeedback(null); onPhaseComplete(); }, 1000); }
+    else { setTimeout(() => { setFeedback(null); setAnswered(false); setSelectedIdxs(new Set()); }, 1000); }
+  };
+
+  const handleTotalAnswer = (val: number) => {
+    if (answered || phaseCompletedRef.current) return;
+    const correct = val === (phaseData.correctVal ?? 0);
+    setFeedback(correct ? 'correct' : 'wrong');
+    setAnswered(true);
+    if (correct) { phaseCompletedRef.current = true; onCorrect(); setTimeout(() => { setFeedback(null); onPhaseComplete(); }, 1000); }
+    else { setTimeout(() => { setFeedback(null); setAnswered(false); }, 800); }
   };
 
   if (phaseComplete) {
     return (
-      <GameShell title="Zoo de Tabelas" emoji="🦁" color="var(--c5)" currentPhase={phase} totalPhases={5} score={score} onRestart={restart}>
-        <PhaseCompleteCard phase={phase} totalPhases={5} score={score} isGameComplete={gameComplete} onNext={nextPhase} onRestart={restart} color="var(--c5)" />
+      <GameShell title="Zoo Tabelas" emoji="🦁" color="var(--c2)" currentPhase={phase} totalPhases={5} score={score} onRestart={restart}>
+        <PhaseCompleteCard phase={phase} totalPhases={5} score={score} isGameComplete={gameComplete} onNext={nextPhase} onRestart={restart} color="var(--c2)" />
       </GameShell>
     );
   }
 
   return (
-    <GameShell title="Zoo de Tabelas" emoji="🦁" color="var(--c5)" currentPhase={phase} totalPhases={5} score={score} onRestart={restart}>
+    <GameShell title="Zoo Tabelas" emoji="🦁" color="var(--c2)" currentPhase={phase} totalPhases={5} score={score} onRestart={restart}>
       <FeedbackOverlay type={feedback} />
-      <div style={{ textAlign: 'center', marginBottom: 16 }}>
-        <h2 style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 17, color: 'var(--text)' }}>{phaseData.question}</h2>
-        <p style={{ color: 'var(--text2)', fontSize: 13, marginTop: 4 }}>Toque na linha correta da tabela!</p>
+
+      <div style={{ textAlign: 'center', marginBottom: 12 }}>
+        <h2 style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 17, color: 'var(--text)' }}>{phaseData.label}</h2>
       </div>
 
       {/* Table */}
-      <div style={{ background: '#fff', borderRadius: 'var(--radius)', border: '1.5px solid var(--border)', overflow: 'hidden', marginBottom: 16 }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 2fr', background: 'var(--c5)', padding: '10px 16px' }}>
-          <span style={{ fontFamily: 'Nunito', fontWeight: 700, fontSize: 13, color: '#fff' }}>Animal</span>
-          <span style={{ fontFamily: 'Nunito', fontWeight: 700, fontSize: 13, color: '#fff' }}>Qtd.</span>
-          <span style={{ fontFamily: 'Nunito', fontWeight: 700, fontSize: 13, color: '#fff' }}>Gráfico</span>
+      <div style={{ borderRadius: 'var(--radius)', border: '1.5px solid var(--border)', overflow: 'hidden', marginBottom: 16 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', background: 'var(--c2)', padding: '8px 12px' }}>
+          {['Animal', 'Emoji', 'Quant.', 'Área'].map(h => (
+            <span key={h} style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 12, color: '#fff' }}>{h}</span>
+          ))}
         </div>
-        {phaseData.data.map((animal, idx) => (
+        {ZOO_DATA.map((row, idx) => {
+          const isSelected = selectedIdxs.has(idx);
+          const tappable = ['most', 'least', 'moreThan5'].includes(phaseData.type ?? '');
+          return (
+            <div
+              key={idx}
+              onPointerUp={() => tappable && handleAnimalTap(idx)}
+              style={{
+                display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr',
+                padding: '9px 12px', background: isSelected ? '#E3F2FD' : idx % 2 === 0 ? '#fff' : 'var(--bg)',
+                border: isSelected ? '2px solid var(--c2)' : '2px solid transparent',
+                cursor: tappable ? 'pointer' : 'default',
+                touchAction: tappable ? 'manipulation' : 'auto',
+                transition: 'background 0.15s',
+              }}
+            >
+              <span style={{ fontFamily: 'Nunito', fontWeight: 700, fontSize: 13, color: 'var(--text)' }}>{row.animal}</span>
+              <AppleEmoji emoji={row.emoji} size={22} />
+              <span style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 16, color: 'var(--c2)' }}>{row.count}</span>
+              <span style={{ fontFamily: 'Nunito', fontSize: 11, color: 'var(--text3)' }}>{row.area}</span>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Phase-specific controls */}
+      {phaseData.type === 'total' && (
+        <div>
+          <p style={{ textAlign: 'center', color: 'var(--text2)', fontSize: 13, marginBottom: 10 }}>Escolha o total correto:</p>
+          <div style={{ display: 'flex', gap: 14, justifyContent: 'center' }}>
+            {totalOptions.map(val => (
+              <button
+                key={val}
+                onPointerUp={() => handleTotalAnswer(val)}
+                style={{
+                  width: 86, height: 86, borderRadius: 20,
+                  border: '2.5px solid var(--border)', background: '#fff',
+                  fontFamily: 'Nunito', fontWeight: 900, fontSize: 36, color: 'var(--text)',
+                  cursor: 'pointer', minHeight: 86, touchAction: 'manipulation',
+                }}
+              >
+                {val}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {phaseData.type === 'moreThan5' && (
+        <button
+          onPointerUp={checkMoreThan5}
+          style={{
+            width: '100%', padding: 14, borderRadius: 'var(--radius-pill)',
+            background: 'var(--c2)', color: '#fff', fontFamily: 'Nunito',
+            fontWeight: 800, fontSize: 15, border: 'none', cursor: 'pointer',
+            minHeight: 52, touchAction: 'manipulation',
+          }}
+        >
+          ✅ Verificar seleção ({selectedIdxs.size} selecionados)
+        </button>
+      )}
+
+      {phaseData.type === 'add' && (
+        <div>
+          <p style={{ textAlign: 'center', color: 'var(--text2)', fontSize: 13, marginBottom: 10 }}>
+            Adicione novos animais ao zoológico!
+          </p>
+          {['🐯 Tigre', '🦒 Girafa'].map((label, i) => (
+            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, background: '#fff', borderRadius: 14, padding: '10px 14px', marginBottom: 8, border: '1.5px solid var(--border)' }}>
+              <span style={{ fontFamily: 'Nunito', fontWeight: 700, fontSize: 14, flex: 1, color: 'var(--text)' }}>{label}</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                <button
+                  onPointerUp={() => setNewCounts(prev => { const n = [...prev]; n[i] = Math.max(1, n[i] - 1); return n; })}
+                  style={{ width: 36, height: 36, borderRadius: 9, border: '1.5px solid var(--border)', background: '#fff', fontSize: 20, cursor: 'pointer', touchAction: 'manipulation', minHeight: 36 }}
+                >−</button>
+                <span style={{ fontFamily: 'Nunito', fontWeight: 900, fontSize: 20, minWidth: 28, textAlign: 'center', color: 'var(--c2)' }}>{newCounts[i]}</span>
+                <button
+                  onPointerUp={() => setNewCounts(prev => { const n = [...prev]; n[i] = Math.min(20, n[i] + 1); return n; })}
+                  style={{ width: 36, height: 36, borderRadius: 9, border: '1.5px solid var(--border)', background: '#fff', fontSize: 20, cursor: 'pointer', touchAction: 'manipulation', minHeight: 36 }}
+                >+</button>
+              </div>
+            </div>
+          ))}
           <button
-            key={animal.name}
-            onClick={() => handleChoice(idx)}
+            onPointerUp={() => {
+              if (!phaseCompletedRef.current) {
+                phaseCompletedRef.current = true;
+                onCorrect();
+                setTimeout(() => onPhaseComplete(), 400);
+              }
+            }}
             style={{
-              display: 'grid',
-              gridTemplateColumns: '1fr 1fr 2fr',
-              padding: '12px 16px',
-              borderBottom: idx < phaseData.data.length - 1 ? '1px solid var(--border)' : 'none',
-              background: '#fff',
-              cursor: 'pointer',
-              textAlign: 'left',
-              width: '100%',
-              alignItems: 'center',
-              transition: 'background 0.15s',
-              minHeight: 72,
+              width: '100%', marginTop: 8, padding: 14, borderRadius: 'var(--radius-pill)',
+              background: 'var(--c2)', color: '#fff', fontFamily: 'Nunito',
+              fontWeight: 800, fontSize: 15, border: 'none', cursor: 'pointer',
+              minHeight: 52, touchAction: 'manipulation',
             }}
           >
-            <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><AppleEmoji emoji={animal.emoji} size={22} /> {animal.name}</span>
-            <span style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 18, color: 'var(--c5)' }}>{animal.count}</span>
-            <div style={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-              {Array.from({ length: animal.count }).map((_, i) => (
-                <div key={i} style={{ width: 12, height: 12, borderRadius: 3, background: 'var(--c5)', opacity: 0.7 }}/>
-              ))}
-            </div>
+            ✅ Adicionar ao zoológico!
           </button>
-        ))}
-      </div>
+        </div>
+      )}
     </GameShell>
   );
 }

@@ -26,6 +26,21 @@ pnpm workspace monorepo using TypeScript. Each package manages its own dependenc
 
 See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and package details.
 
+## 123GO! Game Platform Notes
+
+- 21 games in `artifacts/123go/src/games/` — all fully audited and fixed per audit spec
+- All games use `phaseCompletedRef.current` guard before `onPhaseComplete()` to prevent double-fire
+- All interactive buttons use `onPointerUp` instead of `onClick` for touch reliability + `touchAction: 'manipulation'`
+- Drag games (G01 FestaDaLagarta, G07 TremDosNumeros, G08 PizzariaMagica) support both HTML5 drag (desktop) and pointer-up tap (touch)
+- Sorting/classification games (G10 AtelieOrdem, G12 NaveOrganizadora) use tap-to-select → tap-target pattern
+- G03 CacaEstrelas: answer buttons only shown after flash ends
+- G11 JardimPadroes: empty slot pulsing animation
+- G14 EscondeEscondeAnimal: speechSynthesis position announcement + text fallback
+- G19 SorveteriaDados: Phase 3 count question has 3 button options
+- G20 ZooTabelas: Phase 5 uses +/− buttons for count input
+- G21 PesquisaTurma: Phase 5 publish button only enabled when all categories have ≥1 vote; Phase 3 shows deliberate error chart
+- Shared hook: `artifacts/123go/src/hooks/useDragFixed.ts`
+
 ## Artifacts
 
 ### 123GO! — Plataforma de Jogos de Matemática (`artifacts/123go`)
