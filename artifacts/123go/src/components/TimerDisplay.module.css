@@ -1,0 +1,136 @@
+/* ─── Container ─────────────────────────────────────────────────────────────── */
+.wrapper {
+  display:        inline-flex;
+  align-items:    center;
+  gap:            6px;
+  padding:        6px 14px;
+  border-radius:  50px;
+  background:     rgba(255, 255, 255, 0.92);
+  border:         1.5px solid rgba(0, 0, 0, 0.06);
+
+  /* GPU-only — sem reflow */
+  will-change:    transform, opacity;
+  transform:      translateZ(0);
+
+  /* Fonte amigável para crianças */
+  font-family:    'Nunito', sans-serif;
+  font-weight:    800;
+  font-size:      18px;
+  color:          #1A1A2E;
+  letter-spacing: 0.02em;
+
+  /* Transição suave ao aparecer/sumir */
+  transition:     opacity 0.3s ease, transform 0.3s ease;
+}
+
+/* Quando parado */
+.wrapper:not(.running) {
+  opacity: 0.55;
+}
+
+/* Modo compacto — header pequeno ou mobile */
+.compact {
+  font-size:  14px;
+  padding:    4px 10px;
+  gap:        4px;
+}
+
+/* ─── Ícone ──────────────────────────────────────────────────────────────────── */
+.icon {
+  font-size:   16px;
+  line-height: 1;
+  will-change: transform;
+}
+
+.running .icon {
+  animation: spinSlow 8s linear infinite;
+}
+
+@keyframes spinSlow {
+  from { transform: rotate(0deg) translateZ(0); }
+  to   { transform: rotate(360deg) translateZ(0); }
+}
+
+/* ─── Número (mm:ss) ─────────────────────────────────────────────────────────── */
+.label {
+  will-change: transform, opacity;
+  display:     inline-block;
+  min-width:   52px;
+  text-align:  center;
+  transform:   translateZ(0);
+}
+
+/* Micro-pulso a cada segundo — GPU only */
+@keyframes secondTick {
+  0%   { transform: scale(1) translateZ(0);    opacity: 1; }
+  25%  { transform: scale(1.12) translateZ(0); opacity: 0.85; }
+  60%  { transform: scale(0.97) translateZ(0); opacity: 1; }
+  100% { transform: scale(1) translateZ(0);    opacity: 1; }
+}
+
+.tick {
+  animation: secondTick 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ─── Entrada do componente ──────────────────────────────────────────────────── */
+@keyframes timerAppear {
+  from {
+    transform: scale(0.7) translateY(-8px) translateZ(0);
+    opacity:   0;
+  }
+  to {
+    transform: scale(1) translateY(0) translateZ(0);
+    opacity:   1;
+  }
+}
+
+.wrapper {
+  animation: timerAppear 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* ─── Milestone: múltiplo de 1 minuto ───────────────────────────────────────── */
+@keyframes milestonePulse {
+  0%   { transform: scale(1) translateZ(0);    }
+  40%  { transform: scale(1.18) translateZ(0); }
+  70%  { transform: scale(0.96) translateZ(0); }
+  100% { transform: scale(1) translateZ(0);    }
+}
+
+.milestone {
+  animation:    milestonePulse 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  border-color: rgba(91, 79, 207, 0.3);
+  color:        #5B4FCF;
+}
+
+/* ─── Parado com fadeout ─────────────────────────────────────────────────────── */
+@keyframes timerStop {
+  0%   { transform: scale(1) translateZ(0);    opacity: 1;    }
+  30%  { transform: scale(1.08) translateZ(0); opacity: 1;    }
+  100% { transform: scale(1) translateZ(0);    opacity: 0.45; }
+}
+
+.stopped {
+  animation: timerStop 0.4s ease forwards;
+}
+
+/* ─── Responsividade ─────────────────────────────────────────────────────────── */
+@media (max-width: 375px) {
+  .wrapper { font-size: 15px; padding: 5px 10px; }
+  .icon    { font-size: 13px; }
+}
+
+/* ─── Modo escuro ────────────────────────────────────────────────────────────── */
+@media (prefers-color-scheme: dark) {
+  .wrapper {
+    background:   rgba(30, 30, 50, 0.92);
+    border-color: rgba(255, 255, 255, 0.08);
+    color:        #F0F0FF;
+  }
+}
+
+/* ─── Movimento reduzido ─────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .tick, .running .icon, .milestone, .stopped {
+    animation: none !important;
+  }
+}

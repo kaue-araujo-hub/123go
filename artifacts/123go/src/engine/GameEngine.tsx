@@ -7,6 +7,9 @@ import { isMuted, setGlobalMuted, playCorrect, playWrong } from '../utils/sounds
 import { burstParticles } from '../utils/particles';
 import { games } from '../data/games';
 import { addStar } from '../utils/progress';
+import { useTimer } from '../hooks/useTimer';
+import { TimerDisplay } from '../components/TimerDisplay';
+import { PhaseResults } from '../components/PhaseResults';
 
 interface PhaseConfig {
   speed: number;
@@ -55,6 +58,7 @@ interface GameShellProps {
   showNextPhase?: boolean;
   score?: number;
   onRestart?: () => void;
+  gameId?: string;
 }
 
 function ControlBtn({ onClick, title, children, active = true }: { onClick: () => void; title: string; children: React.ReactNode; active?: boolean }) {
@@ -103,13 +107,47 @@ function SoundIcon({ muted }: { muted: boolean }) {
   );
 }
 
-export function GameShell({ title, emoji, color, currentPhase, totalPhases, children, onNextPhase, showNextPhase, score, onRestart }: GameShellProps) {
+export function GameShell({ title, emoji, color, currentPhase, totalPhases, children, onNextPhase, showNextPhase, score, onRestart, gameId: gameIdProp }: GameShellProps) {
   const [, setLocation] = useLocation();
   const [paused, setPaused] = useState(false);
   const [stopped, setStopped] = useState(false);
   const [muted, setMuted] = useState(() => isMuted());
   const [diffToast, setDiffToast] = useState<string | null>(null);
   const prevPhaseRef = useRef<number>(currentPhase);
+
+  /* ── Timer system ─────────────────────────────────────────────────────────── */
+  const gameId = gameIdProp ?? title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+  const [showResults, setShowResults] = useState(false);
+  const { formatted, isRunning, phaseTimes, totalTime, bestTime,
+          start: timerStart, pause: timerPause,
+          completePhase, completeGame, startNewSession } = useTimer({
+    gameId,
+    phase: currentPhase,
+    autoStart: false,
+  });
+
+  /* Start a new session each time this component mounts */
+  const sessionStartedRef = useRef(false);
+  useEffect(() => {
+    if (!sessionStartedRef.current) {
+      sessionStartedRef.current = true;
+      startNewSession();
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  /* Detect phase completion (showNextPhase flips to true) */
+  const prevShowNextRef = useRef(showNextPhase);
+  useEffect(() => {
+    const was = prevShowNextRef.current;
+    prevShowNextRef.current = showNextPhase;
+    if (showNextPhase && !was) {
+      completePhase();
+      if (currentPhase >= totalPhases) {
+        completeGame();
+        setShowResults(true);
+      }
+    }
+  }, [showNextPhase]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     const prev = prevPhaseRef.current;
@@ -144,6 +182,15 @@ export function GameShell({ title, emoji, color, currentPhase, totalPhases, chil
 
   const isPlaying = countdownDone && !paused && !stopped;
 
+  /* Sync timer with play/pause/stopped/countdown state */
+  useEffect(() => {
+    if (!paused && !stopped && countdownDone) {
+      timerStart();
+    } else {
+      timerPause();
+    }
+  }, [paused, stopped, countdownDone]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const handlePlay = () => {
     if (stopped) {
       setStopped(false);
@@ -166,6 +213,8 @@ export function GameShell({ title, emoji, color, currentPhase, totalPhases, chil
     setPaused(false);
     setStopped(false);
     setCountdownDone(false);
+    setShowResults(false);
+    sessionStartedRef.current = false;
     pendingRestartRef.current = true;
     setCountdownKey(k => k + 1);
   };
@@ -254,8 +303,14 @@ export function GameShell({ title, emoji, color, currentPhase, totalPhases, chil
           </ControlBtn>
         </div>
 
-        {/* RIGHT: score */}
-        <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
+        {/* RIGHT: timer + score */}
+        <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 8 }}>
+          {/* Timer display — compact in top bar */}
+          <TimerDisplay
+            formatted={formatted}
+            isRunning={isRunning}
+            compact
+          />
           {score !== undefined && (
             <span className="entry-pop" style={{
               background: color,
@@ -481,6 +536,32 @@ export function GameShell({ title, emoji, color, currentPhase, totalPhases, chil
                 ↺ Recomeçar
               </button>
             </div>
+          </div>
+        )}
+
+        {/* Phase Results overlay — shown when all phases complete */}
+        {showResults && (
+          <div style={{
+            position: 'absolute',
+            inset: 0,
+            background: 'rgba(255,255,255,0.97)',
+            backdropFilter: 'blur(8px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 60,
+            overflowY: 'auto',
+          }}>
+            <PhaseResults
+              phaseTimes={phaseTimes}
+              totalTime={totalTime}
+              bestTime={bestTime}
+              onReplay={() => {
+                setShowResults(false);
+                handleRestart();
+              }}
+              onNext={() => setLocation('/catalog')}
+            />
           </div>
         )}
       </div>
