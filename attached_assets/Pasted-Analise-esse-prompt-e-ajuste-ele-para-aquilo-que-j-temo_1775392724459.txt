@@ -1,0 +1,211 @@
+Analise esse prompt e ajuste ele para aquilo que já temos, preciso que ele seja ajustado pra trabalahr com o que temsos
+
+---
+
+# 🧠 Prompt para Replit (Workflow de Entrada no Jogo + “Como Jogar”)
+
+Crie um fluxo completo de navegação antes do início de cada jogo na plataforma educacional.
+
+---
+
+## 🎯 Objetivo
+
+Adicionar uma etapa intermediária chamada **“Como Jogar”**, com mini desafios interativos, antes do jogo começar.
+
+---
+
+## 🔄 Fluxo completo do usuário
+
+Implementar o seguinte fluxo:
+
+1. Usuário acessa a plataforma
+
+2. Navega pelo catálogo de jogos
+
+3. Clica no botão **“Acessar”** de um jogo
+
+4. Abre a tela **“Como Jogar”**
+
+5. Usuário pode:
+
+   * Aprender jogando (mini desafios)
+   * Voltar ao catálogo
+   * Iniciar o jogo
+
+6. Ao clicar em **“Jogar”**:
+
+   * Mostrar animação: `1 → 2 → 3 → GO!`
+   * Iniciar o jogo
+
+---
+
+## 🧩 Tela: “Como Jogar”
+
+Criar uma nova tela/componente:
+
+```js
+HowToPlayScreen
+```
+
+---
+
+## 🎮 Tipos de interação
+
+Cada jogo deve ter uma propriedade:
+
+```js
+interactionType = "drag" // "hold" | "tap"
+```
+
+---
+
+## ⚙️ Comportamento dinâmico
+
+### 🟢 Se `interactionType === "drag"`
+
+Mostrar:
+
+* 2 mini desafios de **clicar e arrastar**
+* Exemplo:
+
+  * Arrastar objeto até alvo
+  * Arrastar elemento correto para posição
+
+---
+
+### 🔵 Se `interactionType === "hold"`
+
+Mostrar:
+
+* 2 mini desafios de **clicar e segurar**
+* Exemplo:
+
+  * Segurar botão por X segundos
+  * Manter pressionado até completar ação
+
+---
+
+### 🟡 Se `interactionType === "tap"`
+
+Mostrar:
+
+* 2 mini desafios de **clique rápido**
+* Exemplo:
+
+  * Clicar várias vezes em um elemento
+  * Reagir rapidamente a estímulos
+
+---
+
+## 🎯 Regras dos mini desafios
+
+* Devem ser simples e rápidos
+* Não devem ter falha crítica (sem “game over”)
+* Servem apenas para ensinar a mecânica
+* Feedback visual positivo (cores, animações)
+
+---
+
+## 🔘 Botões obrigatórios
+
+Na tela “Como Jogar”, adicionar:
+
+### 🔙 Botão “Voltar”
+
+* Retorna para o catálogo de jogos
+
+---
+
+### ▶️ Botão “Jogar”
+
+* Leva para animação de início
+
+---
+
+## 🎬 Animação de início
+
+Criar componente:
+
+```js
+StartCountdown
+```
+
+Exibir:
+
+```
+1
+2
+3
+GO!
+```
+
+* Duração total: ~2–3 segundos
+* Após finalizar → iniciar o jogo
+
+---
+
+## ⚙️ Integração com o jogo
+
+Após o countdown:
+
+```js
+startGame({
+  gameId,
+  mode: gameMode
+})
+```
+
+---
+
+## 🧠 Estado de navegação
+
+Controlar fluxo com algo como:
+
+```js
+currentScreen = "catalog" 
+// "howToPlay" | "countdown" | "game"
+```
+
+---
+
+## 🎨 UX (muito importante)
+
+* Interface visual clara e infantil
+* Pouco texto, mais interação
+* Ícones grandes e feedback visual
+* Evitar instruções longas
+
+---
+
+## 🔒 Regras importantes
+
+* O jogo só inicia após clicar em “Jogar”
+* O usuário pode sair a qualquer momento antes disso
+* A tela “Como Jogar” deve carregar rápido
+* Mini desafios não devem frustrar o usuário
+
+---
+
+## 🚀 Extra (opcional, mas recomendado)
+
+* Marcar se o usuário já viu o “Como Jogar”:
+
+```js
+hasSeenTutorial = true
+```
+
+* Permitir pular automaticamente na próxima vez (especialmente para professores)
+
+---
+
+## 💡 Observação de produto (IMPORTANTE)
+
+Essa etapa:
+
+* Reduz frustração das crianças
+* Padroniza entendimento do jogo
+* Diminui necessidade de intervenção do professor
+* Aumenta retenção e engajamento
+
+---
+

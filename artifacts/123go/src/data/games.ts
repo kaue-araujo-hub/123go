@@ -1,20 +1,30 @@
-export interface Game {
-  id: number | string;
-  title: string;
-  desc: string;
+export type InteractionType = 'drag' | 'tap' | 'swipe' | 'hold' | 'gesture' | 'rhythm';
+
+export interface TutorialTheme {
+  bg:    string;
+  color: string;
   emoji: string;
-  bg: string;
-  ano: number;
-  periodo: number;
-  tema: 'numeros' | 'algebra' | 'geometria' | 'grandezas' | 'probabilidade';
-  unidade: string;
-  codigo: string;
-  habilidade: string;
-  objeto: string;
-  comoJogar: string;
-  path: string;
-  ageMin: number;
-  ageMax: number;
+}
+
+export interface Game {
+  id:              number | string;
+  title:           string;
+  desc:            string;
+  emoji:           string;
+  bg:              string;
+  ano:             number;
+  periodo:         number;
+  tema:            'numeros' | 'algebra' | 'geometria' | 'grandezas' | 'probabilidade';
+  unidade:         string;
+  codigo:          string;
+  habilidade:      string;
+  objeto:          string;
+  comoJogar:       string;
+  path:            string;
+  ageMin:          number;
+  ageMax:          number;
+  interactionType: InteractionType;
+  tutorialTheme:   TutorialTheme;
 }
 
 export const games: Game[] = [
@@ -33,7 +43,9 @@ export const games: Game[] = [
     objeto: "Quantificação de elementos de uma coleção: estimativas, contagem um a um, pareamento ou outros agrupamentos.",
     comoJogar: "Arraste as folhas da tela para a lagarta faminta. Conte quantas folhas ela já comeu e pare quando atingir o número pedido. A cada fase o desafio aumenta — mais folhas e menos tempo!",
     ageMin: 5, ageMax: 6,
-    path: "/games/g01-festa-lagarta"
+    path: "/games/g01-festa-lagarta",
+    interactionType: "drag",
+    tutorialTheme: { bg: "#EAF3DE", color: "#4CAF50", emoji: "🐛" },
   },
   {
     id: 2,
@@ -50,7 +62,9 @@ export const games: Game[] = [
     objeto: "Quantificação de elementos de uma coleção: estimativas, contagem um a um, pareamento ou outros agrupamentos.",
     comoJogar: "Observe os objetos na tela e tente formá-los em pares. Se algum objeto ficar sozinho, o número é ímpar; se todos formarem pares, é par. Toque em 'Par' ou 'Ímpar' para responder!",
     ageMin: 5, ageMax: 6,
-    path: "/games/g02-par-impar"
+    path: "/games/g02-par-impar",
+    interactionType: "tap",
+    tutorialTheme: { bg: "#FFF0F5", color: "#E91E8C", emoji: "🧦" },
   },
   {
     id: 3,
@@ -67,7 +81,9 @@ export const games: Game[] = [
     objeto: "Quantificação de elementos de uma coleção: estimativas, contagem um a um, pareamento ou outros agrupamentos.",
     comoJogar: "Uma constelação de estrelas aparece por alguns segundos — memorize! Em seguida ela some e você deve tocar no número que representa quantas estrelas havia. Nas fases avançadas as constelações ficam maiores e o tempo de visualização menor.",
     ageMin: 5, ageMax: 6,
-    path: "/games/g03-caca-estrelas"
+    path: "/games/g03-caca-estrelas",
+    interactionType: "tap",
+    tutorialTheme: { bg: "#E8E8FF", color: "#5B4FCF", emoji: "⭐" },
   },
   {
     id: 4,
@@ -84,7 +100,9 @@ export const games: Game[] = [
     objeto: "Comparação de quantidades: correspondência biunívoca; estimativas; mais, menos, tanto quanto.",
     comoJogar: "Dois potes de balas aparecem na tela. Compare as quantidades e toque no pote que tem MAIS balas, no que tem MENOS, ou diga se os dois têm a mesma quantidade — de acordo com a pergunta da fase!",
     ageMin: 5, ageMax: 6,
-    path: "/games/g04-loja-balas"
+    path: "/games/g04-loja-balas",
+    interactionType: "tap",
+    tutorialTheme: { bg: "#FFF3E0", color: "#FF9800", emoji: "🍬" },
   },
   {
     id: 5,
@@ -101,7 +119,9 @@ export const games: Game[] = [
     objeto: "Comparação de quantidades: correspondência biunívoca; estimativas; mais, menos, tanto quanto.",
     comoJogar: "Duas lagoas aparecem com diferentes quantidades de flores. Deslize (arraste) a rã para a lagoa que tem mais flores. Cuidado — nas fases avançadas a diferença é cada vez menor e você precisa contar com atenção!",
     ageMin: 5, ageMax: 6,
-    path: "/games/g05-ra-puladora"
+    path: "/games/g05-ra-puladora",
+    interactionType: "swipe",
+    tutorialTheme: { bg: "#E8F5E9", color: "#4CAF50", emoji: "🐸" },
   },
   {
     id: 6,
@@ -118,7 +138,9 @@ export const games: Game[] = [
     objeto: "Comparação de quantidades: correspondência biunívoca; estimativas; mais, menos, tanto quanto.",
     comoJogar: "Dois grupos de balões aparecem na tela. Toque nos balões do grupo maior para estourá-los até que os dois grupos fiquem com a mesma quantidade. Equilibre a festa antes que o tempo acabe!",
     ageMin: 5, ageMax: 6,
-    path: "/games/g06-baloes-festa"
+    path: "/games/g06-baloes-festa",
+    interactionType: "tap",
+    tutorialTheme: { bg: "#F3E5F5", color: "#9C27B0", emoji: "🎈" },
   },
   {
     id: 7,
@@ -135,7 +157,9 @@ export const games: Game[] = [
     objeto: "Construção de fatos básicos da adição e subtração.",
     comoJogar: "O trem tem vagões com números em sequência, mas um vagão está vazio. Observe o padrão da sequência (crescente ou decrescente) e arraste o número correto para completar o trem. Nas fases finais os números chegam a 20!",
     ageMin: 5, ageMax: 6,
-    path: "/games/g07-trem-numeros"
+    path: "/games/g07-trem-numeros",
+    interactionType: "drag",
+    tutorialTheme: { bg: "#E3F2FD", color: "#2196F3", emoji: "🚂" },
   },
   {
     id: 8,
@@ -152,7 +176,9 @@ export const games: Game[] = [
     objeto: "Construção de fatos básicos da adição e subtração.",
     comoJogar: "O cliente pede uma pizza com um certo número de fatias. Já existem algumas fatias na bandeja — calcule quantas faltam e arraste a quantidade certa de fatias para completar o pedido. É treino de adição e subtração na prática!",
     ageMin: 5, ageMax: 6,
-    path: "/games/g08-pizzaria-magica"
+    path: "/games/g08-pizzaria-magica",
+    interactionType: "drag",
+    tutorialTheme: { bg: "#FFF8E1", color: "#FFC107", emoji: "🍕" },
   },
   {
     id: 9,
@@ -169,7 +195,9 @@ export const games: Game[] = [
     objeto: "Construção de fatos básicos da adição e subtração.",
     comoJogar: "Uma conta de adição ou subtração aparece no céu estrelado. Resolva o cálculo mentalmente e toque no resultado correto entre as opções exibidas. Acerte as contas para capturar as constelações e vencer a batalha!",
     ageMin: 5, ageMax: 6,
-    path: "/games/g09-batalha-constelacoes"
+    path: "/games/g09-batalha-constelacoes",
+    interactionType: "gesture",
+    tutorialTheme: { bg: "#E8E8FF", color: "#5B4FCF", emoji: "🌌" },
   },
   {
     id: 10,
@@ -186,7 +214,9 @@ export const games: Game[] = [
     objeto: "Classificação e seriação de objetos do cotidiano por atributos.",
     comoJogar: "Objetos coloridos aparecem no ateliê. Cada gaveta tem um rótulo (cor, forma ou tamanho). Arraste cada objeto para a gaveta que corresponde ao seu atributo. Nas fases avançadas, mais de um atributo é avaliado ao mesmo tempo!",
     ageMin: 5, ageMax: 6,
-    path: "/games/g10-atelie-ordem"
+    path: "/games/g10-atelie-ordem",
+    interactionType: "drag",
+    tutorialTheme: { bg: "#FCE4EC", color: "#E91E8C", emoji: "🎨" },
   },
   {
     id: 11,
@@ -203,7 +233,9 @@ export const games: Game[] = [
     objeto: "Classificação e seriação de objetos do cotidiano por atributos.",
     comoJogar: "Uma sequência de flores aparece no jardim com um espaço vazio no final. Analise o padrão (cor, tipo ou tamanho) e toque na flor correta entre as opções para completar a sequência. O jardim vai ficando mais complexo a cada fase!",
     ageMin: 5, ageMax: 6,
-    path: "/games/g11-jardim-padroes"
+    path: "/games/g11-jardim-padroes",
+    interactionType: "drag",
+    tutorialTheme: { bg: "#E8F5E9", color: "#4CAF50", emoji: "🌸" },
   },
   {
     id: 12,
@@ -220,7 +252,9 @@ export const games: Game[] = [
     objeto: "Classificação e seriação de objetos do cotidiano por atributos.",
     comoJogar: "Alienígenas de diferentes cores, formas e tamanhos precisam ser organizados na nave. Cada compartimento aceita apenas aliens com determinados atributos. Arraste cada alien para o compartimento correto antes que a nave decole!",
     ageMin: 5, ageMax: 6,
-    path: "/games/g12-nave-organizadora"
+    path: "/games/g12-nave-organizadora",
+    interactionType: "drag",
+    tutorialTheme: { bg: "#E8EAF6", color: "#3F51B5", emoji: "🚀" },
   },
   {
     id: 13,
@@ -237,7 +271,9 @@ export const games: Game[] = [
     objeto: "Posição e deslocamento de objetos: lateralidade, frente/atrás, em cima/embaixo.",
     comoJogar: "O robô está perdido no labirinto! Use os botões de seta (cima, baixo, esquerda, direita) para movê-lo casa a casa até chegar à porta de saída. Planeje o caminho com cuidado para não bater nas paredes!",
     ageMin: 5, ageMax: 6,
-    path: "/games/g13-robo-perdido"
+    path: "/games/g13-robo-perdido",
+    interactionType: "tap",
+    tutorialTheme: { bg: "#E0F2F1", color: "#009688", emoji: "🤖" },
   },
   {
     id: 14,
@@ -254,7 +290,9 @@ export const games: Game[] = [
     objeto: "Posição e deslocamento de objetos: lateralidade, frente/atrás, em cima/embaixo.",
     comoJogar: "Um narrador descreve onde o animal está escondido usando palavras de posição (atrás, embaixo, à direita, etc.). Observe a cena e toque no lugar correto onde o animal está. Ouça com atenção — as pistas ficam mais elaboradas nas fases finais!",
     ageMin: 5, ageMax: 6,
-    path: "/games/g14-esconde-esconde"
+    path: "/games/g14-esconde-esconde",
+    interactionType: "tap",
+    tutorialTheme: { bg: "#FFF3E0", color: "#FF9800", emoji: "🦊" },
   },
   {
     id: 15,
@@ -271,7 +309,9 @@ export const games: Game[] = [
     objeto: "Posição e deslocamento de objetos: lateralidade, frente/atrás, em cima/embaixo.",
     comoJogar: "O rei dá uma ordem ao cavaleiro usando palavras de posição: 'vá para a direita da torre' ou 'fique à frente do portão'. Toque na posição correta no mapa do castelo para mover o cavaleiro. Cumpra todas as ordens do rei para avançar de fase!",
     ageMin: 5, ageMax: 6,
-    path: "/games/g15-castelo-posicoes"
+    path: "/games/g15-castelo-posicoes",
+    interactionType: "drag",
+    tutorialTheme: { bg: "#F3E5F5", color: "#9C27B0", emoji: "🏰" },
   },
   {
     id: 16,
@@ -288,7 +328,9 @@ export const games: Game[] = [
     objeto: "Medidas de tempo: dia, semana, mês e ano; períodos do dia.",
     comoJogar: "Observe a posição do sol (ou da lua e estrelas) no céu e deslize o controle para indicar o período correto do dia: manhã, tarde ou noite. Nas fases avançadas, imagens de situações do cotidiano ajudam a identificar o momento!",
     ageMin: 5, ageMax: 6,
-    path: "/games/g16-sol-lua-estrelas"
+    path: "/games/g16-sol-lua-estrelas",
+    interactionType: "swipe",
+    tutorialTheme: { bg: "#FFF9C4", color: "#FFC107", emoji: "☀️" },
   },
   {
     id: 17,
@@ -305,7 +347,9 @@ export const games: Game[] = [
     objeto: "Medidas de tempo: dia, semana, mês e ano; períodos do dia.",
     comoJogar: "Cards com os nomes dos dias da semana estão embaralhados. Arraste-os para colocá-los na ordem correta, de segunda-feira a domingo. Nas fases avançadas, você também precisa posicionar os meses do ano na sequência certa!",
     ageMin: 5, ageMax: 6,
-    path: "/games/g17-calendario-vivo"
+    path: "/games/g17-calendario-vivo",
+    interactionType: "drag",
+    tutorialTheme: { bg: "#E1F5FE", color: "#03A9F4", emoji: "📅" },
   },
   {
     id: 18,
@@ -322,7 +366,9 @@ export const games: Game[] = [
     objeto: "Medidas de tempo: dia, semana, mês e ano; períodos do dia.",
     comoJogar: "A máquina do tempo está quebrada! Toque nos botões com dias, meses ou períodos do dia na ordem cronológica correta para consertá-la. Cada sequência completada certa repara uma engrenagem — complete todas para viajar no tempo!",
     ageMin: 5, ageMax: 6,
-    path: "/games/g18-maquina-tempo"
+    path: "/games/g18-maquina-tempo",
+    interactionType: "tap",
+    tutorialTheme: { bg: "#FBE9E7", color: "#FF5722", emoji: "⚙️" },
   },
   {
     id: 19,
@@ -339,7 +385,9 @@ export const games: Game[] = [
     objeto: "Leitura de tabelas e gráficos de colunas construídos pelos alunos.",
     comoJogar: "Um gráfico colorido mostra a venda de sabores de sorvete na sorveteria. Leia as barras do gráfico e responda às perguntas: qual sabor vendeu mais? Quantas bolas de morango foram vendidas? A dificuldade aumenta com mais sabores e perguntas mais elaboradas!",
     ageMin: 5, ageMax: 6,
-    path: "/games/g19-sorveteria-dados"
+    path: "/games/g19-sorveteria-dados",
+    interactionType: "tap",
+    tutorialTheme: { bg: "#FFF0F5", color: "#E91E8C", emoji: "🍦" },
   },
   {
     id: 20,
@@ -356,7 +404,9 @@ export const games: Game[] = [
     objeto: "Leitura de tabelas e gráficos de colunas construídos pelos alunos.",
     comoJogar: "Uma tabela mostra a contagem de animais no zoo. Leia os dados e responda perguntas como 'qual animal tem mais exemplares?' ou 'quantos leões há no total?'. Nas fases avançadas a tabela tem mais linhas e as perguntas exigem comparação entre linhas!",
     ageMin: 5, ageMax: 6,
-    path: "/games/g20-zoo-tabelas"
+    path: "/games/g20-zoo-tabelas",
+    interactionType: "tap",
+    tutorialTheme: { bg: "#F9FBE7", color: "#8BC34A", emoji: "🦁" },
   },
   {
     id: 21,
@@ -373,22 +423,24 @@ export const games: Game[] = [
     objeto: "Leitura de tabelas e gráficos de colunas construídos pelos alunos.",
     comoJogar: "Personagens da turma aparecem um a um com suas respostas a uma enquete. Toque na opção votada por cada personagem para registrar o voto. Veja o gráfico de barras crescer em tempo real e depois responda perguntas sobre o resultado da pesquisa!",
     ageMin: 5, ageMax: 6,
-    path: "/games/g21-pesquisa-turma"
-  }
+    path: "/games/g21-pesquisa-turma",
+    interactionType: "tap",
+    tutorialTheme: { bg: "#E8EAF6", color: "#3F51B5", emoji: "📊" },
+  },
 ];
 
 export const temaColors: Record<string, string> = {
-  numeros: "var(--c3)",
-  algebra: "var(--c2)",
-  geometria: "var(--c1)",
-  grandezas: "var(--c4)",
+  numeros:       "var(--c3)",
+  algebra:       "var(--c2)",
+  geometria:     "var(--c1)",
+  grandezas:     "var(--c4)",
   probabilidade: "var(--c5)",
 };
 
 export const temaLabels: Record<string, string> = {
-  numeros: "Números",
-  algebra: "Álgebra",
-  geometria: "Geometria",
-  grandezas: "Grandezas e Medidas",
+  numeros:       "Números",
+  algebra:       "Álgebra",
+  geometria:     "Geometria",
+  grandezas:     "Grandezas e Medidas",
   probabilidade: "Probabilidade e Estatística",
 };

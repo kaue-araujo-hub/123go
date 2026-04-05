@@ -12,6 +12,7 @@ import { TimerDisplay } from '../components/TimerDisplay';
 import { PhaseResults } from '../components/PhaseResults';
 import { ModeBadge } from '../components/ModeBadge';
 import { useGameMode } from '../hooks/useGameMode';
+import { HowToPlayScreen } from '../components/HowToPlay/HowToPlayScreen';
 
 interface PhaseConfig {
   speed: number;
@@ -110,7 +111,7 @@ function SoundIcon({ muted }: { muted: boolean }) {
 }
 
 export function GameShell({ title, emoji, color, currentPhase, totalPhases, children, onNextPhase, showNextPhase, score, onRestart, gameId: gameIdProp }: GameShellProps) {
-  const [, setLocation] = useLocation();
+  const [location, setLocation] = useLocation();
   const [paused, setPaused] = useState(false);
   const [stopped, setStopped] = useState(false);
   const [muted, setMuted] = useState(() => isMuted());
@@ -173,6 +174,10 @@ export function GameShell({ title, emoji, color, currentPhase, totalPhases, chil
   const [countdownKey, setCountdownKey]   = useState(0);
   const [countdownDone, setCountdownDone] = useState(false);
   const pendingRestartRef = useRef(false);
+
+  /* ── How To Play ───────────────────────────────────────────────────────────── */
+  const gameData  = games.find(g => g.path === location) ?? null;
+  const [howToPlayDone, setHowToPlayDone] = useState(false);
 
   /* Mode (Modalidades de Aula) */
   const { isTime, config: modeConfig } = useGameMode();
@@ -239,6 +244,17 @@ export function GameShell({ title, emoji, color, currentPhase, totalPhases, chil
     pendingRestartRef.current = true;
     setCountdownKey(k => k + 1);
   };
+
+  /* ── HowToPlay guard — render before everything else ───────────────────── */
+  if (!howToPlayDone && gameData) {
+    return (
+      <HowToPlayScreen
+        game={gameData}
+        onPlay={() => setHowToPlayDone(true)}
+        onBack={() => setLocation('/catalog')}
+      />
+    );
+  }
 
   return (
     <div className="game-shell-bg" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>

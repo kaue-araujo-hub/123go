@@ -58,3 +58,14 @@ See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and pa
 - `src/pages/TeacherDashboard.tsx` — PIN login + ModalitySelector + session export panel
 - **Countdown timer in Modo Tempo**: game top bar shows countdown (counting down from timeLimitSeconds) instead of stopwatch; turns red + shakes at ≤ 10s
 - **Events**: `123go:mode-changed`, `123go:difficulty-changed`, `123go:role-changed`, `123go:session-started`
+
+**Como Jogar — How To Play (complete)**
+- `src/data/games.ts` — `interactionType` (`drag|tap|swipe|hold|gesture|rhythm`) + `tutorialTheme {bg,color,emoji}` added to all 21 games and `Game` interface
+- `src/data/tutorials.ts` — `TUTORIALS` record: 2 mini-challenges per interaction type (drag, tap, swipe, hold, gesture, rhythm); full TypeScript interfaces `TutorialChallenge`, `Tutorial`, `InteractionType`
+- `src/components/HowToPlay/HowToPlayScreen.tsx` — 4-step flow: `preview → challenge1 → challenge2 → ready`; teachers jump directly to "ready"; returning students see quick "ready" screen with option to review; `localStorage` key `123go_tutorial_{id}` persists per-game
+- `src/components/HowToPlay/HowToPlayScreen.module.css` — GPU-only animations, `prefers-reduced-motion` guard
+- `src/components/HowToPlay/InteractionPreview.tsx` — Animated demo of each interaction type using the game's own emoji; `demoDrag`, `demoTap`, `demoSwipe`, `demoHold`, `demoLineGrow` CSS keyframe animations
+- `src/components/HowToPlay/InteractionPreview.module.css`
+- `src/components/HowToPlay/MiniChallenge.tsx` — 6 self-contained sub-components (Drag/Tap/Swipe/Hold/Gesture/Rhythm); all use native pointer events (no external hooks); `playCorrect`/`playWrong` from sounds.ts; hint appears after 2 failed attempts; no "game over" punishments
+- `src/components/HowToPlay/MiniChallenge.module.css`
+- **GameEngine.tsx integration**: `howToPlayDone` state (default `false`); `games.find(g => g.path === location)` matches current URL to game data; early return renders `HowToPlayScreen` → user clicks "Jogar!" → `howToPlayDone = true` → `CountdownOverlay` (existing) → game; no changes to any of the 21 game files needed
