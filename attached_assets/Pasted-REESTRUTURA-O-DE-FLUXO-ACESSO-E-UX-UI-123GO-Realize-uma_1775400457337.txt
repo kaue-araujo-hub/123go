@@ -1,0 +1,48 @@
+REESTRUTURAÇÃO DE FLUXO, ACESSO E UX/UI (123GO!)
+"Realize uma reestruturação profunda no fluxo de acesso e na experiência de jogo da plataforma 123GO! conforme as diretrizes abaixo:
+
+1. Remoção de Barreira e Unificação de Rota:
+
+Delete a tela/rota /professor que solicita senha. O acesso deve ser livre e direto a partir do catálogo.
+
+Integre o fluxo de início de jogo diretamente na rota /catalog. Ao clicar em um jogo, o usuário deve seguir o novo workflow: Catálogo → Seleção de Modo → Como Jogar → Countdown → Jogo.
+
+2. Seleção de Modo e 'Como Jogar' (UX Adaptativa):
+
+Antes de iniciar, apresente uma tela de seleção de modo: Prática 🟢 / Desafio 🟡 / Tempo 🔴.
+
+Na tela 'Como Jogar', implemente Motion Effects obrigatórios:
+
+Ícones e mãos de instrução com animação pulse (escala 1.08) e bounce suave.
+
+Elementos interativos devem ter hover:scale-105 e animação 'pop' ao acertar.
+
+Adicione um botão 'Pular' / 'Ir direto para o jogo' no canto superior direito da tela 'Como Jogar' para reduzir a fricção de usuários avançados.
+
+3. Countdown Inteligente (1, 2, 3, GO!):
+
+Melhore a animação do countdown usando Fade + Scale. Cada número deve entrar com zoom e o 'GO!' deve ter um efeito bounce.
+
+Controle de Navegação: Adicione um botão '← Voltar' visível durante todo o countdown. Se clicado, deve interromper imediatamente o cronômetro e retornar o usuário para a tela 'Como Jogar'.
+
+4. Pesquisa Técnica e Pedagógica (BNCC):
+
+Otimize o campo de busca para identificar códigos de habilidades (ex: EF01MA01).
+
+Adicione um chip de busca rápida chamado 'Habilidades 📑' que liste os códigos por ano escolar.
+
+No modal 'Saiba Mais' de cada jogo, exiba claramente o código da habilidade e o público-alvo (ex: 1º Ano atendendo 5 a 6 anos).
+
+5. Gamificação no Header (Engajamento):
+
+Adicione no Header um widget de Sequência (Streak 🔥) para dias consecutivos de jogo.
+
+Crie um botão 'Meu Progresso 🔽' que, ao ser clicado, mostre um popover com a % de evolução do nível atual e o total de estrelas coletadas.
+
+6. Padronização Visual e Performance:
+
+Remova as barras de rolagem padrão; use scrollbars finas (8px), arredondadas e discretas que combinem com a marca.
+
+Garanta que as animações usem apenas transform e opacity para manter 60fps em dispositivos móveis.
+
+Aplique essas mudanças em todos os jogos da plataforma de forma global e consistente agora."

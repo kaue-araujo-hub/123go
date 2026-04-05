@@ -1,7 +1,7 @@
 import { Switch, Route, Router as WouterRouter } from "wouter";
 import { HomePage } from "./pages/HomePage";
 import { Catalog } from "./pages/Catalog";
-import { TeacherDashboard } from "./pages/TeacherDashboard";
+
 import { FestaDaLagarta } from "./games/FestaDaLagarta";
 import { ParOuImpar } from "./games/ParOuImpar";
 import { CacaEstrelas } from "./games/CacaEstrelas";
@@ -62,7 +62,6 @@ function Router() {
       <Route path="/games/g19-sorveteria-dados" component={SorveteriaDados} />
       <Route path="/games/g20-zoo-tabelas" component={ZooTabelas} />
       <Route path="/games/g21-pesquisa-turma" component={PesquisaTurma} />
-      <Route path="/professor" component={TeacherDashboard} />
       <Route component={NotFound} />
     </Switch>
   );

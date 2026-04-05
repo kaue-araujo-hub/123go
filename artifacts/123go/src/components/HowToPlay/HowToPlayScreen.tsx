@@ -99,9 +99,9 @@ export function HowToPlayScreen({ game, onPlay, onBack }: Props) {
             Pular →
           </button>
         )}
-        {!isTeacher && step !== 'preview' && (
+        {!isTeacher && step !== 'ready' && (
           <button className={styles.btnSkip} onClick={() => setStep('ready')} aria-label="Ir direto para jogar">
-            Pular
+            Pular →
           </button>
         )}
       </header>

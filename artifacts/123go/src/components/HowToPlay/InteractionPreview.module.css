@@ -20,13 +20,19 @@
   background:      var(--preview-bg, #EEEDFE);
   border:          2px solid color-mix(in srgb, var(--preview-color, #5B4FCF) 20%, transparent);
   font-size:       36px;
-  animation:       iconPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  animation:       iconPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both,
+                   iconPulse 2.2s ease-in-out 0.6s infinite;
   will-change:     transform;
 }
 
 @keyframes iconPop {
   from { transform: scale(0.4) translateZ(0); opacity: 0; }
   to   { transform: scale(1) translateZ(0); opacity: 1; }
+}
+
+@keyframes iconPulse {
+  0%, 100% { transform: scale(1) translateZ(0); }
+  50%      { transform: scale(1.08) translateZ(0); box-shadow: 0 0 18px color-mix(in srgb, var(--preview-color, #5B4FCF) 35%, transparent); }
 }
 
 /* ─── Texto ────────────────────────────────────────────────────────────────── */
@@ -177,6 +183,7 @@
   animation:     btnAppear 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s both;
 }
 
+.btnReady:hover  { transform: scale(1.05) translateZ(0); }
 .btnReady:active { transform: scale(0.96) translateZ(0); opacity: 0.9; }
 
 @keyframes btnAppear {
@@ -186,5 +193,5 @@
 
 @media (prefers-reduced-motion: reduce) {
   .iconBadge, .demoDragObj, .demoTapObj, .demoSwipeObj, .demoHoldObj, .demoLine,
-  .demoArrow, .btnReady { animation: none !important; }
+  .demoArrow, .btnReady { animation: none !important; transition: none !important; }
 }

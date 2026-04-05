@@ -1,32 +1,33 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const STEPS = [
-  { char: '1', color: '#F59E0B' },
-  { char: '2', color: '#EF4444' },
   { char: '3', color: '#3B82F6' },
+  { char: '2', color: '#EF4444' },
+  { char: '1', color: '#F59E0B' },
   { char: 'GO!', color: '#10B981' },
 ];
 
-const STEP_MS = 1100;
-const GO_MS   = 900;
+const STEP_MS = 900;
+const GO_MS   = 800;
 
 interface Props {
   countdownKey: number;
-  onComplete: () => void;
+  onComplete:   () => void;
+  onBack?:      () => void;
 }
 
-export function CountdownOverlay({ countdownKey, onComplete }: Props) {
-  const [step, setStep]       = useState(0);
+export function CountdownOverlay({ countdownKey, onComplete, onBack }: Props) {
+  const [step,    setStep]    = useState(0);
   const [closing, setClosing] = useState(false);
+  const cancelledRef          = useRef(false);
 
-  /* Reset whenever countdownKey changes (restart) */
   useEffect(() => {
+    cancelledRef.current = false;
     setStep(0);
     setClosing(false);
   }, [countdownKey]);
 
-  /* Advance through steps */
   useEffect(() => {
     if (closing) return;
 
@@ -34,9 +35,10 @@ export function CountdownOverlay({ countdownKey, onComplete }: Props) {
     const delay  = isLast ? GO_MS : STEP_MS;
 
     const t = setTimeout(() => {
+      if (cancelledRef.current) return;
       if (isLast) {
         setClosing(true);
-        setTimeout(onComplete, 320);
+        setTimeout(() => { if (!cancelledRef.current) onComplete(); }, 300);
       } else {
         setStep(s => s + 1);
       }
@@ -45,14 +47,22 @@ export function CountdownOverlay({ countdownKey, onComplete }: Props) {
     return () => clearTimeout(t);
   }, [step, closing, onComplete]);
 
+  const isGo = step === STEPS.length - 1;
+
+  function handleBack() {
+    cancelledRef.current = true;
+    onBack?.();
+  }
+
   return (
     <AnimatePresence>
       {!closing && (
         <motion.div
           key="countdown-bg"
-          initial={{ opacity: 1 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.32 }}
+          transition={{ duration: 0.22 }}
           style={{
             position: 'fixed',
             inset: 0,
@@ -63,23 +73,63 @@ export function CountdownOverlay({ countdownKey, onComplete }: Props) {
             alignItems: 'center',
             justifyContent: 'center',
             flexDirection: 'column',
-            gap: 0,
           }}
         >
+          {/* ← Voltar button */}
+          {onBack && (
+            <button
+              onClick={handleBack}
+              style={{
+                position: 'absolute',
+                top: 18,
+                left: 16,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 5,
+                color: 'var(--text3)',
+                fontFamily: 'Nunito',
+                fontWeight: 700,
+                fontSize: 14,
+                border: 'none',
+                background: 'none',
+                cursor: 'pointer',
+                padding: '6px 10px',
+                borderRadius: 8,
+                transition: 'color 0.15s',
+              }}
+              onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.color = 'var(--text)'; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.color = 'var(--text3)'; }}
+            >
+              ← Voltar
+            </button>
+          )}
+
+          {/* Number / GO! */}
           <AnimatePresence mode="wait">
             <motion.span
               key={step}
-              initial={{ scale: 0.15, opacity: 0, rotate: -8 }}
-              animate={{ scale: 1,    opacity: 1, rotate: 0 }}
-              exit={{ scale: 1.6,     opacity: 0, rotate: 6 }}
-              transition={{ type: 'spring', stiffness: 320, damping: 22 }}
+              initial={{ scale: 0.1, opacity: 0, y: 20 }}
+              animate={
+                isGo
+                  ? {
+                      scale: [0.3, 1.25, 1.0],
+                      opacity: 1,
+                      y: 0,
+                      transition: { duration: 0.45, times: [0, 0.5, 1], ease: 'easeOut' },
+                    }
+                  : { scale: 1, opacity: 1, y: 0 }
+              }
+              exit={{ scale: 1.8, opacity: 0, y: -20, transition: { duration: 0.22, ease: 'easeIn' } }}
+              transition={{ type: 'spring', stiffness: 340, damping: 22 }}
               style={{
                 fontFamily: 'Nunito',
                 fontWeight: 900,
                 lineHeight: 1,
                 userSelect: 'none',
-                letterSpacing: step === STEPS.length - 1 ? '-2px' : '-4px',
-                fontSize: step === STEPS.length - 1 ? 'clamp(72px, 20vw, 200px)' : 'clamp(100px, 28vw, 280px)',
+                letterSpacing: isGo ? '-2px' : '-4px',
+                fontSize: isGo
+                  ? 'clamp(72px, 20vw, 180px)'
+                  : 'clamp(110px, 30vw, 280px)',
                 color: STEPS[step].color,
                 textShadow: `0 8px 60px ${STEPS[step].color}55`,
                 display: 'block',
@@ -89,20 +139,20 @@ export function CountdownOverlay({ countdownKey, onComplete }: Props) {
             </motion.span>
           </AnimatePresence>
 
-          {/* Dot progress indicator */}
+          {/* Dot progress */}
           <div style={{
             display: 'flex',
             gap: 8,
-            marginTop: 32,
+            marginTop: 36,
             position: 'absolute',
-            bottom: 48,
+            bottom: 52,
           }}>
             {STEPS.map((s, i) => (
               <motion.div
                 key={i}
                 animate={{
                   background: i <= step ? s.color : '#e0e0e0',
-                  scale: i === step ? 1.4 : 1,
+                  scale: i === step ? 1.5 : 1,
                 }}
                 transition={{ type: 'spring', stiffness: 400, damping: 20 }}
                 style={{

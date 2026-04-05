@@ -13,6 +13,7 @@ import { PhaseResults } from '../components/PhaseResults';
 import { ModeBadge } from '../components/ModeBadge';
 import { useGameMode } from '../hooks/useGameMode';
 import { HowToPlayScreen } from '../components/HowToPlay/HowToPlayScreen';
+import { GameModeSelectScreen } from '../components/GameModeSelect/GameModeSelectScreen';
 
 interface PhaseConfig {
   speed: number;
@@ -175,8 +176,9 @@ export function GameShell({ title, emoji, color, currentPhase, totalPhases, chil
   const [countdownDone, setCountdownDone] = useState(false);
   const pendingRestartRef = useRef(false);
 
-  /* ── How To Play ───────────────────────────────────────────────────────────── */
+  /* ── Mode selection + How To Play ─────────────────────────────────────────── */
   const gameData  = games.find(g => g.path === location) ?? null;
+  const [modeSelected,  setModeSelected]  = useState(false);
   const [howToPlayDone, setHowToPlayDone] = useState(false);
 
   /* Mode (Modalidades de Aula) */
@@ -245,13 +247,23 @@ export function GameShell({ title, emoji, color, currentPhase, totalPhases, chil
     setCountdownKey(k => k + 1);
   };
 
-  /* ── HowToPlay guard — render before everything else ───────────────────── */
+  /* ── Mode select guard — shown first before HowToPlay ───────────────────── */
+  if (!modeSelected && gameData) {
+    return (
+      <GameModeSelectScreen
+        onSelect={() => setModeSelected(true)}
+        onBack={() => setLocation('/catalog')}
+      />
+    );
+  }
+
+  /* ── HowToPlay guard — shown after mode is picked ───────────────────────── */
   if (!howToPlayDone && gameData) {
     return (
       <HowToPlayScreen
         game={gameData}
         onPlay={() => setHowToPlayDone(true)}
-        onBack={() => setLocation('/catalog')}
+        onBack={() => { setModeSelected(false); }}
       />
     );
   }
@@ -263,6 +275,7 @@ export function GameShell({ title, emoji, color, currentPhase, totalPhases, chil
         <CountdownOverlay
           countdownKey={countdownKey}
           onComplete={handleCountdownComplete}
+          onBack={() => setHowToPlayDone(false)}
         />
       )}
 
