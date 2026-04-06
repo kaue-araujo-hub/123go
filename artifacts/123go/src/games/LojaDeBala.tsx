@@ -7,7 +7,7 @@ const PHASES = [
   { question: 'Qual pote tem MENOS balas?', potes: [{ count: 7, emoji: '🍬', label: 'A' }, { count: 10, emoji: '🍭', label: 'B' }], correct: 0 },
   { question: 'Qual pote tem MAIS balas?', potes: [{ count: 10, emoji: '🍬', label: 'A' }, { count: 9, emoji: '🍭', label: 'B' }], correct: 0 },
   { question: 'Qual pote tem MENOS balas?', potes: [{ count: 6, emoji: '🍬', label: 'A' }, { count: 8, emoji: '🍭', label: 'B' }], correct: 0 },
-  { question: 'Qual pote tem MAIS balas?', potes: [{ count: 11, emoji: '🍬', label: 'A' }, { count: 7, emoji: '🍭', label: 'B' }], correct: 0 },
+  { question: 'Qual pote tem MAIS balas?', potes: [{ count: 8, emoji: '🍬', label: 'A' }, { count: 5, emoji: '🍭', label: 'B' }], correct: 0 },
 ];
 
 function PoteVisual({ count, emoji, label, selected, onTap }: {
