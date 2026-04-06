@@ -130,63 +130,72 @@ export function RaPuladora() {
     <GameShell title="Rã Puladora" emoji="🐸" color="var(--c3)" currentPhase={phase} totalPhases={5} score={score} onRestart={restart}>
       <FeedbackOverlay type={feedback} />
 
-      <div style={{ textAlign: 'center', marginBottom: 12 }}>
-        <p style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 18, color: 'var(--text)', margin: 0 }}>
-          {questionLabel}
-        </p>
-      </div>
+      {/* Flex column — fills GameShell content area, no overflow */}
+      <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden', gap: 8 }}>
 
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 12, willChange: 'transform' }}>
-        <div style={{ display: 'inline-block', animation: jumping !== null ? 'frogJump 0.42s ease' : undefined }}>
-          <AppleEmoji emoji="🐸" size={88} className={jumping === null ? 'game-character-idle' : ''} />
+        {/* Question */}
+        <div style={{ textAlign: 'center', flexShrink: 0 }}>
+          <p style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 17, color: 'var(--text)', margin: 0 }}>
+            {questionLabel}
+          </p>
         </div>
-      </div>
 
-      <div style={{ display: 'flex', gap: 12 }}>
-        {([0, 1] as const).map(idx => {
-          const count = round.counts[idx];
-          const VISIBLE_CAP = 15;
-          const visible = Math.min(count, VISIBLE_CAP);
-          const extra = count - visible;
-          return (
-            <button
-              key={idx}
-              onPointerUp={() => handleJump(idx)}
-              style={{
-                flex: 1, padding: '10px 6px', borderRadius: 20,
-                border: '3px solid #81C784',
-                background: jumping === idx ? '#C8E6C9' : '#E8F5E9',
-                cursor: 'pointer', display: 'flex', flexDirection: 'column',
-                alignItems: 'center', gap: 6, minHeight: 110,
-                transition: 'background 0.2s', touchAction: 'manipulation',
-              }}
-            >
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, auto)', gap: 2, justifyContent: 'center' }}>
-                {Array.from({ length: visible }).map((_, i) => (
-                  <AppleEmoji key={i} emoji="🌸" size={13} />
-                ))}
-              </div>
-              {extra > 0 && (
-                <span style={{ fontFamily: 'Nunito', fontSize: 11, color: '#4CAF50', fontWeight: 700 }}>+{extra}</span>
-              )}
-              <span style={{ fontFamily: 'Nunito', fontWeight: 900, fontSize: 30, color: '#2E7D32', lineHeight: 1 }}>
-                {count}
-              </span>
-              <span style={{ fontFamily: 'Nunito', fontSize: 11, color: '#888' }}>flores</span>
-            </button>
-          );
-        })}
-      </div>
+        {/* Frog */}
+        <div style={{ display: 'flex', justifyContent: 'center', flexShrink: 0, willChange: 'transform' }}>
+          <div style={{ display: 'inline-block', animation: jumping !== null ? 'frogJump 0.42s ease' : undefined }}>
+            <AppleEmoji emoji="🐸" size={64} className={jumping === null ? 'game-character-idle' : ''} />
+          </div>
+        </div>
 
-      {/* Progress dots */}
-      <div style={{ display: 'flex', gap: 6, justifyContent: 'center', marginTop: 16 }}>
-        {Array.from({ length: cfg.roundsToWin }).map((_, i) => (
-          <div key={i} style={{
-            width: 10, height: 10, borderRadius: '50%',
-            background: i < roundNum - 1 ? 'var(--c3)' : i === roundNum - 1 ? '#81C784' : 'var(--border)',
-            transition: 'background 0.3s',
-          }} />
-        ))}
+        {/* Lily-pad buttons — grow to fill remaining space */}
+        <div style={{ display: 'flex', gap: 12, flex: 1, minHeight: 0 }}>
+          {([0, 1] as const).map(idx => {
+            const count = round.counts[idx];
+            const VISIBLE_CAP = 15;
+            const visible = Math.min(count, VISIBLE_CAP);
+            const extra = count - visible;
+            return (
+              <button
+                key={idx}
+                onPointerUp={() => handleJump(idx)}
+                style={{
+                  flex: 1, padding: '8px 6px', borderRadius: 20,
+                  border: '3px solid #81C784',
+                  background: jumping === idx ? '#C8E6C9' : '#E8F5E9',
+                  cursor: 'pointer', display: 'flex', flexDirection: 'column',
+                  alignItems: 'center', justifyContent: 'center', gap: 4,
+                  transition: 'background 0.2s', touchAction: 'manipulation',
+                  overflow: 'hidden',
+                }}
+              >
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, auto)', gap: 2, justifyContent: 'center' }}>
+                  {Array.from({ length: visible }).map((_, i) => (
+                    <AppleEmoji key={i} emoji="🌸" size={13} />
+                  ))}
+                </div>
+                {extra > 0 && (
+                  <span style={{ fontFamily: 'Nunito', fontSize: 11, color: '#4CAF50', fontWeight: 700 }}>+{extra}</span>
+                )}
+                <span style={{ fontFamily: 'Nunito', fontWeight: 900, fontSize: 28, color: '#2E7D32', lineHeight: 1 }}>
+                  {count}
+                </span>
+                <span style={{ fontFamily: 'Nunito', fontSize: 11, color: '#888' }}>flores</span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Progress dots */}
+        <div style={{ display: 'flex', gap: 6, justifyContent: 'center', flexShrink: 0, paddingBottom: 4 }}>
+          {Array.from({ length: cfg.roundsToWin }).map((_, i) => (
+            <div key={i} style={{
+              width: 10, height: 10, borderRadius: '50%',
+              background: i < roundNum - 1 ? 'var(--c3)' : i === roundNum - 1 ? '#81C784' : 'var(--border)',
+              transition: 'background 0.3s',
+            }} />
+          ))}
+        </div>
+
       </div>
 
       <style>{`
