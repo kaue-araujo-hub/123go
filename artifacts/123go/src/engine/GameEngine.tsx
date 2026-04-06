@@ -1073,7 +1073,7 @@ function ShareModal({ score, totalPhases, onClose }: ShareModalProps) {
           onClick={handleShare}
           disabled={loading}
           style={{
-            width: '100%', padding: '14px 0', borderRadius: 99,
+            width: '75%', padding: '13px 0', borderRadius: 99,
             background: shareState === 'done' || shareState === 'copied' ? '#22C55E' : '#7C3AED',
             color: '#fff', fontFamily: 'Nunito', fontWeight: 800, fontSize: 16,
             border: 'none', cursor: loading ? 'wait' : 'pointer',
