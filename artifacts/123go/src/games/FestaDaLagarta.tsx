@@ -130,6 +130,9 @@ export function FestaDaLagarta() {
         )}
         {positions.length > 0 && Array.from({ length: phaseData.max }, (_, i) => i).filter(id => !collectedIds.has(id)).map(id => {
           const pos = positions[id] || { x: 30 + (id % 5) * 52, y: 30 };
+          // stagger duration (2.4–3.8 s) and delay so leaves sway independently
+          const dur  = 2.4 + (id % 4) * 0.35;
+          const del  = -(id * 0.47 % dur);
           return (
             <div
               key={id}
@@ -145,7 +148,9 @@ export function FestaDaLagarta() {
                 boxShadow: '0 3px 10px rgba(0,0,0,0.18)',
                 opacity: phaseReady ? 1 : 0.5, touchAction: 'none',
                 userSelect: 'none', transition: 'opacity 0.3s',
-                willChange: 'transform',
+                animation: phaseReady
+                  ? `leafSway ${dur}s ${del}s ease-in-out infinite`
+                  : undefined,
               }}
             >
               🍃
@@ -159,6 +164,15 @@ export function FestaDaLagarta() {
           ✋ Agrupe de {phaseData.groupSize} em {phaseData.groupSize}!
         </p>
       )}
+
+      <style>{`
+        @keyframes leafSway {
+          0%   { transform: translateX(0)    rotate(0deg);  }
+          25%  { transform: translateX(9px)  rotate(4deg);  }
+          75%  { transform: translateX(-9px) rotate(-4deg); }
+          100% { transform: translateX(0)    rotate(0deg);  }
+        }
+      `}</style>
     </GameShell>
   );
 }
