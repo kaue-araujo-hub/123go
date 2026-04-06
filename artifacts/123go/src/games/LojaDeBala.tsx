@@ -17,21 +17,23 @@ function PoteVisual({ count, emoji, label, selected, onTap }: {
     <button
       onPointerUp={onTap}
       style={{
-        flex: 1, padding: 14, borderRadius: 20,
+        flex: 1, padding: '10px 8px', borderRadius: 20,
         border: `3px solid ${selected ? 'var(--c3)' : 'var(--border)'}`,
         background: selected ? '#EDE9FF' : '#fff', cursor: 'pointer',
-        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8,
-        minHeight: 120, transition: 'all 0.2s', touchAction: 'manipulation',
+        display: 'flex', flexDirection: 'column', alignItems: 'center',
+        justifyContent: 'center', gap: 6,
+        minHeight: 0, transition: 'all 0.2s', touchAction: 'manipulation',
+        overflow: 'hidden',
       }}
     >
-      <span style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 13, color: 'var(--text2)' }}>Pote {label}</span>
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, justifyContent: 'center', maxWidth: 130 }}>
+      <span style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 13, color: 'var(--text2)', flexShrink: 0 }}>Pote {label}</span>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 3, justifyContent: 'center', maxWidth: 130, overflow: 'hidden' }}>
         {Array.from({ length: Math.min(count, 20) }).map((_, i) => (
-          <AppleEmoji key={i} emoji={emoji} size={18} />
+          <AppleEmoji key={i} emoji={emoji} size={16} />
         ))}
         {count > 20 && <span style={{ fontSize: 11, color: 'var(--text3)', fontWeight: 700 }}>+{count - 20}</span>}
       </div>
-      <span style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 26, color: 'var(--text)' }}>{count}</span>
+      <span style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 24, color: 'var(--text)', flexShrink: 0 }}>{count}</span>
     </button>
   );
 }
@@ -74,20 +76,29 @@ export function LojaDeBala() {
   return (
     <GameShell title="Loja de Balas" emoji="🍬" color="var(--c3)" currentPhase={phase} totalPhases={5} score={score} onRestart={restart}>
       <FeedbackOverlay type={feedback} />
-      <div style={{ textAlign: 'center', marginBottom: 20 }}>
-        <div style={{ marginBottom: 8 }}><AppleEmoji emoji="🏪" size={44} /></div>
-        <h2 style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 19, color: 'var(--text)' }}>
-          {phaseData.question}
-        </h2>
-      </div>
-      <div style={{ display: 'flex', gap: 14 }}>
-        {phaseData.potes.map((pote, idx) => (
-          <PoteVisual
-            key={idx} count={pote.count} emoji={pote.emoji} label={pote.label}
-            selected={idx === phaseData.correct && answered}
-            onTap={() => handleChoice(idx)}
-          />
-        ))}
+
+      {/* Flex column — fills GameShell area, no overflow */}
+      <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden', gap: 10 }}>
+
+        {/* Header */}
+        <div style={{ textAlign: 'center', flexShrink: 0 }}>
+          <div style={{ marginBottom: 6 }}><AppleEmoji emoji="🏪" size={40} /></div>
+          <h2 style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 18, color: 'var(--text)', margin: 0 }}>
+            {phaseData.question}
+          </h2>
+        </div>
+
+        {/* Potes — grow to fill remaining space */}
+        <div style={{ display: 'flex', gap: 14, flex: 1, minHeight: 0 }}>
+          {phaseData.potes.map((pote, idx) => (
+            <PoteVisual
+              key={idx} count={pote.count} emoji={pote.emoji} label={pote.label}
+              selected={idx === phaseData.correct && answered}
+              onTap={() => handleChoice(idx)}
+            />
+          ))}
+        </div>
+
       </div>
     </GameShell>
   );
