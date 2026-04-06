@@ -218,14 +218,16 @@ export function GameShell({ title, emoji, color, currentPhase, totalPhases, chil
 
   const isPlaying = countdownDone && !paused && !stopped;
 
-  /* Sync timer with play/pause/stopped/countdown state */
+  /* Sync timer with play/pause/stopped/countdown state.
+     currentPhase is included so the timer restarts whenever a new phase
+     begins (completePhase resets it, but the other deps don't change). */
   useEffect(() => {
     if (!paused && !stopped && countdownDone) {
       timerStart();
     } else {
       timerPause();
     }
-  }, [paused, stopped, countdownDone]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [paused, stopped, countdownDone, currentPhase]); // eslint-disable-line react-hooks/exhaustive-deps
 
   /* ── BGM lifecycle ─────────────────────────────────────────────────── */
   useEffect(() => {

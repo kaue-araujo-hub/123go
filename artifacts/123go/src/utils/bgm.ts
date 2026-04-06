@@ -13,7 +13,7 @@ let _loopTimer:  ReturnType<typeof setTimeout> | null = null;
 let _currentTrack: string | null = null;
 let _playing = false;
 
-const BASE_VOL = 0.30;
+const BASE_VOL = 0.15;
 
 // Read mute state from localStorage (shared with sounds.ts)
 let _muted = (() => {
