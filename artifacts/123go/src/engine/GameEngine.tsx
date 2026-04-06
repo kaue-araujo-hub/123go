@@ -4,6 +4,7 @@ import confetti from 'canvas-confetti';
 import { CountdownOverlay } from '../components/CountdownOverlay';
 import { AppleEmoji } from '../utils/AppleEmoji';
 import { isMuted, setGlobalMuted, playCorrect, playWrong } from '../utils/sounds';
+import { startBGM, stopBGM, setBGMMuted, resumeBGM, getGameTrackId } from '../utils/bgm';
 import { burstParticles } from '../utils/particles';
 import { games } from '../data/games';
 import { addStar } from '../utils/progress';
@@ -169,8 +170,11 @@ export function GameShell({ title, emoji, color, currentPhase, totalPhases, chil
 
   const toggleMuted = useCallback(() => {
     setMuted(m => {
-      setGlobalMuted(!m);
-      return !m;
+      const next = !m;
+      setGlobalMuted(next);
+      setBGMMuted(next);
+      if (!next) resumeBGM();
+      return next;
     });
   }, []);
 
@@ -222,6 +226,25 @@ export function GameShell({ title, emoji, color, currentPhase, totalPhases, chil
       timerPause();
     }
   }, [paused, stopped, countdownDone]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  /* ── BGM lifecycle ─────────────────────────────────────────────────── */
+  useEffect(() => {
+    if (countdownDone && !paused && !stopped) {
+      // Gameplay: play the game-specific track
+      startBGM(getGameTrackId(location));
+    } else if (modeSelected && !howToPlayDone) {
+      // HowToPlay screen: gentle preparation music (same as catalog)
+      startBGM('catalog');
+    } else {
+      // Countdown, paused, stopped, mode-select: no BGM (just SFX for countdown)
+      stopBGM();
+    }
+  }, [countdownDone, paused, stopped, location, modeSelected, howToPlayDone]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  /* Stop BGM when the game component unmounts (user navigates away) */
+  useEffect(() => {
+    return () => { stopBGM(); };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handlePlay = () => {
     if (stopped) {

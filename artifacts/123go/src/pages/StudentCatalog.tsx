@@ -3,6 +3,7 @@ import { useLocation } from 'wouter';
 import { games } from '../data/games';
 import { StudentGameCard } from '../components/StudentGameCard';
 import { touchStreak, getStreak, getStarsToday, getTotalStars, getLevelInfo } from '../utils/progress';
+import { startBGM, stopBGM } from '../utils/bgm';
 import styles from './StudentCatalog.module.css';
 
 function StatRow({ icon, label, value, highlight = false, flash = false }: {
@@ -37,6 +38,12 @@ export function StudentCatalog() {
   const [progressOpen, setProgressOpen] = useState(false);
   const [starFlash,    setStarFlash]   = useState(false);
   const progressRef = useRef<HTMLDivElement>(null);
+
+  /* Catalog background music */
+  useEffect(() => {
+    startBGM('catalog');
+    return () => { stopBGM(); };
+  }, []);
 
   /* Touch streak on first load */
   useEffect(() => {

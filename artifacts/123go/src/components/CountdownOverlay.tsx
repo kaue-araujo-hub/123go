@@ -1,10 +1,11 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { playCountdownTick, playCountdownGo } from '../utils/sounds';
 
 const STEPS = [
-  { char: '1', color: '#F59E0B' },
+  { char: '3', color: '#F59E0B' },
   { char: '2', color: '#EF4444' },
-  { char: '3', color: '#3B82F6' },
+  { char: '1', color: '#3B82F6' },
   { char: 'GO!', color: '#10B981' },
 ];
 
@@ -27,6 +28,17 @@ export function CountdownOverlay({ countdownKey, onComplete, onBack }: Props) {
     setStep(0);
     setClosing(false);
   }, [countdownKey]);
+
+  // Play sound when step changes
+  useEffect(() => {
+    if (closing) return;
+    const isGo = step === STEPS.length - 1;
+    if (isGo) {
+      playCountdownGo();
+    } else {
+      playCountdownTick();
+    }
+  }, [step, closing]);
 
   useEffect(() => {
     if (closing) return;
