@@ -210,16 +210,19 @@ export function StudentCatalog() {
             )}
           </button>
 
-          {/* ── Popover panel ── */}
+          {/* ── Popover panel (fixed, centered on screen) ── */}
           {progressOpen && (
             <div style={{
-              position: 'absolute', top: 'calc(100% + 10px)', right: 0,
-              width: 272,
+              position: 'fixed',
+              top: 62,
+              left: '50%',
+              transform: 'translateX(-50%)',
+              width: 'min(288px, calc(100vw - 32px))',
               background: '#fff',
               border: '1.5px solid #E5E7EB',
               borderRadius: 20,
-              boxShadow: '0 10px 40px rgba(0,0,0,0.13)',
-              zIndex: 300,
+              boxShadow: '0 10px 40px rgba(0,0,0,0.16)',
+              zIndex: 400,
               overflow: 'hidden',
               animation: 'scSlideDown 0.2s ease',
             }}>
@@ -256,7 +259,7 @@ export function StudentCatalog() {
 
               <div style={{ padding: '14px 18px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
                 <StatRow icon="⭐" label="Estrelas hoje" value={starsToday > 0 ? `${starsToday}` : '—'} highlight={starsToday > 0} flash={starFlash} />
-                <StatRow icon="🌟" label="Total de estrelas" value={`${levelInfo.starsInLevel + (levelInfo.level - 1) * 15}`} />
+                <StatRow icon="🌟" label="Total de estrelas" value={`${levelInfo.totalStars}`} />
                 <StatRow icon="🔥" label="Sequência de dias" value={`${streak} dia${streak !== 1 ? 's' : ''}`} />
               </div>
 
@@ -330,8 +333,8 @@ export function StudentCatalog() {
           100% { transform: scale(1); }
         }
         @keyframes scSlideDown {
-          from { opacity: 0; transform: translateY(-8px); }
-          to   { opacity: 1; transform: translateY(0); }
+          from { opacity: 0; transform: translateX(-50%) translateY(-8px); }
+          to   { opacity: 1; transform: translateX(-50%) translateY(0); }
         }
         @media (max-width: 520px) {
           .${styles.progressBtnLabel} { display: none !important; }

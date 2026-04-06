@@ -1,7 +1,5 @@
 const TODAY = () => new Date().toISOString().slice(0, 10);
 
-const STARS_PER_LEVEL = 15;
-
 /* ── Streak ─────────────────────────────────────────────────────────── */
 
 export function getStreak(): number {
@@ -50,12 +48,32 @@ export function addStar(): void {
   window.dispatchEvent(new CustomEvent('123go-progress-update'));
 }
 
-/* ── Level ─────────────────────────────────────────────────────────── */
+/* ── Level ──────────────────────────────────────────────────────────── */
+/*
+ * Stars needed grow by 5 each level:
+ *   Level 1 → 5 stars to advance
+ *   Level 2 → 10 stars to advance
+ *   Level 3 → 15 stars to advance  …etc.
+ */
 
 export function getLevelInfo() {
-  const total       = getTotalStars();
-  const level       = Math.floor(total / STARS_PER_LEVEL) + 1;
-  const starsInLevel = total % STARS_PER_LEVEL;
-  const progressPct = Math.round((starsInLevel / STARS_PER_LEVEL) * 100);
-  return { level, starsInLevel, starsForLevel: STARS_PER_LEVEL, progressPct };
+  const total = getTotalStars();
+
+  let level    = 1;
+  let consumed = 0;
+
+  while (true) {
+    const needed = level * 5;
+    if (consumed + needed > total) break;
+    consumed += needed;
+    level++;
+  }
+
+  const starsInLevel = total - consumed;
+  const starsForLevel = level * 5;
+  const progressPct   = starsForLevel > 0
+    ? Math.round((starsInLevel / starsForLevel) * 100)
+    : 0;
+
+  return { level, starsInLevel, starsForLevel, progressPct, totalStars: total };
 }
