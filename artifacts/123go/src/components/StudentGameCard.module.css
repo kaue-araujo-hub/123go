@@ -1,0 +1,127 @@
+.card {
+  display:        flex;
+  flex-direction: column;
+  align-items:    center;
+  gap:            6px;
+  cursor:         pointer;
+  border-radius:  14px;
+  overflow:       hidden;
+  background:     rgba(255,255,255,0.04);
+  border:         1px solid rgba(255,255,255,0.06);
+
+  animation:  cardAppear 0.35s ease both;
+  will-change: transform, opacity;
+
+  transition: transform 0.15s ease, border-color 0.15s ease;
+
+  touch-action: manipulation;
+  user-select:  none;
+  -webkit-user-select: none;
+
+  outline: none;
+}
+
+.card:focus-visible {
+  border-color: rgba(91,79,207,0.7);
+  box-shadow:   0 0 0 2px rgba(91,79,207,0.4);
+}
+
+@keyframes cardAppear {
+  from { transform: scale(0.85) translateZ(0); opacity: 0; }
+  to   { transform: scale(1)    translateZ(0); opacity: 1; }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .card:hover {
+    transform:    translateY(-3px) scale(1.03) translateZ(0);
+    border-color: rgba(255,255,255,0.15);
+  }
+
+  .card:hover .emoji {
+    transform: scale(1.18) translateY(-4px) translateZ(0);
+  }
+}
+
+.card:active {
+  transform: scale(0.95) translateZ(0);
+}
+
+.thumb {
+  width:      100%;
+  aspect-ratio: 1;
+  position:   relative;
+  display:    flex;
+  align-items:   center;
+  justify-content: center;
+  overflow:   hidden;
+  background: var(--card-bg, #EEEDFE);
+}
+
+.thumbBg {
+  position:   absolute;
+  inset:      0;
+  background: var(--card-bg, #EEEDFE);
+}
+
+.thumbCircle {
+  position:      absolute;
+  width:         70%;
+  height:        70%;
+  border-radius: 50%;
+  background:    rgba(255,255,255,0.15);
+  will-change:   transform;
+  animation:     circlePulse 3s ease-in-out infinite;
+  animation-delay: calc(var(--card-index, 0) * 0.15s);
+}
+
+@keyframes circlePulse {
+  0%, 100% { transform: scale(1) translateZ(0); }
+  50%      { transform: scale(1.08) translateZ(0); }
+}
+
+.emoji {
+  position:    relative;
+  z-index:     1;
+  font-size:   clamp(32px, 7vw, 48px);
+  line-height: 1;
+  will-change: transform;
+  filter:      drop-shadow(0 4px 8px rgba(0,0,0,0.18));
+  animation:   emojiIdle 3.5s ease-in-out infinite;
+  transition:  transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
+}
+
+@keyframes emojiIdle {
+  0%, 100% { transform: translateY(0) rotate(0deg) translateZ(0); }
+  30%      { transform: translateY(-4px) rotate(-3deg) translateZ(0); }
+  70%      { transform: translateY(-3px) rotate(2deg) translateZ(0); }
+}
+
+.name {
+  font-family:  'Nunito', sans-serif;
+  font-weight:  700;
+  font-size:    clamp(10px, 2.5vw, 12px);
+  color:        rgba(255,255,255,0.85);
+  text-align:   center;
+  line-height:  1.3;
+  margin:       0;
+  padding:      0 6px 8px;
+  display:      -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow:     hidden;
+}
+
+@media (min-width: 480px) {
+  .emoji { font-size: clamp(36px, 7vw, 52px); }
+  .name  { font-size: 12px; padding: 0 8px 10px; }
+}
+
+@media (min-width: 768px) {
+  .emoji { font-size: clamp(40px, 7vw, 56px); }
+  .name  { font-size: 13px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card, .emoji, .thumbCircle { animation: none !important; transition: none !important; }
+  .card:hover { transform: none; }
+}

@@ -74,6 +74,18 @@ See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and pa
 - **Countdown timer in Modo Tempo**: game top bar shows countdown (counting down from timeLimitSeconds) instead of stopwatch; turns red + shakes at ≤ 10s
 - **Events**: `123go:mode-changed`, `123go:difficulty-changed`, `123go:role-changed`, `123go:session-started`
 
+**Entry Screen + Student Catalog (complete)**
+- `src/pages/EntryScreen.tsx` + `.module.css` — dark welcome screen (fundo #1A1A2E) with animated SVG logo, floating bubbles, and two profile buttons (Aluno/Professor)
+- `src/pages/StudentCatalog.tsx` + `.module.css` — FRIV-style dark catalog: sticky header (← + logo + busca), auto-fill grid of `StudentGameCard` components; no filters/pagination/description
+- `src/components/StudentGameCard.tsx` + `.module.css` — compact card: colored thumbnail area + emoji + game name only; animated idle emoji
+- `src/pages/TeacherPinScreen.tsx` — 4-digit PIN input (default: 1234), shake animation on wrong PIN
+- **Route changes in App.tsx**: `/` → EntryScreen; `/student` → StudentCatalog; `/teacher-pin` → TeacherPinScreen; `/catalog` → existing Catalog (teacher only); games unchanged
+- **GameEngine.tsx**: `modeSelected` and `howToPlayDone` both initialize to `SessionManager.isStudent()` — students skip mode selection + HowToPlay entirely and go straight to countdown
+- **Student game flow**: StudentCatalog card tap → navigate to game route → CountdownOverlay → game (Prática mode default)
+- **Teacher game flow**: Catalog → mode selection → HowToPlay → CountdownOverlay → game (configured mode)
+- `SessionManager.logoutTeacher()` called on student entry to guarantee student role
+- Back navigation in GameEngine is role-aware: `catalogPath = isStudent ? '/student' : '/catalog'`
+
 **Como Jogar — How To Play (complete)**
 - `src/data/games.ts` — `interactionType` (`drag|tap|swipe|hold|gesture|rhythm`) + `tutorialTheme {bg,color,emoji}` added to all 21 games and `Game` interface
 - `src/data/tutorials.ts` — `TUTORIALS` record: 2 mini-challenges per interaction type (drag, tap, swipe, hold, gesture, rhythm); full TypeScript interfaces `TutorialChallenge`, `Tutorial`, `InteractionType`

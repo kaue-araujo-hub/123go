@@ -14,6 +14,7 @@ import { ModeBadge } from '../components/ModeBadge';
 import { useGameMode } from '../hooks/useGameMode';
 import { HowToPlayScreen } from '../components/HowToPlay/HowToPlayScreen';
 import { GameModeSelectScreen } from '../components/GameModeSelect/GameModeSelectScreen';
+import { SessionManager } from '../auth/SessionManager';
 
 interface PhaseConfig {
   speed: number;
@@ -113,6 +114,8 @@ function SoundIcon({ muted }: { muted: boolean }) {
 
 export function GameShell({ title, emoji, color, currentPhase, totalPhases, children, onNextPhase, showNextPhase, score, onRestart, gameId: gameIdProp }: GameShellProps) {
   const [location, setLocation] = useLocation();
+  // Students return to their simplified catalog; teachers return to the full catalog
+  const catalogPath = SessionManager.isStudent() ? '/student' : '/catalog';
   const [paused, setPaused] = useState(false);
   const [stopped, setStopped] = useState(false);
   const [muted, setMuted] = useState(() => isMuted());
@@ -178,8 +181,9 @@ export function GameShell({ title, emoji, color, currentPhase, totalPhases, chil
 
   /* ── Mode selection + How To Play ─────────────────────────────────────────── */
   const gameData  = games.find(g => g.path === location) ?? null;
-  const [modeSelected,  setModeSelected]  = useState(false);
-  const [howToPlayDone, setHowToPlayDone] = useState(false);
+  // Students skip mode selection and go straight to gameplay (always Prática)
+  const [modeSelected,  setModeSelected]  = useState(() => SessionManager.isStudent());
+  const [howToPlayDone, setHowToPlayDone] = useState(() => SessionManager.isStudent());
 
   /* Mode (Modalidades de Aula) */
   const { isTime, config: modeConfig } = useGameMode();
@@ -252,7 +256,7 @@ export function GameShell({ title, emoji, color, currentPhase, totalPhases, chil
     return (
       <GameModeSelectScreen
         onSelect={() => setModeSelected(true)}
-        onBack={() => setLocation('/catalog')}
+        onBack={() => setLocation(catalogPath)}
       />
     );
   }
@@ -294,7 +298,7 @@ export function GameShell({ title, emoji, color, currentPhase, totalPhases, chil
         {/* LEFT: back + title */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1, minWidth: 0 }}>
           <button
-            onClick={() => setLocation('/catalog')}
+            onClick={() => setLocation(catalogPath)}
             aria-label="Voltar ao catálogo"
             className="btn-interactive"
             style={{
@@ -555,7 +559,7 @@ export function GameShell({ title, emoji, color, currentPhase, totalPhases, chil
             <p style={{ color: 'var(--text2)', fontSize: 14, margin: 0 }}>Deseja jogar novamente?</p>
             <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', justifyContent: 'center' }}>
               <button
-                onClick={() => setLocation('/catalog')}
+                onClick={() => setLocation(catalogPath)}
                 style={{
                   padding: '10px 22px',
                   borderRadius: 'var(--radius-pill)',
@@ -614,7 +618,7 @@ export function GameShell({ title, emoji, color, currentPhase, totalPhases, chil
                 setShowResults(false);
                 handleRestart();
               }}
-              onNext={() => setLocation('/catalog')}
+              onNext={() => setLocation(catalogPath)}
             />
           </div>
         )}
@@ -1161,7 +1165,7 @@ export function PhaseCompleteCard({ phase, totalPhases, score, isGameComplete, o
               </button>
               <button
                 className="btn-interactive action-btn"
-                onClick={() => setLocation('/catalog')}
+                onClick={() => setLocation(catalogPath)}
                 style={{
                   padding: '12px 22px',
                   borderRadius: 'var(--radius-pill)',

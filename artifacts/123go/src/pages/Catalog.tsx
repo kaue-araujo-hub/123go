@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useRef, useCallback } from 'react';
+import { useLocation } from 'wouter';
 import { Header } from '../components/Header';
 import { FilterBar, type FilterState } from '../components/FilterBar';
 import { GameCard } from '../components/GameCard';
@@ -37,6 +38,7 @@ function ListIcon({ active }: { active: boolean }) {
 }
 
 export function Catalog() {
+  const [, setLocation] = useLocation();
   const [searchQuery, setSearchQuery] = useState('');
   const [filters, setFilters] = useState<FilterState>({ ano: null, periodo: null, tema: null, age: null });
   const [currentPage, setCurrentPage] = useState(1);
@@ -106,6 +108,29 @@ export function Catalog() {
       <Header onSearch={handleSearch} />
 
       <main style={{ flex: 1, maxWidth: 900, margin: '0 auto', width: '100%', padding: '20px 16px' }}>
+        {/* Back to entry */}
+        <button
+          onPointerUp={() => setLocation('/')}
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 4,
+            fontSize: 13,
+            color: 'var(--text3)',
+            background: 'transparent',
+            border: 'none',
+            cursor: 'pointer',
+            padding: '4px 0',
+            marginBottom: 8,
+            fontFamily: 'Nunito Sans',
+            fontWeight: 600,
+            minHeight: 44,
+            touchAction: 'manipulation',
+          }}
+          aria-label="Voltar à tela inicial"
+        >
+          ← Sair
+        </button>
         {/* Breadcrumb + stats */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 0, marginBottom: 16, flexWrap: 'wrap', rowGap: 8 }}>
           <h1 style={{
