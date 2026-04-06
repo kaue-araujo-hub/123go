@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { GameShell, useGameEngine, FeedbackOverlay, PhaseCompleteCard } from '../engine/GameEngine';
 import { AppleEmoji } from '../utils/AppleEmoji';
 
-const FLASH_DURATIONS = [4000, 4000, 4000, 4000, 4000];
+const FLASH_DURATIONS = [7000, 4000, 4000, 4000, 4000];
 const STAR_COUNTS     = [3, 7, 4, 9, 5];
 
 function generateOptions(correct: number): number[] {
