@@ -1077,6 +1077,7 @@ interface PhaseCompleteCardProps {
 
 export function PhaseCompleteCard({ phase, totalPhases, score, isGameComplete, onNext, onRestart, color }: PhaseCompleteCardProps) {
   const [, setLocation] = useLocation();
+  const catalogPath = SessionManager.isStudent() ? '/student' : '/catalog';
   const [showShare, setShowShare] = useState(false);
 
   useEffect(() => {
