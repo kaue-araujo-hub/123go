@@ -6,7 +6,7 @@
   justify-content: center;
   gap:             32px;
   padding:         24px 20px 40px;
-  background:      #1A1A2E;
+  background:      #ffffff;
   position:        relative;
   overflow:        hidden;
 }
@@ -69,7 +69,7 @@
   font-family: 'Nunito Sans', sans-serif;
   font-weight: 600;
   font-size:   clamp(13px, 3.5vw, 16px);
-  color:       rgba(255,255,255,0.5);
+  color:       #9CA3AF;
   margin:      0;
   text-align:  center;
   letter-spacing: 0.04em;

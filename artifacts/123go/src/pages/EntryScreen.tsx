@@ -51,36 +51,11 @@ export function EntryScreen() {
         transition={{ type: 'spring', stiffness: 200, damping: 18, delay: 0.05 }}
         aria-label="123GO! Plataforma de jogos de matemática"
       >
-        <div className={styles.numbersArt} aria-hidden="true">
-          <svg viewBox="0 0 200 120" xmlns="http://www.w3.org/2000/svg" width="200" height="120">
-            <rect x="4"  y="2"  width="12" height="6"  rx="2" fill="#FF6B35" opacity="0.9"/>
-            <rect x="10" y="2"  width="6"  height="52" rx="2" fill="#4CAF50" opacity="0.85"/>
-            <rect x="4"  y="50" width="22" height="6"  rx="2" fill="#4CAF50" opacity="0.7"/>
-            <path d="M38 8 A16 16 0 0 1 70 8 Q70 22 55 32 L38 48 L70 48" stroke="#E91E8C" strokeWidth="7" fill="none" strokeLinecap="round"/>
-            <rect x="38" y="22" width="32" height="7" rx="3" fill="#5B4FCF" opacity="0.5"/>
-            <rect x="46" y="36" width="24" height="7" rx="3" fill="#FF9800" opacity="0.6"/>
-            <path d="M88 8 A14 14 0 0 1 116 8 Q116 22 102 26 Q116 30 116 44 A14 14 0 0 1 88 44" stroke="#00B4D8" strokeWidth="7" fill="none" strokeLinecap="round"/>
-            <rect x="100" y="6"  width="18" height="14" rx="3" fill="#FF9800" opacity="0.55"/>
-            <ellipse cx="110" cy="26" rx="10" ry="8"  fill="#5B4FCF" opacity="0.35"/>
-            <ellipse cx="110" cy="44" rx="10" ry="10" fill="#E91E8C" opacity="0.4"/>
-            <line x1="14" y1="68" x2="2"  y2="82"  stroke="#5B4FCF" strokeWidth="7" strokeLinecap="round"/>
-            <ellipse cx="14" cy="100" rx="14" ry="14" fill="#4CAF50" opacity="0.8"/>
-            <ellipse cx="14" cy="100" rx="9"  ry="9"  fill="#2D6A30" opacity="0.4"/>
-            <path d="M14 86 A14 14 0 0 1 28 100" stroke="#5B4FCF" strokeWidth="6" fill="none" strokeLinecap="round"/>
-            <rect x="46" y="66" width="30" height="7" rx="3" fill="#00B8A0"/>
-            <rect x="58" y="66" width="7"  height="8" rx="2" fill="#3D4A3D" opacity="0.5"/>
-            <line x1="76" y1="68" x2="52" y2="118" stroke="#E91E8C" strokeWidth="7" strokeLinecap="round"/>
-            <ellipse cx="166" cy="84"  rx="16" ry="16" fill="#FF6B35" opacity="0.85"/>
-            <ellipse cx="166" cy="104" rx="16" ry="16" fill="#00B4D8" opacity="0.85"/>
-            <ellipse cx="166" cy="96"  rx="10" ry="8"  fill="#3D3D3D" opacity="0.3"/>
-          </svg>
-        </div>
-
         <h1 className={styles.logoText} aria-label="123GO!">
           <span style={{ color: '#5B4FCF' }}>1</span>
           <span style={{ color: '#E91E8C' }}>2</span>
           <span style={{ color: '#FF6B35' }}>3</span>
-          <span style={{ color: '#fff' }}>G</span>
+          <span style={{ color: '#1A1A2E' }}>G</span>
           <span style={{ color: '#4CAF50' }}>O</span>
           <span style={{ color: '#E91E8C' }}>!</span>
         </h1>
@@ -125,10 +100,6 @@ export function EntryScreen() {
         </motion.button>
 
       </div>
-
-      <p className={styles.footer} aria-hidden="true">
-        Currículo Paulista · 1º ano · Matemática
-      </p>
 
     </div>
   );
