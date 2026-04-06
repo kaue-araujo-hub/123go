@@ -78,83 +78,91 @@ export function BaloesdaFesta() {
   return (
     <GameShell title="Balões da Festa" emoji="🎈" color={color} currentPhase={phase} totalPhases={5} score={score} onRestart={restart}>
       <FeedbackOverlay type={feedback} />
-      <div style={{ textAlign: 'center', marginBottom: 10 }}>
-        <h2 style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 15, color: 'var(--text)', marginBottom: 4 }}>
-          {phaseData.question}
-        </h2>
-        {remaining > 0 ? (
-          <p style={{ color, fontFamily: 'Nunito', fontWeight: 800, fontSize: 16, margin: 0 }}>
-            Ainda faltam <span style={{ fontSize: 22 }}>{remaining}</span> balões!
-          </p>
-        ) : (
-          <p style={{ color: 'var(--c5)', fontFamily: 'Nunito', fontWeight: 800, fontSize: 15, margin: 0 }}>
-            🎉 Grupos igualizados!
-          </p>
-        )}
-      </div>
 
-      <div style={{ display: 'flex', gap: 12, marginBottom: 12 }}>
-        {/* Active group (can be popped) */}
-        <div style={{ flex: 1, background: activeBg, borderRadius: 16, padding: 10, border: `2px solid ${color}` }}>
-          <p style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 12, color, textAlign: 'center', margin: '0 0 6px' }}>
-            Grupo principal: {bigGroup - popped}
-          </p>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, justifyContent: 'center' }}>
-            {Array.from({ length: bigVisible }, (_, i) => (
-              <button
-                key={i}
-                onPointerUp={() => handlePop(i)}
-                style={{
-                  background: 'none', border: 'none', cursor: popped >= phaseData.pop ? 'default' : 'pointer',
-                  padding: 2, width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  touchAction: 'manipulation',
-                  animation: splashing.has(i) ? 'splashPop 0.28s ease forwards' : undefined,
-                }}
-              >
-                {poppedSet.has(i)
-                  ? <span style={{ fontSize: 16 }}>💨</span>
-                  : splashing.has(i)
-                  ? <span style={{ fontSize: 16 }}>💥</span>
-                  : <AppleEmoji emoji="🎈" size={22} style={{ filter: hueFilter }} />
-                }
-              </button>
-            ))}
-          </div>
-          {bigExtra > 0 && <p style={{ fontFamily: 'Nunito', fontSize: 10, color, textAlign: 'center', margin: '3px 0 0' }}>+{bigExtra}</p>}
+      {/* Flex column — fills GameShell, no scroll */}
+      <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden', gap: 8 }}>
+
+        {/* Header */}
+        <div style={{ textAlign: 'center', flexShrink: 0 }}>
+          <h2 style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 14, color: 'var(--text)', marginBottom: 2, margin: '0 0 2px' }}>
+            {phaseData.question}
+          </h2>
+          {remaining > 0 ? (
+            <p style={{ color, fontFamily: 'Nunito', fontWeight: 800, fontSize: 14, margin: 0 }}>
+              Faltam <span style={{ fontSize: 18 }}>{remaining}</span> balões!
+            </p>
+          ) : (
+            <p style={{ color: 'var(--c5)', fontFamily: 'Nunito', fontWeight: 800, fontSize: 14, margin: 0 }}>
+              🎉 Grupos igualizados!
+            </p>
+          )}
         </div>
 
-        {/* Static group (no interaction) */}
-        <div style={{ flex: 1, background: '#F5F5F5', borderRadius: 16, padding: 10, border: '2px dashed #CCC', opacity: 0.8 }}>
-          <p style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 12, color: '#888', textAlign: 'center', margin: '0 0 6px' }}>
-            Grupo alvo: {smallGroup}
-          </p>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, justifyContent: 'center', pointerEvents: 'none' }}>
-            {Array.from({ length: smallVisible }, (_, i) => (
-              <AppleEmoji key={i} emoji="🎈" size={18} style={{ opacity: 0.5, filter: 'grayscale(1)' }} />
-            ))}
+        {/* Balloon groups — grow to fill space */}
+        <div style={{ display: 'flex', gap: 10, flex: 1, minHeight: 0 }}>
+          {/* Active group (can be popped) */}
+          <div style={{ flex: 1, background: activeBg, borderRadius: 16, padding: 8, border: `2px solid ${color}`, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+            <p style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 11, color, textAlign: 'center', margin: '0 0 4px', flexShrink: 0 }}>
+              Grupo principal: {bigGroup - popped}
+            </p>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 3, justifyContent: 'center', overflow: 'hidden', flex: 1, alignContent: 'flex-start' }}>
+              {Array.from({ length: bigVisible }, (_, i) => (
+                <button
+                  key={i}
+                  onPointerUp={() => handlePop(i)}
+                  style={{
+                    background: 'none', border: 'none', cursor: popped >= phaseData.pop ? 'default' : 'pointer',
+                    padding: 1, width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    touchAction: 'manipulation',
+                    animation: splashing.has(i) ? 'splashPop 0.28s ease forwards' : undefined,
+                  }}
+                >
+                  {poppedSet.has(i)
+                    ? <span style={{ fontSize: 14 }}>💨</span>
+                    : splashing.has(i)
+                    ? <span style={{ fontSize: 14 }}>💥</span>
+                    : <AppleEmoji emoji="🎈" size={18} style={{ filter: hueFilter }} />
+                  }
+                </button>
+              ))}
+            </div>
+            {bigExtra > 0 && <p style={{ fontFamily: 'Nunito', fontSize: 10, color, textAlign: 'center', margin: '2px 0 0', flexShrink: 0 }}>+{bigExtra}</p>}
           </div>
-          {smallExtra > 0 && <p style={{ fontFamily: 'Nunito', fontSize: 10, color: '#999', textAlign: 'center', margin: '3px 0 0' }}>+{smallExtra}</p>}
-        </div>
-      </div>
 
-      {/* Big POP button */}
-      <button
-        onPointerUp={() => {
-          if (popped >= phaseData.pop) return;
-          const next = Array.from({ length: bigVisible }, (_, i) => i).find(i => !poppedSet.has(i) && !splashing.has(i));
-          if (next !== undefined) handlePop(next);
-        }}
-        disabled={popped >= phaseData.pop}
-        style={{
-          width: '100%', padding: '14px', borderRadius: 'var(--radius-pill)',
-          background: popped >= phaseData.pop ? 'var(--border)' : color, color: '#fff',
-          fontFamily: 'Nunito', fontWeight: 800, fontSize: 18, border: 'none',
-          cursor: popped >= phaseData.pop ? 'default' : 'pointer', minHeight: 56,
-          touchAction: 'manipulation', transition: 'background 0.2s',
-        }}
-      >
-        {popped >= phaseData.pop ? '✅ Grupos Iguais!' : '💥 POP!'}
-      </button>
+          {/* Static group (no interaction) */}
+          <div style={{ flex: 1, background: '#F5F5F5', borderRadius: 16, padding: 8, border: '2px dashed #CCC', opacity: 0.8, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+            <p style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 11, color: '#888', textAlign: 'center', margin: '0 0 4px', flexShrink: 0 }}>
+              Grupo alvo: {smallGroup}
+            </p>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 3, justifyContent: 'center', pointerEvents: 'none', overflow: 'hidden', flex: 1, alignContent: 'flex-start' }}>
+              {Array.from({ length: smallVisible }, (_, i) => (
+                <AppleEmoji key={i} emoji="🎈" size={16} style={{ opacity: 0.5, filter: 'grayscale(1)' }} />
+              ))}
+            </div>
+            {smallExtra > 0 && <p style={{ fontFamily: 'Nunito', fontSize: 10, color: '#999', textAlign: 'center', margin: '2px 0 0', flexShrink: 0 }}>+{smallExtra}</p>}
+          </div>
+        </div>
+
+        {/* POP button — fixed at bottom */}
+        <button
+          onPointerUp={() => {
+            if (popped >= phaseData.pop) return;
+            const next = Array.from({ length: bigVisible }, (_, i) => i).find(i => !poppedSet.has(i) && !splashing.has(i));
+            if (next !== undefined) handlePop(next);
+          }}
+          disabled={popped >= phaseData.pop}
+          style={{
+            flexShrink: 0, width: '100%', padding: '11px', borderRadius: 'var(--radius-pill)',
+            background: popped >= phaseData.pop ? 'var(--border)' : color, color: '#fff',
+            fontFamily: 'Nunito', fontWeight: 800, fontSize: 17, border: 'none',
+            cursor: popped >= phaseData.pop ? 'default' : 'pointer', minHeight: 48,
+            touchAction: 'manipulation', transition: 'background 0.2s',
+          }}
+        >
+          {popped >= phaseData.pop ? '✅ Grupos Iguais!' : '💥 POP!'}
+        </button>
+
+      </div>
 
       <style>{`
         @keyframes splashPop {
