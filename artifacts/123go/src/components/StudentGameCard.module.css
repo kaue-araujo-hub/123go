@@ -6,13 +6,14 @@
   cursor:         pointer;
   border-radius:  14px;
   overflow:       hidden;
-  background:     rgba(255,255,255,0.04);
-  border:         1px solid rgba(255,255,255,0.06);
+  background:     #fff;
+  border:         1px solid #E5E7EB;
+  box-shadow:     0 1px 4px rgba(0,0,0,0.06);
 
   animation:  cardAppear 0.35s ease both;
   will-change: transform, opacity;
 
-  transition: transform 0.15s ease, border-color 0.15s ease;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
 
   touch-action: manipulation;
   user-select:  none;
@@ -22,8 +23,8 @@
 }
 
 .card:focus-visible {
-  border-color: rgba(91,79,207,0.7);
-  box-shadow:   0 0 0 2px rgba(91,79,207,0.4);
+  border-color: rgba(91,79,207,0.6);
+  box-shadow:   0 0 0 3px rgba(91,79,207,0.2);
 }
 
 @keyframes cardAppear {
@@ -33,8 +34,9 @@
 
 @media (hover: hover) and (pointer: fine) {
   .card:hover {
-    transform:    translateY(-3px) scale(1.03) translateZ(0);
-    border-color: rgba(255,255,255,0.15);
+    transform:    translateY(-4px) scale(1.03) translateZ(0);
+    box-shadow:   0 8px 20px rgba(0,0,0,0.12);
+    border-color: #C4B5FD;
   }
 
   .card:hover .emoji {
@@ -68,7 +70,7 @@
   width:         70%;
   height:        70%;
   border-radius: 50%;
-  background:    rgba(255,255,255,0.15);
+  background:    rgba(255,255,255,0.22);
   will-change:   transform;
   animation:     circlePulse 3s ease-in-out infinite;
   animation-delay: calc(var(--card-index, 0) * 0.15s);
@@ -100,7 +102,7 @@
   font-family:  'Nunito', sans-serif;
   font-weight:  700;
   font-size:    clamp(10px, 2.5vw, 12px);
-  color:        rgba(255,255,255,0.85);
+  color:        #1A1A2E;
   text-align:   center;
   line-height:  1.3;
   margin:       0;
