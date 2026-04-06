@@ -99,27 +99,6 @@ export function StudentCatalog() {
           <span style={{ color: '#E91E8C' }}>!</span>
         </h1>
 
-        {/* 🔥 Streak chip */}
-        <div
-          title={`${streak} dia${streak !== 1 ? 's' : ''} seguido${streak !== 1 ? 's' : ''}!`}
-          style={{
-            flexShrink: 0,
-            display: 'flex', alignItems: 'center', gap: 4,
-            background: 'linear-gradient(135deg, #FEF3C7, #FDE68A)',
-            border: '1.5px solid #FCD34D',
-            borderRadius: 9999,
-            padding: '5px 11px',
-            fontFamily: 'Nunito', fontWeight: 800, fontSize: 13,
-            color: '#92400E',
-            animation: 'scStreakPulse 2.4s ease-in-out infinite',
-            cursor: 'default',
-            userSelect: 'none',
-          }}
-        >
-          <span style={{ fontSize: 15 }}>🔥</span>
-          <span>{streak}</span>
-        </div>
-
         {/* ── Meu Progresso button + popover ── */}
         <div ref={progressRef} style={{ position: 'relative', flexShrink: 0 }}>
           <button
@@ -272,10 +251,6 @@ export function StudentCatalog() {
       </main>
 
       <style>{`
-        @keyframes scStreakPulse {
-          0%, 100% { transform: scale(1); }
-          50%       { transform: scale(1.06); box-shadow: 0 0 10px rgba(251,191,36,0.4); }
-        }
         @keyframes scStudentBurst {
           0%   { transform: scale(1); }
           40%  { transform: scale(1.5); }
