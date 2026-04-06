@@ -75,7 +75,6 @@ export function ParOuImpar() {
         <h2 style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 19, color: 'var(--text)', marginBottom: 4 }}>
           Toque no item que ficou <span style={{ color: 'var(--c3)' }}>sozinho!</span>
         </h2>
-        <p style={{ color: 'var(--text2)', fontSize: 13 }}>Tema: <strong>{themeName}</strong></p>
       </div>
       <div style={{
         display: 'flex', flexWrap: 'wrap', gap: 10, justifyContent: 'center',
