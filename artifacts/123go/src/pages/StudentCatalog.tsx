@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react'
 import { useLocation } from 'wouter';
 import { games } from '../data/games';
 import { StudentGameCard } from '../components/StudentGameCard';
-import { touchStreak, getStreak, getStarsToday, getLevelInfo } from '../utils/progress';
+import { touchStreak, getStreak, getStarsToday, getTotalStars, getLevelInfo } from '../utils/progress';
 import styles from './StudentCatalog.module.css';
 
 function StatRow({ icon, label, value, highlight = false, flash = false }: {
@@ -32,6 +32,7 @@ export function StudentCatalog() {
   /* ── Gamification state ─────────────────────────────── */
   const [streak,       setStreak]      = useState(() => getStreak());
   const [starsToday,   setStarsToday]  = useState(() => getStarsToday());
+  const [totalStars,   setTotalStars]  = useState(() => getTotalStars());
   const [levelInfo,    setLevelInfo]   = useState(() => getLevelInfo());
   const [progressOpen, setProgressOpen] = useState(false);
   const [starFlash,    setStarFlash]   = useState(false);
@@ -47,6 +48,7 @@ export function StudentCatalog() {
   useEffect(() => {
     const handler = () => {
       setStarsToday(getStarsToday());
+      setTotalStars(getTotalStars());
       setLevelInfo(getLevelInfo());
       setStreak(getStreak());
       setStarFlash(true);
@@ -259,7 +261,7 @@ export function StudentCatalog() {
 
               <div style={{ padding: '14px 18px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
                 <StatRow icon="⭐" label="Estrelas hoje" value={starsToday > 0 ? `${starsToday}` : '—'} highlight={starsToday > 0} flash={starFlash} />
-                <StatRow icon="🌟" label="Total de estrelas" value={`${levelInfo.totalStars}`} />
+                <StatRow icon="🌟" label="Total de estrelas" value={`${totalStars}`} />
                 <StatRow icon="🔥" label="Sequência de dias" value={`${streak} dia${streak !== 1 ? 's' : ''}`} />
               </div>
 
