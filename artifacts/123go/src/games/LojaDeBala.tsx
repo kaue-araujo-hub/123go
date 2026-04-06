@@ -4,7 +4,7 @@ import { AppleEmoji } from '../utils/AppleEmoji';
 
 const PHASES = [
   { question: 'Qual pote tem MAIS balas?', potes: [{ count: 5, emoji: '🍬', label: 'A' }, { count: 9, emoji: '🍭', label: 'B' }], correct: 1 },
-  { question: 'Qual pote tem MENOS balas?', potes: [{ count: 10, emoji: '🍬', label: 'A' }, { count: 14, emoji: '🍭', label: 'B' }], correct: 0 },
+  { question: 'Qual pote tem MENOS balas?', potes: [{ count: 7, emoji: '🍬', label: 'A' }, { count: 10, emoji: '🍭', label: 'B' }], correct: 0 },
   { question: 'Qual pote tem MAIS balas?', potes: [{ count: 12, emoji: '🍬', label: 'A' }, { count: 8, emoji: '🍭', label: 'B' }], correct: 0 },
   { question: 'Qual pote tem MENOS balas?', potes: [{ count: 9, emoji: '🍬', label: 'A' }, { count: 16, emoji: '🍭', label: 'B' }], correct: 0 },
   { question: 'Qual pote tem MAIS balas?', potes: [{ count: 11, emoji: '🍬', label: 'A' }, { count: 7, emoji: '🍭', label: 'B' }], correct: 0 },
