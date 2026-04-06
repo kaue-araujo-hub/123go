@@ -1039,12 +1039,24 @@ function ShareModal({ score, totalPhases, onClose }: ShareModalProps) {
           </div>
         </div>
 
-        {/* Stars */}
-        <div style={{ display: 'flex', justifyContent: 'center', gap: 4, marginBottom: 10 }}>
-          {Array.from({ length: totalPhases }).map((_, i) => (
-            <span key={i} style={{ fontSize: 32, color: i < score ? '#F59E0B' : '#E5E7EB', lineHeight: 1 }}>★</span>
-          ))}
-        </div>
+        {/* Stars — staggered layout: row1 = odd indices (0,2,4), row2 = even indices (1,3) */}
+        {(() => {
+          const starColor = (i: number) => i < score ? '#F59E0B' : '#E5E7EB';
+          const row1 = [0, 2, 4].filter(i => i < totalPhases);
+          const row2 = [1, 3].filter(i => i < totalPhases);
+          return (
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, marginBottom: 12 }}>
+              <div style={{ display: 'flex', gap: 6 }}>
+                {row1.map(i => <span key={i} style={{ fontSize: 38, color: starColor(i), lineHeight: 1 }}>★</span>)}
+              </div>
+              {row2.length > 0 && (
+                <div style={{ display: 'flex', gap: 6 }}>
+                  {row2.map(i => <span key={i} style={{ fontSize: 38, color: starColor(i), lineHeight: 1 }}>★</span>)}
+                </div>
+              )}
+            </div>
+          );
+        })()}
 
         {/* Score */}
         <div style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 18, color: '#111', marginBottom: 4 }}>
