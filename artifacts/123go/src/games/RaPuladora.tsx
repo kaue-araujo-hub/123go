@@ -134,9 +134,6 @@ export function RaPuladora() {
         <p style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 18, color: 'var(--text)', margin: 0 }}>
           {questionLabel}
         </p>
-        <p style={{ color: 'var(--text2)', fontSize: 12, marginTop: 4 }}>
-          Toque na lagoa certa! · Rodada {roundNum}/{cfg.roundsToWin}
-        </p>
       </div>
 
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 12, willChange: 'transform' }}>
