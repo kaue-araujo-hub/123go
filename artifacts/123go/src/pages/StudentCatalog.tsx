@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, useRef } from 'react';
+import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { useLocation } from 'wouter';
 import { games } from '../data/games';
 import { StudentGameCard } from '../components/StudentGameCard';
@@ -67,6 +67,19 @@ export function StudentCatalog() {
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
+  const [searchOpen, setSearchOpen] = useState(false);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  const openSearch = useCallback(() => {
+    setSearchOpen(true);
+    setTimeout(() => searchInputRef.current?.focus(), 50);
+  }, []);
+
+  const closeSearch = useCallback(() => {
+    setSearchOpen(false);
+    setSearchQuery('');
+  }, []);
+
   const filteredGames = useMemo(() => {
     if (!searchQuery.trim()) return games;
     const q = searchQuery.toLowerCase();
@@ -81,25 +94,77 @@ export function StudentCatalog() {
     <div className={styles.screen}>
 
       <header className={styles.header}>
-        <button
-          className={styles.backBtn}
-          onPointerUp={() => setLocation('/')}
-          aria-label="Voltar à tela inicial"
-          style={{ touchAction: 'manipulation' }}
-        >
-          ←
-        </button>
 
-        <h1 className={styles.logo} aria-label="123GO!">
-          <span style={{ color: '#5B4FCF' }}>1</span>
-          <span style={{ color: '#E91E8C' }}>2</span>
-          <span style={{ color: '#FF6B35' }}>3</span>
-          <span style={{ color: '#1A1A2E' }}>G</span>
-          <span style={{ color: '#4CAF50' }}>O</span>
-          <span style={{ color: '#E91E8C' }}>!</span>
-        </h1>
+        {/* ── Search overlay state ── */}
+        {searchOpen && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1 }}>
+            <div style={{
+              flex: 1, display: 'flex', alignItems: 'center', gap: 8,
+              background: '#F3F4F6', border: '1.5px solid #E5E7EB',
+              borderRadius: 9999, padding: '0 12px 0 14px',
+              transition: 'border-color 0.2s',
+            }}>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+              </svg>
+              <input
+                ref={searchInputRef}
+                type="text"
+                placeholder="Buscar jogo..."
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                aria-label="Buscar jogo por nome"
+                style={{
+                  flex: 1, border: 'none', outline: 'none',
+                  background: 'transparent',
+                  fontFamily: 'Nunito', fontWeight: 600, fontSize: 15,
+                  color: '#1A1A2E', padding: '10px 0',
+                }}
+              />
+              {searchQuery && (
+                <button
+                  onPointerUp={() => setSearchQuery('')}
+                  style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#9CA3AF', fontSize: 16, padding: 0, lineHeight: 1, touchAction: 'manipulation' }}
+                  aria-label="Limpar busca"
+                >✕</button>
+              )}
+            </div>
+            <button
+              onPointerUp={closeSearch}
+              style={{
+                flexShrink: 0, border: '1px solid #E5E7EB', background: '#F9FAFB',
+                borderRadius: 9999, color: '#6B7280',
+                fontFamily: 'Nunito', fontWeight: 700, fontSize: 13,
+                cursor: 'pointer', padding: '8px 14px', touchAction: 'manipulation',
+              }}
+            >
+              Cancelar
+            </button>
+          </div>
+        )}
 
-        {/* ── Meu Progresso button + popover ── */}
+        {/* ── Default state ── */}
+        {!searchOpen && (
+          <>
+            <button
+              className={styles.backBtn}
+              onPointerUp={() => setLocation('/')}
+              aria-label="Voltar à tela inicial"
+              style={{ touchAction: 'manipulation' }}
+            >
+              ←
+            </button>
+
+            <h1 className={styles.logo} aria-label="123GO!">
+              <span style={{ color: '#5B4FCF' }}>1</span>
+              <span style={{ color: '#E91E8C' }}>2</span>
+              <span style={{ color: '#FF6B35' }}>3</span>
+              <span style={{ color: '#1A1A2E' }}>G</span>
+              <span style={{ color: '#4CAF50' }}>O</span>
+              <span style={{ color: '#E91E8C' }}>!</span>
+            </h1>
+
+            {/* ── Meu Progresso button + popover ── */}
         <div ref={progressRef} style={{ position: 'relative', flexShrink: 0 }}>
           <button
             onClick={() => setProgressOpen(o => !o)}
@@ -212,18 +277,26 @@ export function StudentCatalog() {
           )}
         </div>
 
-        {/* Search */}
-        <div className={styles.searchWrap}>
-          <span className={styles.searchIcon} aria-hidden="true">🔍</span>
-          <input
-            className={styles.searchInput}
-            type="text"
-            placeholder="Buscar jogo..."
-            value={searchQuery}
-            onChange={e => setSearchQuery(e.target.value)}
-            aria-label="Buscar jogo por nome"
-          />
-        </div>
+            {/* Search icon button */}
+            <button
+              onPointerUp={openSearch}
+              aria-label="Abrir busca"
+              style={{
+                marginLeft: 'auto',
+                width: 40, height: 40, borderRadius: '50%',
+                border: '1px solid #E5E7EB',
+                background: '#F9FAFB',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                cursor: 'pointer', flexShrink: 0, touchAction: 'manipulation',
+                transition: 'background 0.15s ease',
+              }}
+            >
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#6B7280" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+              </svg>
+            </button>
+          </>
+        )}
       </header>
 
       <main className={styles.main}>
