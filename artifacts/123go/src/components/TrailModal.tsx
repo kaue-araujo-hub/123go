@@ -383,13 +383,14 @@ export function TrailModal({ trail, onClose }: Props) {
               onClick={handleShare}
               style={{
                 width: '100%', padding: '14px 0',
-                borderRadius: 14, border: 'none',
-                background: trail.color, color: '#fff',
-                fontFamily: 'Nunito', fontWeight: 800, fontSize: 15,
+                borderRadius: 99, border: 'none',
+                background: copyDone ? '#22C55E' : '#7C3AED', color: '#fff',
+                fontFamily: 'Nunito', fontWeight: 800, fontSize: 16,
                 cursor: 'pointer', marginBottom: 10,
+                transition: 'background 0.25s ease',
               }}
             >
-              {copyDone ? '✅ Copiado!' : '📤 Compartilhar Progresso'}
+              {copyDone ? '✅ Compartilhado!' : 'Compartilhar'}
             </button>
             <button
               onClick={() => setShowComplete(false)}
