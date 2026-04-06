@@ -36,6 +36,10 @@ export function FestaDaLagarta() {
   const [phaseReady, setPhaseReady] = useState(false);
   const [positions, setPositions] = useState<{ x: number; y: number }[]>([]);
   const [collectedIds, setCollectedIds] = useState<Set<number>>(new Set());
+  // Track which leaf is currently being dragged so we can hide it immediately
+  const [draggingId, setDraggingId] = useState<number | null>(null);
+  const draggingIdRef = useRef<number | null>(null);
+  const dropSucceededRef = useRef(false);
   const phaseCompletedRef = useRef(false);
   const collectedRef = useRef(0);
   const phaseData = PHASES[phase - 1];
@@ -48,6 +52,8 @@ export function FestaDaLagarta() {
     setDragOver(false);
     setPhaseReady(false);
     setCollectedIds(new Set());
+    setDraggingId(null);
+    draggingIdRef.current = null;
     setPositions(getPositions(phaseData.max));
     const t = setTimeout(() => setPhaseReady(true), 300);
     return () => clearTimeout(t);
@@ -72,6 +78,30 @@ export function FestaDaLagarta() {
     handleCollect();
   }, [phaseReady, collectedIds, handleCollect]);
 
+  const handleDragStart = useCallback((id: number) => {
+    draggingIdRef.current = id;
+    dropSucceededRef.current = false;
+    setDraggingId(id);
+  }, []);
+
+  const handleDragEnd = useCallback(() => {
+    // If the drop never fired (drag cancelled), restore the leaf
+    if (!dropSucceededRef.current) {
+      draggingIdRef.current = null;
+      setDraggingId(null);
+    }
+  }, []);
+
+  const handleDrop = useCallback(() => {
+    const id = draggingIdRef.current;
+    if (id === null) return;
+    dropSucceededRef.current = true;
+    draggingIdRef.current = null;
+    setDraggingId(null);
+    setCollectedIds(prev => { const n = new Set(prev); n.add(id); return n; });
+    handleCollect();
+  }, [handleCollect]);
+
   if (phaseComplete) {
     return (
       <GameShell title="Festa da Lagarta" emoji="🐛" color="var(--c5)" currentPhase={phase} totalPhases={5} score={score} onRestart={restart}>
@@ -85,9 +115,6 @@ export function FestaDaLagarta() {
       <FeedbackOverlay type={feedback} />
       <div style={{ textAlign: 'center', marginBottom: 6 }}>
         <p style={{ fontFamily: 'Nunito', fontWeight: 700, fontSize: 15, color: 'var(--text)', margin: 0 }}>{phaseData.label}</p>
-        <p style={{ color: 'var(--text2)', fontSize: 13, marginTop: 2 }}>
-          Folhas: <strong style={{ color: 'var(--c5)' }}>{collected}</strong> / {phaseData.target}
-        </p>
       </div>
       <div style={{ background: 'var(--border)', borderRadius: 8, height: 10, marginBottom: 10, overflow: 'hidden' }}>
         <div style={{ height: '100%', background: 'var(--c5)', width: `${Math.min((collected / phaseData.target) * 100, 100)}%`, transition: 'width 0.3s ease', borderRadius: 8 }} />
@@ -97,7 +124,7 @@ export function FestaDaLagarta() {
       <div
         onDragOver={e => { e.preventDefault(); setDragOver(true); }}
         onDragLeave={() => setDragOver(false)}
-        onDrop={e => { e.preventDefault(); setDragOver(false); handleCollect(); }}
+        onDrop={e => { e.preventDefault(); setDragOver(false); handleDrop(); }}
         style={{
           background: dragOver ? '#D7F2D7' : '#F1F8E9',
           border: `3px dashed ${dragOver ? '#4CAF50' : '#A5D6A7'}`,
@@ -137,7 +164,8 @@ export function FestaDaLagarta() {
             <div
               key={id}
               draggable={phaseReady}
-              onDragStart={e => { e.dataTransfer.effectAllowed = 'move'; }}
+              onDragStart={e => { e.dataTransfer.effectAllowed = 'move'; handleDragStart(id); }}
+              onDragEnd={handleDragEnd}
               onPointerUp={() => handleLeafTap(id)}
               style={{
                 position: 'absolute', left: pos.x, top: pos.y,
@@ -146,9 +174,11 @@ export function FestaDaLagarta() {
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 fontSize: 28, cursor: phaseReady ? 'pointer' : 'default',
                 boxShadow: '0 3px 10px rgba(0,0,0,0.18)',
-                opacity: phaseReady ? 1 : 0.5, touchAction: 'none',
-                userSelect: 'none', transition: 'opacity 0.3s',
-                animation: phaseReady
+                opacity: id === draggingId ? 0 : phaseReady ? 1 : 0.5,
+                pointerEvents: id === draggingId ? 'none' : 'auto',
+                touchAction: 'none', userSelect: 'none',
+                transition: 'opacity 0.15s',
+                animation: phaseReady && id !== draggingId
                   ? `leafSway ${dur}s ${del}s ease-in-out infinite`
                   : undefined,
               }}
