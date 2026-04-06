@@ -36,10 +36,9 @@ export function FestaDaLagarta() {
   const [phaseReady, setPhaseReady] = useState(false);
   const [positions, setPositions] = useState<{ x: number; y: number }[]>([]);
   const [collectedIds, setCollectedIds] = useState<Set<number>>(new Set());
-  // Track which leaf is currently being dragged so we can hide it immediately
+  // Which leaf is currently being dragged (hide it visually while dragging)
   const [draggingId, setDraggingId] = useState<number | null>(null);
-  const draggingIdRef = useRef<number | null>(null);
-  const dropSucceededRef = useRef(false);
+  const draggingIdRef  = useRef<number | null>(null);
   const phaseCompletedRef = useRef(false);
   const collectedRef = useRef(0);
   const phaseData = PHASES[phase - 1];
@@ -59,6 +58,7 @@ export function FestaDaLagarta() {
     return () => clearTimeout(t);
   }, [phase]);
 
+  /** Core collection logic — always call this exactly once per leaf collected */
   const handleCollect = useCallback(() => {
     if (!phaseReady || phaseCompletedRef.current) return;
     const next = collectedRef.current + 1;
@@ -72,33 +72,42 @@ export function FestaDaLagarta() {
     }
   }, [phaseReady, phaseData.target, onCorrect, onPhaseComplete]);
 
+  /** Tap on a leaf (touch / click without drag) */
   const handleLeafTap = useCallback((id: number) => {
+    // Ignore if this leaf is the one being dragged (pointer-up fires on drag-end too)
     if (!phaseReady || phaseCompletedRef.current || collectedIds.has(id)) return;
+    if (draggingIdRef.current === id) return;
     setCollectedIds(prev => { const n = new Set(prev); n.add(id); return n; });
     handleCollect();
   }, [phaseReady, collectedIds, handleCollect]);
 
-  const handleDragStart = useCallback((id: number) => {
+  /** Called when a drag gesture begins on a leaf */
+  const handleDragStart = useCallback((id: number, e: React.DragEvent) => {
+    e.dataTransfer.effectAllowed = 'move';
     draggingIdRef.current = id;
-    dropSucceededRef.current = false;
     setDraggingId(id);
   }, []);
 
+  /** Called when the drag ends on the source leaf (whether dropped or cancelled) */
   const handleDragEnd = useCallback(() => {
-    // If the drop never fired (drag cancelled), restore the leaf
-    if (!dropSucceededRef.current) {
+    // Only restore if the drop zone never received the drop
+    if (draggingIdRef.current !== null) {
       draggingIdRef.current = null;
       setDraggingId(null);
     }
   }, []);
 
-  const handleDrop = useCallback(() => {
+  /** Called when a leaf is dropped onto the drop zone */
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setDragOver(false);
     const id = draggingIdRef.current;
-    if (id === null) return;
-    dropSucceededRef.current = true;
+    // Clear dragging state BEFORE updating collectedIds so leaf doesn't flicker back
     draggingIdRef.current = null;
     setDraggingId(null);
-    setCollectedIds(prev => { const n = new Set(prev); n.add(id); return n; });
+    if (id !== null) {
+      setCollectedIds(prev => { const n = new Set(prev); n.add(id); return n; });
+    }
     handleCollect();
   }, [handleCollect]);
 
@@ -124,7 +133,7 @@ export function FestaDaLagarta() {
       <div
         onDragOver={e => { e.preventDefault(); setDragOver(true); }}
         onDragLeave={() => setDragOver(false)}
-        onDrop={e => { e.preventDefault(); setDragOver(false); handleDrop(); }}
+        onDrop={handleDrop}
         style={{
           background: dragOver ? '#D7F2D7' : '#F1F8E9',
           border: `3px dashed ${dragOver ? '#4CAF50' : '#A5D6A7'}`,
@@ -164,7 +173,7 @@ export function FestaDaLagarta() {
             <div
               key={id}
               draggable={phaseReady}
-              onDragStart={e => { e.dataTransfer.effectAllowed = 'move'; handleDragStart(id); }}
+              onDragStart={e => handleDragStart(id, e)}
               onDragEnd={handleDragEnd}
               onPointerUp={() => handleLeafTap(id)}
               style={{
