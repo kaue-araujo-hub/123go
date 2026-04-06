@@ -55,7 +55,7 @@ export function TeacherPinScreen() {
   return (
     <div style={{
       minHeight: '100dvh',
-      background: '#1A1A2E',
+      background: '#ffffff',
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
@@ -70,16 +70,17 @@ export function TeacherPinScreen() {
           position: 'absolute',
           top: 18,
           left: 16,
-          background: 'transparent',
-          border: '1px solid rgba(255,255,255,0.12)',
+          background: '#F9FAFB',
+          border: '1px solid #E5E7EB',
           borderRadius: 50,
-          color: 'rgba(255,255,255,0.6)',
+          color: '#6B7280',
           fontFamily: 'Nunito',
           fontSize: 14,
           fontWeight: 700,
           cursor: 'pointer',
           padding: '8px 16px',
           touchAction: 'manipulation',
+          transition: 'background 0.15s ease',
         }}
       >
         ← Voltar
@@ -91,7 +92,7 @@ export function TeacherPinScreen() {
           fontFamily: 'Nunito',
           fontWeight: 900,
           fontSize: 'clamp(22px, 6vw, 32px)',
-          color: '#fff',
+          color: '#1A1A2E',
           margin: 0,
           textAlign: 'center',
         }}>
@@ -100,7 +101,7 @@ export function TeacherPinScreen() {
         <p style={{
           fontFamily: 'Nunito Sans',
           fontSize: 14,
-          color: 'rgba(255,255,255,0.45)',
+          color: '#9CA3AF',
           margin: 0,
           textAlign: 'center',
         }}>
@@ -129,9 +130,9 @@ export function TeacherPinScreen() {
                 width: 60,
                 height: 68,
                 borderRadius: 14,
-                border: `2px solid ${error ? '#EF4444' : digit ? '#E91E8C' : 'rgba(255,255,255,0.15)'}`,
-                background: digit ? 'rgba(233,30,140,0.12)' : 'rgba(255,255,255,0.05)',
-                color: '#fff',
+                border: `2px solid ${error ? '#EF4444' : digit ? '#E91E8C' : '#E5E7EB'}`,
+                background: digit ? 'rgba(233,30,140,0.07)' : '#F9FAFB',
+                color: '#1A1A2E',
                 fontFamily: 'Nunito',
                 fontWeight: 900,
                 fontSize: 28,
@@ -165,7 +166,7 @@ export function TeacherPinScreen() {
       <p style={{
         fontFamily: 'Nunito Sans',
         fontSize: 11,
-        color: 'rgba(255,255,255,0.2)',
+        color: '#D1D5DB',
         margin: 0,
         textAlign: 'center',
         letterSpacing: '0.05em',
