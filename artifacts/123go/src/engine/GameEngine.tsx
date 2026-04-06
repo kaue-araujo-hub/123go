@@ -298,7 +298,7 @@ export function GameShell({ title, emoji, color, currentPhase, totalPhases, chil
   }
 
   return (
-    <div className="game-shell-bg" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <div className="game-shell-bg" style={{ height: '100dvh', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
       {/* 123GO! countdown overlay */}
       {!countdownDone && (
         <CountdownOverlay
@@ -521,7 +521,7 @@ export function GameShell({ title, emoji, color, currentPhase, totalPhases, chil
       )}
 
       {/* Game content */}
-      <div className="game-area" style={{ flex: 1, padding: '14px 14px', maxWidth: 720, margin: '0 auto', width: '100%', position: 'relative' }}>
+      <div className="game-area" style={{ flex: 1, minHeight: 0, overflow: 'hidden', padding: '14px 14px', maxWidth: 720, margin: '0 auto', width: '100%', position: 'relative', boxSizing: 'border-box' }}>
         {children}
 
         {/* Paused overlay */}
