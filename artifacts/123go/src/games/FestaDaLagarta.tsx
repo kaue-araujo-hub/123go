@@ -253,11 +253,6 @@ export function FestaDaLagarta() {
           })}
         </div>
 
-        {phaseData.groupSize > 1 && (
-          <p style={{ textAlign: 'center', color: 'var(--c5)', fontSize: 12, fontWeight: 700, marginTop: 6 }}>
-            ✋ Agrupe de {phaseData.groupSize} em {phaseData.groupSize}!
-          </p>
-        )}
       </div>
 
       <style>{`
