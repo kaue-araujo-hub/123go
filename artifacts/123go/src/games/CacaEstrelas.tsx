@@ -109,9 +109,11 @@ export function CacaEstrelas() {
         <h2 style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 18, color: 'var(--text)', marginBottom: 4 }}>
           Memorize e conte as estrelas!
         </h2>
-        <p style={{ color: 'var(--text2)', fontSize: 13 }}>
-          {showStars ? `⏱ O céu pisca por ${flashDuration / 1000}s` : 'Escolha o número correto!'}
-        </p>
+        {showStars && (
+          <p style={{ color: 'var(--text2)', fontSize: 13 }}>
+            ⏱ O céu pisca por {flashDuration / 1000}s
+          </p>
+        )}
       </div>
 
       <StarField key={`${phase}-${answered}`} count={starCount} visible={showStars} />
