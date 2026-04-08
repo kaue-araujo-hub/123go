@@ -11,11 +11,11 @@ const ZOO_DATA = [
 ];
 
 const PHASES = [
-  { label: 'Qual animal tem MAIS?',          type: 'most'       },
-  { label: 'Qual animal tem MENOS?',         type: 'least'      },
-  { label: 'Quantos animais ao todo?',       type: 'total',     correctVal: 4 + 7 + 12 + 3 + 5 },
-  { label: 'Quais animais têm 5 ou MAIS?',    type: 'moreThan5' },
-  { label: 'Adicione novos animais à tabela!', type: 'add'      },
+  { label: 'Qual animal tem MAIS?',         type: 'most'       },
+  { label: 'Qual animal tem MENOS?',        type: 'least'      },
+  { label: 'Quantos animais ao todo?',      type: 'total',     correctVal: 4 + 7 + 12 + 3 + 5 },
+  { label: 'Quais animais têm 5 ou MAIS?',  type: 'moreThan5'  },
+  { label: 'Quais animais têm MENOS de 6?', type: 'lessThan6'  },
 ];
 
 function genTotalOptions(correct: number): number[] {
@@ -26,11 +26,10 @@ function genTotalOptions(correct: number): number[] {
 
 export function ZooTabelas() {
   const { phase, score, phaseComplete, gameComplete, onCorrect, onPhaseComplete, nextPhase, restart } = useGameEngine(5);
-  const [feedback,      setFeedback]      = useState<'correct' | 'wrong' | null>(null);
-  const [answered,      setAnswered]      = useState(false);
-  const [selectedIdxs,  setSelectedIdxs]  = useState<Set<number>>(new Set());
-  const [totalOptions,  setTotalOptions]  = useState<number[]>([]);
-  const [newCounts,     setNewCounts]     = useState<number[]>([2, 2]);
+  const [feedback,     setFeedback]    = useState<'correct' | 'wrong' | null>(null);
+  const [answered,     setAnswered]    = useState(false);
+  const [selectedIdxs, setSelectedIdxs] = useState<Set<number>>(new Set());
+  const [totalOptions, setTotalOptions] = useState<number[]>([]);
   const phaseCompletedRef = useRef(false);
   const phaseData = PHASES[phase - 1];
 
@@ -39,22 +38,19 @@ export function ZooTabelas() {
     setAnswered(false);
     setFeedback(null);
     setSelectedIdxs(new Set());
-    setNewCounts([2, 2]);
     if (phaseData.type === 'total') {
       setTotalOptions(genTotalOptions(phaseData.correctVal ?? 0));
     }
   }, [phase]);
 
-  /* single-select answer (most / least) */
+  /* single-select (most / least) */
   const handleAnimalTap = (idx: number) => {
     if (answered || phaseCompletedRef.current) return;
     let correct = false;
     if (phaseData.type === 'most') {
-      const maxCount = Math.max(...ZOO_DATA.map(a => a.count));
-      correct = ZOO_DATA[idx].count === maxCount;
+      correct = ZOO_DATA[idx].count === Math.max(...ZOO_DATA.map(a => a.count));
     } else if (phaseData.type === 'least') {
-      const minCount = Math.min(...ZOO_DATA.map(a => a.count));
-      correct = ZOO_DATA[idx].count === minCount;
+      correct = ZOO_DATA[idx].count === Math.min(...ZOO_DATA.map(a => a.count));
     }
     setFeedback(correct ? 'correct' : 'wrong');
     setAnswered(true);
@@ -66,7 +62,7 @@ export function ZooTabelas() {
     }
   };
 
-  /* multi-select toggle (moreThan5) */
+  /* multi-select toggle (moreThan5 / lessThan6) */
   const toggleAnimal = (idx: number) => {
     if (answered || phaseCompletedRef.current) return;
     const ns = new Set(selectedIdxs);
@@ -74,9 +70,13 @@ export function ZooTabelas() {
     setSelectedIdxs(ns);
   };
 
-  const checkMoreThan5 = () => {
+  /* generic multi-select verify */
+  const checkMultiSelect = () => {
     if (answered || phaseCompletedRef.current) return;
-    const expected = ZOO_DATA.map((a, i) => a.count >= 5 ? i : -1).filter(i => i >= 0);
+    const expected =
+      phaseData.type === 'moreThan5'
+        ? ZOO_DATA.map((a, i) => a.count >= 5 ? i : -1).filter(i => i >= 0)
+        : ZOO_DATA.map((a, i) => a.count < 6  ? i : -1).filter(i => i >= 0);
     const correct = expected.length === selectedIdxs.size && expected.every(i => selectedIdxs.has(i));
     setFeedback(correct ? 'correct' : 'wrong');
     setAnswered(true);
@@ -109,7 +109,13 @@ export function ZooTabelas() {
     );
   }
 
-  const isTappablePhase = phaseData.type === 'most' || phaseData.type === 'least' || phaseData.type === 'moreThan5';
+  const isMultiSelect = phaseData.type === 'moreThan5' || phaseData.type === 'lessThan6';
+  const isSingleSelect = phaseData.type === 'most' || phaseData.type === 'least';
+  const isTappablePhase = isSingleSelect || isMultiSelect;
+
+  const multiHint =
+    phaseData.type === 'moreThan5' ? 'Selecione os animais com 5 ou mais' :
+    phaseData.type === 'lessThan6' ? 'Selecione os animais com menos de 6' : '';
 
   return (
     <GameShell title="Zoo Tabelas" emoji="🦁" color="var(--c2)" currentPhase={phase} totalPhases={5} score={score} onRestart={restart}>
@@ -119,7 +125,7 @@ export function ZooTabelas() {
         <h2 style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 17, color: 'var(--text)' }}>{phaseData.label}</h2>
       </div>
 
-      {/* Reference table — not clickable, just visual */}
+      {/* Reference table */}
       <div style={{ borderRadius: 'var(--radius)', border: '1.5px solid var(--border)', overflow: 'hidden', marginBottom: 14 }}>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', background: 'var(--c2)', padding: '8px 12px' }}>
           {['Animal', 'Emoji', 'Quant.', 'Área'].map(h => (
@@ -143,23 +149,20 @@ export function ZooTabelas() {
         ))}
       </div>
 
-      {/* ── Animal icon buttons for phases 1, 2, 4 ── */}
+      {/* Animal icon buttons — phases 1, 2, 4, 5 */}
       {isTappablePhase && (
         <div>
           <p style={{ textAlign: 'center', color: 'var(--text2)', fontSize: 12, marginBottom: 8 }}>
-            {phaseData.type === 'moreThan5'
-              ? 'Selecione os animais com 5 ou mais'
-              : 'Toque no animal correto'}
+            {isMultiSelect ? multiHint : 'Toque no animal correto'}
           </p>
 
-          {/* Single horizontal row — no wrap */}
           <div style={{ display: 'flex', gap: 6, marginBottom: 10 }}>
             {ZOO_DATA.map((animal, idx) => {
               const isSelected = selectedIdxs.has(idx);
               return (
                 <button
                   key={idx}
-                  onPointerUp={() => phaseData.type === 'moreThan5' ? toggleAnimal(idx) : handleAnimalTap(idx)}
+                  onPointerUp={() => isMultiSelect ? toggleAnimal(idx) : handleAnimalTap(idx)}
                   style={{
                     flex: 1,
                     display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3,
@@ -186,9 +189,9 @@ export function ZooTabelas() {
             })}
           </div>
 
-          {phaseData.type === 'moreThan5' && (
+          {isMultiSelect && (
             <button
-              onPointerUp={checkMoreThan5}
+              onPointerUp={checkMultiSelect}
               style={{
                 width: '100%', padding: 13, borderRadius: 'var(--radius-pill)',
                 background: selectedIdxs.size === 0 ? 'var(--border)' : 'var(--c2)',
@@ -204,7 +207,7 @@ export function ZooTabelas() {
         </div>
       )}
 
-      {/* ── Total count options (phase 3) ── */}
+      {/* Total count options (phase 3) */}
       {phaseData.type === 'total' && (
         <div>
           <p style={{ textAlign: 'center', color: 'var(--text2)', fontSize: 13, marginBottom: 10 }}>Escolha o total correto:</p>
@@ -224,49 +227,6 @@ export function ZooTabelas() {
               </button>
             ))}
           </div>
-        </div>
-      )}
-
-      {/* ── Add animals (phase 5) ── */}
-      {phaseData.type === 'add' && (
-        <div>
-          <p style={{ textAlign: 'center', color: 'var(--text2)', fontSize: 13, marginBottom: 10 }}>
-            Adicione novos animais ao zoológico!
-          </p>
-          {[{ emoji: '🐯', name: 'Tigre' }, { emoji: '🦒', name: 'Girafa' }].map((animal, i) => (
-            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, background: '#fff', borderRadius: 14, padding: '10px 14px', marginBottom: 8, border: '1.5px solid var(--border)' }}>
-              <AppleEmoji emoji={animal.emoji} size={32} />
-              <span style={{ fontFamily: 'Nunito', fontWeight: 700, fontSize: 14, flex: 1, color: 'var(--text)' }}>{animal.name}</span>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                <button
-                  onPointerUp={() => setNewCounts(prev => { const n = [...prev]; n[i] = Math.max(1, n[i] - 1); return n; })}
-                  style={{ width: 36, height: 36, borderRadius: 9, border: '1.5px solid var(--border)', background: '#fff', fontSize: 20, cursor: 'pointer', touchAction: 'manipulation', minHeight: 36 }}
-                >−</button>
-                <span style={{ fontFamily: 'Nunito', fontWeight: 900, fontSize: 20, minWidth: 28, textAlign: 'center', color: 'var(--c2)' }}>{newCounts[i]}</span>
-                <button
-                  onPointerUp={() => setNewCounts(prev => { const n = [...prev]; n[i] = Math.min(20, n[i] + 1); return n; })}
-                  style={{ width: 36, height: 36, borderRadius: 9, border: '1.5px solid var(--border)', background: '#fff', fontSize: 20, cursor: 'pointer', touchAction: 'manipulation', minHeight: 36 }}
-                >+</button>
-              </div>
-            </div>
-          ))}
-          <button
-            onPointerUp={() => {
-              if (!phaseCompletedRef.current) {
-                phaseCompletedRef.current = true;
-                onCorrect();
-                setTimeout(() => onPhaseComplete(), 400);
-              }
-            }}
-            style={{
-              width: '100%', marginTop: 8, padding: 14, borderRadius: 'var(--radius-pill)',
-              background: 'var(--c2)', color: '#fff', fontFamily: 'Nunito',
-              fontWeight: 800, fontSize: 15, border: 'none', cursor: 'pointer',
-              minHeight: 52, touchAction: 'manipulation',
-            }}
-          >
-            ✅ Adicionar ao zoológico!
-          </button>
         </div>
       )}
     </GameShell>
