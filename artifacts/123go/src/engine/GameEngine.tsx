@@ -304,7 +304,9 @@ export function GameShell({ title, emoji, color, currentPhase, totalPhases, chil
         <CountdownOverlay
           countdownKey={countdownKey}
           onComplete={handleCountdownComplete}
-          onBack={() => setHowToPlayDone(false)}
+          onBack={SessionManager.isStudent()
+            ? () => setLocation(catalogPath)
+            : () => setHowToPlayDone(false)}
         />
       )}
 

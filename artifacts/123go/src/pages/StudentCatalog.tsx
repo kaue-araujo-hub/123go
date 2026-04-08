@@ -2,12 +2,18 @@ import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react'
 import { useLocation } from 'wouter';
 import { games } from '../data/games';
 import { StudentGameCard } from '../components/StudentGameCard';
+import { SessionManager } from '../auth/SessionManager';
 import { startBGM, stopBGM } from '../utils/bgm';
 import styles from './StudentCatalog.module.css';
 
 export function StudentCatalog() {
   const [, setLocation] = useLocation();
   const [searchQuery, setSearchQuery] = useState('');
+
+  /* Always enforce student role on this page */
+  useEffect(() => {
+    SessionManager.logoutTeacher();
+  }, []);
 
   /* Catalog background music */
   useEffect(() => {
