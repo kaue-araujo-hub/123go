@@ -120,13 +120,14 @@ export function SorveteriaDados() {
     <GameShell title="Sorveteria dos Dados" emoji="🍦" color="var(--c2)" currentPhase={phase} totalPhases={5} score={score} onRestart={restart}>
       <FeedbackOverlay type={feedback} />
 
-      <div style={{ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 0 }}>
+      <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
         <div style={{ textAlign: 'center', marginBottom: 14 }}>
           <h2 style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 17, color: 'var(--text)' }}>
             {phaseData.label}
           </h2>
         </div>
 
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
         {/* Bar chart */}
         <div style={{ background: '#fff', borderRadius: 'var(--radius)', border: '1.5px solid var(--border)', padding: '14px 10px', marginBottom: 16 }}>
           <div style={{ display: 'flex', alignItems: 'flex-end', gap: 10, height: 140, justifyContent: 'center' }}>
@@ -184,6 +185,7 @@ export function SorveteriaDados() {
             Toque na barra do sabor correto!
           </p>
         )}
+        </div>
       </div>
     </GameShell>
   );
