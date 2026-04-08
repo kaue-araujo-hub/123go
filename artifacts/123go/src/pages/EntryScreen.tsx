@@ -14,14 +14,6 @@ export function EntryScreen() {
     setLocation('/student');
   }
 
-  function handleTeacher() {
-    if (SessionManager.isTeacher()) {
-      setLocation('/catalog');
-    } else {
-      setLocation('/teacher-pin');
-    }
-  }
-
   return (
     <div className={styles.screen} role="main">
 
@@ -68,7 +60,7 @@ export function EntryScreen() {
         <motion.button
           className={`${styles.btn} ${styles.btnStudent}`}
           onPointerUp={handleStudent}
-          aria-label="Entrar como Aluno ou Visitante"
+          aria-label="Jogar agora"
           style={{ touchAction: 'manipulation' }}
           initial={{ x: -30, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
@@ -76,25 +68,7 @@ export function EntryScreen() {
         >
           <span className={styles.btnIcon} aria-hidden="true">🎮</span>
           <div className={styles.btnText}>
-            <span className={styles.btnTitle}>Aluno / Visitante</span>
-            <span className={styles.btnSub}>Jogar agora</span>
-          </div>
-          <span className={styles.btnArrow} aria-hidden="true">→</span>
-        </motion.button>
-
-        <motion.button
-          className={`${styles.btn} ${styles.btnTeacher}`}
-          onPointerUp={handleTeacher}
-          aria-label="Entrar como Professor ou Instrutor"
-          style={{ touchAction: 'manipulation' }}
-          initial={{ x: 30, opacity: 0 }}
-          animate={{ x: 0, opacity: 1 }}
-          transition={{ type: 'spring', stiffness: 220, damping: 20, delay: 0.48 }}
-        >
-          <span className={styles.btnIcon} aria-hidden="true">🎓</span>
-          <div className={styles.btnText}>
-            <span className={styles.btnTitle}>Professor / Instrutor</span>
-            <span className={styles.btnSub}>Gerenciar turma</span>
+            <span className={styles.btnTitle}>Jogar Agora</span>
           </div>
           <span className={styles.btnArrow} aria-hidden="true">→</span>
         </motion.button>
