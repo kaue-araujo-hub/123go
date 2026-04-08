@@ -14,17 +14,19 @@ const PHASES = [
 const COLOR = ['#5B4FCF', '#E91E8C', '#4CAF50', '#FF9800', '#9C27B0'];
 const BG    = ['#F8F7FF', '#FFF5FB', '#F3FFF5', '#FFF8F0', '#FAF3FF'];
 
-/* Rich palette of hue filters — one assigned randomly per balloon */
 const BALLOON_HUES = [
-  'hue-rotate(0deg)   saturate(2)   brightness(1.05)', // red
-  'hue-rotate(30deg)  saturate(2)   brightness(1.1)',  // orange
-  'hue-rotate(55deg)  saturate(2)   brightness(1.1)',  // yellow
-  'hue-rotate(120deg) saturate(1.6) brightness(1.0)',  // green
-  'hue-rotate(175deg) saturate(1.8) brightness(1.0)',  // teal
-  'hue-rotate(210deg) saturate(2)   brightness(1.1)',  // blue
-  'hue-rotate(260deg) saturate(1.8) brightness(1.1)',  // violet
-  'hue-rotate(310deg) saturate(1.8) brightness(1.05)', // pink
+  'hue-rotate(0deg)   saturate(2)   brightness(1.05)',
+  'hue-rotate(30deg)  saturate(2)   brightness(1.1)',
+  'hue-rotate(55deg)  saturate(2)   brightness(1.1)',
+  'hue-rotate(120deg) saturate(1.6) brightness(1.0)',
+  'hue-rotate(175deg) saturate(1.8) brightness(1.0)',
+  'hue-rotate(210deg) saturate(2)   brightness(1.1)',
+  'hue-rotate(260deg) saturate(1.8) brightness(1.1)',
+  'hue-rotate(310deg) saturate(1.8) brightness(1.05)',
 ];
+
+/* 5 amplitude buckets — distinct named keyframes, no CSS variables */
+const AMP_LEVELS = [20, 32, 44, 56, 68];
 
 function seededRandom(seed: number) {
   let s = seed;
@@ -48,16 +50,15 @@ export function BaloesdaFesta() {
   const popped    = poppedSet.size;
   const remaining = phaseData.pop - popped;
 
-  /* Stable random layout + float params + individual color per phase */
   const balloons = useMemo(() => {
     const rand = seededRandom(phase * 997 + phaseData.total * 31);
     return Array.from({ length: phaseData.total }, () => ({
-      left:     6  + rand() * 78,                                       // 6 – 84 %
-      top:      4  + rand() * 76,                                       // 4 – 80 %
-      duration: 1.8 + rand() * 1.6,                                     // 1.8 – 3.4 s
-      delay:    -(rand() * 3.0),                                        // –3 – 0 s
-      amp:      30  + rand() * 40,                                      // 30 – 70 px
-      hue:      BALLOON_HUES[Math.floor(rand() * BALLOON_HUES.length)], // random color
+      left:     6  + rand() * 78,
+      top:      5  + rand() * 75,
+      duration: 1.6 + rand() * 1.8,
+      delay:    -(rand() * 3.5),
+      ampIdx:   Math.floor(rand() * AMP_LEVELS.length),
+      hue:      BALLOON_HUES[Math.floor(rand() * BALLOON_HUES.length)],
     }));
   }, [phase, phaseData.total]);
 
@@ -101,7 +102,6 @@ export function BaloesdaFesta() {
 
       <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
 
-        {/* Question + counter */}
         <div style={{ textAlign: 'center', flexShrink: 0, padding: '4px 0 6px' }}>
           <h2 style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 15, color: 'var(--text)', margin: '0 0 2px' }}>
             {phaseData.question}
@@ -117,7 +117,6 @@ export function BaloesdaFesta() {
           )}
         </div>
 
-        {/* Full-area floating balloon field */}
         <div style={{
           position: 'relative', flex: 1, borderRadius: 18,
           background: bg, overflow: 'hidden',
@@ -126,6 +125,7 @@ export function BaloesdaFesta() {
           {balloons.map((b, i) => {
             const isPopped    = poppedSet.has(i);
             const isSplashing = splashing.has(i);
+            const animName    = `bfFloat${AMP_LEVELS[b.ampIdx]}`;
 
             return (
               <button
@@ -135,7 +135,9 @@ export function BaloesdaFesta() {
                   position: 'absolute',
                   left: `${b.left}%`,
                   top:  `${b.top}%`,
-                  transform: 'translate(-50%, -50%)',
+                  /* center via margin — NO transform here, animation owns transform */
+                  marginLeft: -24,
+                  marginTop:  -28,
                   background: 'none', border: 'none', padding: 0,
                   width: 48, height: 56,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -145,13 +147,12 @@ export function BaloesdaFesta() {
                     ? 'bfSplash 0.30s ease forwards'
                     : isPopped
                     ? 'none'
-                    : `bfFloat ${b.duration.toFixed(2)}s ${b.delay.toFixed(2)}s ease-in-out infinite alternate`,
+                    : `${animName} ${b.duration.toFixed(2)}s ${b.delay.toFixed(2)}s ease-in-out infinite alternate`,
                   zIndex: isPopped ? 0 : isSplashing ? 10 : 1,
                   opacity: isPopped ? 0 : 1,
                   transition: isPopped ? 'opacity 0.15s ease' : undefined,
                   willChange: 'transform',
-                  '--amp': `${b.amp.toFixed(0)}px`,
-                } as React.CSSProperties}
+                }}
               >
                 {isSplashing
                   ? <span style={{ fontSize: 28 }}>💥</span>
@@ -166,14 +167,15 @@ export function BaloesdaFesta() {
       </div>
 
       <style>{`
-        @keyframes bfFloat {
-          from { transform: translate(-50%, calc(-50% - var(--amp, 14px))); }
-          to   { transform: translate(-50%, calc(-50% + var(--amp, 14px))); }
-        }
+        @keyframes bfFloat20 { from { transform: translateY(-20px); } to { transform: translateY(20px); } }
+        @keyframes bfFloat32 { from { transform: translateY(-32px); } to { transform: translateY(32px); } }
+        @keyframes bfFloat44 { from { transform: translateY(-44px); } to { transform: translateY(44px); } }
+        @keyframes bfFloat56 { from { transform: translateY(-56px); } to { transform: translateY(56px); } }
+        @keyframes bfFloat68 { from { transform: translateY(-68px); } to { transform: translateY(68px); } }
         @keyframes bfSplash {
-          0%   { transform: translate(-50%, -50%) scale(1);   opacity: 1; }
-          55%  { transform: translate(-50%, -50%) scale(2.0); opacity: 0.7; }
-          100% { transform: translate(-50%, -50%) scale(0);   opacity: 0; }
+          0%   { transform: scale(1);   opacity: 1; }
+          55%  { transform: scale(2.2); opacity: 0.7; }
+          100% { transform: scale(0);   opacity: 0; }
         }
       `}</style>
     </GameShell>
