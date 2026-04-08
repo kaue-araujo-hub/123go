@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useIsDesktop } from '../hooks/useIsDesktop';
 import { GameShell, useGameEngine, FeedbackOverlay, PhaseCompleteCard } from '../engine/GameEngine';
 import { AppleEmoji } from '../utils/AppleEmoji';
 
@@ -88,6 +89,7 @@ const PHASES = [
 
 export function AtelieOrdem() {
   const { phase, score, phaseComplete, gameComplete, onCorrect, onPhaseComplete, nextPhase, restart } = useGameEngine(5);
+  const isDesktop = useIsDesktop();
 
   const [feedback,    setFeedback]    = useState<'correct' | 'wrong' | null>(null);
   const [placed,      setPlaced]      = useState<Record<string, string[]>>({});
@@ -194,16 +196,17 @@ export function AtelieOrdem() {
       {ghostPos && draggingObj && (
         <div style={{
           position: 'fixed',
-          left: ghostPos.x - 36, top: ghostPos.y - 36,
-          width: 72, height: 72,
-          background: '#fff', borderRadius: 18,
+          left: ghostPos.x - (isDesktop ? 50 : 36),
+          top:  ghostPos.y - (isDesktop ? 50 : 36),
+          width: isDesktop ? 100 : 72, height: isDesktop ? 100 : 72,
+          background: '#fff', borderRadius: isDesktop ? 24 : 18,
           border: '3px solid var(--c1)',
           boxShadow: '0 8px 24px rgba(0,0,0,0.2)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           zIndex: 9999, pointerEvents: 'none',
           transform: 'scale(1.15)',
         }}>
-          <AppleEmoji emoji={draggingObj.emoji} size={46} />
+          <AppleEmoji emoji={draggingObj.emoji} size={isDesktop ? 68 : 46} />
         </div>
       )}
 
@@ -229,14 +232,16 @@ export function AtelieOrdem() {
         )}
         {remaining.map(obj => {
           const isDraggingMe = draggingObj?.emoji === obj.emoji;
+          const tileSize = isDesktop ? 100 : 64;
+          const emojiSize = isDesktop ? 68 : 44;
           return (
             <div
               key={obj.emoji}
               onPointerDown={e => startDrag(e, obj)}
               style={{
-                width: 64, height: 64,
+                width: tileSize, height: tileSize,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                cursor: 'grab', background: 'var(--bg)', borderRadius: 16,
+                cursor: 'grab', background: 'var(--bg)', borderRadius: isDesktop ? 24 : 16,
                 border: '2px solid var(--border)',
                 boxShadow: isDraggingMe ? 'none' : '0 2px 6px rgba(0,0,0,0.08)',
                 touchAction: 'none', userSelect: 'none',
@@ -245,14 +250,14 @@ export function AtelieOrdem() {
                 transform: isDraggingMe ? 'scale(0.9)' : 'scale(1)',
               }}
             >
-              <AppleEmoji emoji={obj.emoji} size={44} />
+              <AppleEmoji emoji={obj.emoji} size={emojiSize} />
             </div>
           );
         })}
       </div>
 
       {/* Drawer drop zones */}
-      <div style={{ display: 'flex', gap: 8 }}>
+      <div style={{ display: 'flex', gap: isDesktop ? 14 : 8 }}>
         {phaseData.drawers.map(drawer => {
           const isHovered = hoveredKey === drawer.key;
           return (
@@ -260,10 +265,10 @@ export function AtelieOrdem() {
               key={drawer.key}
               ref={el => { drawerNodeRefs.current[drawer.key] = el; }}
               style={{
-                flex: 1, padding: '8px 6px', borderRadius: 16,
+                flex: 1, padding: isDesktop ? '14px 10px' : '8px 6px', borderRadius: 16,
                 border: `3px solid ${isHovered ? drawer.color : `${drawer.color}88`}`,
                 background: isHovered ? `${drawer.color}33` : `${drawer.color}12`,
-                minHeight: 130,
+                minHeight: isDesktop ? 210 : 130,
                 display: 'flex', flexDirection: 'column', gap: 5,
                 alignItems: 'center',
                 transition: 'border 0.15s, background 0.15s, transform 0.15s',
@@ -272,17 +277,17 @@ export function AtelieOrdem() {
               }}
             >
               <span style={{
-                fontSize: 11, fontWeight: 800, color: drawer.color,
+                fontSize: isDesktop ? 15 : 11, fontWeight: 800, color: drawer.color,
                 textAlign: 'center', fontFamily: 'Nunito', lineHeight: 1.2,
               }}>
                 {drawer.label}
               </span>
               <div style={{
-                display: 'flex', flexWrap: 'wrap', gap: 3,
+                display: 'flex', flexWrap: 'wrap', gap: isDesktop ? 6 : 3,
                 justifyContent: 'center', flex: 1, alignContent: 'center',
               }}>
                 {(placed[drawer.key] || []).map((emoji, i) => (
-                  <AppleEmoji key={i} emoji={emoji} size={26} />
+                  <AppleEmoji key={i} emoji={emoji} size={isDesktop ? 40 : 26} />
                 ))}
               </div>
             </div>

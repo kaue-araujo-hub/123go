@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { GameShell, useGameEngine, FeedbackOverlay, PhaseCompleteCard } from '../engine/GameEngine';
 import { AppleEmoji } from '../utils/AppleEmoji';
+import { useIsDesktop } from '../hooks/useIsDesktop';
 
 const PHASES = [
   { target: 3, max: 5,  label: 'Arraste 3 folhas para a lagarta!', groupSize: 1 },
@@ -13,14 +14,14 @@ const PHASES = [
 const LEAF_COLORS = ['#5CAD3C', '#8BC34A', '#4CAF50', '#66BB6A', '#81C784', '#3E9642', '#69BD45', '#A5D6A7',
   '#5CAD3C', '#8BC34A', '#4CAF50', '#66BB6A'];
 
-function getPositions(count: number): { x: number; y: number }[] {
+function getPositions(count: number, maxX = 220, maxY = 120): { x: number; y: number }[] {
   const MIN_DIST = 72;
   const positions: { x: number; y: number }[] = [];
   for (let i = 0; i < count; i++) {
     let pos = { x: 0, y: 0 };
     let attempts = 0;
     do {
-      pos = { x: 36 + Math.random() * 220, y: 24 + Math.random() * 120 };
+      pos = { x: 36 + Math.random() * maxX, y: 24 + Math.random() * maxY };
       attempts++;
     } while (attempts < 60 && positions.some(p => Math.hypot(p.x - pos.x, p.y - pos.y) < MIN_DIST));
     positions.push(pos);
@@ -38,6 +39,7 @@ interface PointerDrag {
 
 export function FestaDaLagarta() {
   const { phase, score, phaseComplete, gameComplete, onCorrect, onPhaseComplete, nextPhase, restart } = useGameEngine(5);
+  const isDesktop = useIsDesktop();
   const [collected, setCollected]     = useState(0);
   const [feedback, setFeedback]       = useState<'correct' | 'wrong' | null>(null);
   const [dragOver, setDragOver]       = useState(false);
@@ -68,7 +70,7 @@ export function FestaDaLagarta() {
     setDraggingId(null);
     setPointerDrag(null);
     pointerDragRef.current = null;
-    setPositions(getPositions(phaseData.max));
+    setPositions(getPositions(phaseData.max, isDesktop ? 380 : 220, isDesktop ? 200 : 120));
     const t = setTimeout(() => setPhaseReady(true), 300);
     return () => clearTimeout(t);
   }, [phase]);
@@ -164,12 +166,14 @@ export function FestaDaLagarta() {
       {pointerDrag && (
         <div style={{
           position: 'fixed',
-          left: pointerDrag.ghostX - 27,
-          top:  pointerDrag.ghostY - 27,
-          width: 54, height: 54, borderRadius: 14,
+          left: pointerDrag.ghostX - (isDesktop ? 41 : 27),
+          top:  pointerDrag.ghostY - (isDesktop ? 41 : 27),
+          width: isDesktop ? 82 : 54, height: isDesktop ? 82 : 54,
+          borderRadius: isDesktop ? 20 : 14,
           background: LEAF_COLORS[pointerDrag.id % LEAF_COLORS.length],
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: 28, opacity: 0.88, pointerEvents: 'none', zIndex: 9999,
+          fontSize: isDesktop ? 44 : 28, opacity: 0.88,
+          pointerEvents: 'none', zIndex: 9999,
           boxShadow: '0 8px 24px rgba(0,0,0,0.30)',
           transform: 'scale(1.18)',
         }}>🍃</div>
@@ -196,13 +200,14 @@ export function FestaDaLagarta() {
             background: dragOver ? '#D7F2D7' : '#F1F8E9',
             border: `3px dashed ${dragOver ? '#4CAF50' : '#A5D6A7'}`,
             borderRadius: 20, padding: '10px 12px', textAlign: 'center',
-            marginBottom: 10, transition: 'all 0.2s ease', minHeight: 110,
+            marginBottom: 10, transition: 'all 0.2s ease',
+            minHeight: isDesktop ? 200 : 110,
             display: 'flex', flexDirection: 'column', alignItems: 'center',
             justifyContent: 'center', gap: 5,
           }}
         >
           <div className={collected > 0 ? '' : 'game-character-idle'}>
-            <AppleEmoji emoji="🐛" size={76} />
+            <AppleEmoji emoji="🐛" size={isDesktop ? 120 : 76} />
           </div>
           <div style={{ display: 'flex', gap: 3, flexWrap: 'wrap', justifyContent: 'center', maxWidth: 180 }}>
             {Array.from({ length: Math.min(collected, 12) }).map((_, i) => (
@@ -216,7 +221,7 @@ export function FestaDaLagarta() {
         </div>
 
         {/* Leaves area */}
-        <div style={{ position: 'relative', minHeight: 170, background: '#fff', borderRadius: 'var(--radius)', border: '1.5px solid var(--border)', overflow: 'hidden' }}>
+        <div style={{ position: 'relative', minHeight: isDesktop ? 280 : 170, background: '#fff', borderRadius: 'var(--radius)', border: '1.5px solid var(--border)', overflow: 'hidden' }}>
           {!phaseReady && (
             <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <span style={{ color: 'var(--text3)', fontSize: 13 }}>Preparando...</span>
@@ -227,16 +232,17 @@ export function FestaDaLagarta() {
             const dur = 2.4 + (id % 4) * 0.35;
             const del = -(id * 0.47 % dur);
             const isBeingDragged = id === draggingId;
+            const leafSize = isDesktop ? 82 : 54;
             return (
               <div
                 key={id}
                 onPointerDown={e => onLeafPointerDown(id, e)}
                 style={{
                   position: 'absolute', left: pos.x, top: pos.y,
-                  width: 54, height: 54, borderRadius: 14,
+                  width: leafSize, height: leafSize, borderRadius: isDesktop ? 20 : 14,
                   background: LEAF_COLORS[id % LEAF_COLORS.length],
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 28,
+                  fontSize: isDesktop ? 44 : 28,
                   cursor: phaseReady ? 'grab' : 'default',
                   boxShadow: '0 3px 10px rgba(0,0,0,0.18)',
                   opacity: isBeingDragged ? 0 : phaseReady ? 1 : 0.5,

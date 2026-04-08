@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useIsDesktop } from '../hooks/useIsDesktop';
 import { GameShell, useGameEngine, FeedbackOverlay, PhaseCompleteCard } from '../engine/GameEngine';
 import { AppleEmoji } from '../utils/AppleEmoji';
 
@@ -87,6 +88,7 @@ export function NaveOrganizadora() {
   const phaseCompletedRef = useRef(false);
   const correctRef        = useRef(0);
 
+  const isDesktop = useIsDesktop();
   const phaseData = PHASES[phase - 1];
   const isMystery = phase === 5;
   const mysteryHints: Record<string, string> = { circle: '⭕ Círculo', square: '⬛ Quadrado' };
@@ -186,16 +188,17 @@ export function NaveOrganizadora() {
       {ghostPos && draggingItem && (
         <div style={{
           position: 'fixed',
-          left: ghostPos.x - 34, top: ghostPos.y - 34,
-          width: 68, height: 68,
-          background: '#fff', borderRadius: 16,
+          left: ghostPos.x - (isDesktop ? 50 : 34),
+          top:  ghostPos.y - (isDesktop ? 50 : 34),
+          width: isDesktop ? 100 : 68, height: isDesktop ? 100 : 68,
+          background: '#fff', borderRadius: isDesktop ? 22 : 16,
           border: '3px solid var(--c2)',
           boxShadow: '0 8px 24px rgba(0,0,0,0.22)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           zIndex: 9999, pointerEvents: 'none',
           transform: 'scale(1.12)',
         }}>
-          <AppleEmoji emoji={draggingItem.emoji} size={44} />
+          <AppleEmoji emoji={draggingItem.emoji} size={isDesktop ? 64 : 44} />
         </div>
       )}
 
@@ -212,19 +215,23 @@ export function NaveOrganizadora() {
       {/* Items to drag */}
       <div style={{
         background: '#fff', borderRadius: 'var(--radius)', border: '1.5px solid var(--border)',
-        padding: 14, marginBottom: 18,
-        display: 'flex', flexWrap: 'wrap', gap: 10, justifyContent: 'center', minHeight: 72,
+        padding: isDesktop ? 20 : 14, marginBottom: isDesktop ? 24 : 18,
+        display: 'flex', flexWrap: 'wrap', gap: isDesktop ? 16 : 10,
+        justifyContent: 'center', minHeight: isDesktop ? 120 : 72,
       }}>
         {remaining.map(item => {
           const isDraggingMe = draggingItem?.id === item.id;
+          const tileSize = isDesktop ? 100 : 64;
+          const emojiSize = isDesktop ? 64 : 40;
           return (
             <div
               key={item.id}
               onPointerDown={e => startDrag(e, item)}
               style={{
-                width: 64, height: 64, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                width: tileSize, height: tileSize,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
                 cursor: 'grab', background: 'var(--bg)',
-                borderRadius: 14, border: '2.5px solid var(--border)',
+                borderRadius: isDesktop ? 22 : 14, border: '2.5px solid var(--border)',
                 opacity: isDraggingMe ? 0.3 : 1,
                 transform: isDraggingMe ? 'scale(0.9) translateZ(0)' : 'scale(1) translateZ(0)',
                 transition: 'opacity 0.15s, transform 0.15s',
@@ -232,7 +239,7 @@ export function NaveOrganizadora() {
                 boxShadow: isDraggingMe ? 'none' : '0 2px 8px rgba(0,0,0,0.07)',
               }}
             >
-              <AppleEmoji emoji={item.emoji} size={40} />
+              <AppleEmoji emoji={item.emoji} size={emojiSize} />
             </div>
           );
         })}
@@ -242,7 +249,7 @@ export function NaveOrganizadora() {
       </div>
 
       {/* Drop compartments */}
-      <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', gap: isDesktop ? 16 : 10, flexWrap: 'wrap' }}>
         {phaseData.compartments.map(comp => {
           const isHovered = hoveredComp === comp.key;
           const hint      = isMystery && correctCount >= 2 ? mysteryHints[comp.key] : null;
@@ -251,23 +258,25 @@ export function NaveOrganizadora() {
               key={comp.key}
               ref={el => { compRefs.current[comp.key] = el; }}
               style={{
-                flex: 1, minWidth: 88, padding: 10, borderRadius: 16,
+                flex: 1, minWidth: isDesktop ? 140 : 88,
+                padding: isDesktop ? 16 : 10, borderRadius: 16,
                 border: `3px solid ${isHovered ? comp.color : `${comp.color}66`}`,
                 background: isHovered ? `${comp.color}28` : `${comp.color}0D`,
-                minHeight: 96, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
+                minHeight: isDesktop ? 160 : 96,
+                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
                 cursor: draggingItem ? 'copy' : 'default',
                 transition: 'all 0.15s',
                 transform: isHovered ? 'scale(1.03)' : 'scale(1)',
                 boxShadow: isHovered ? `0 0 14px ${comp.color}66` : 'none',
               }}
             >
-              <span style={{ fontSize: 12, fontWeight: 700, color: comp.color, textAlign: 'center' }}>
+              <span style={{ fontSize: isDesktop ? 16 : 12, fontWeight: 700, color: comp.color, textAlign: 'center' }}>
                 {hint ?? comp.label}
               </span>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, justifyContent: 'center' }}>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: isDesktop ? 6 : 4, justifyContent: 'center' }}>
                 {(placed[comp.key] || []).map((id, i) => {
                   const item = ITEMS.find(a => a.id === id);
-                  return item ? <AppleEmoji key={i} emoji={item.emoji} size={28} /> : null;
+                  return item ? <AppleEmoji key={i} emoji={item.emoji} size={isDesktop ? 44 : 28} /> : null;
                 })}
               </div>
             </div>

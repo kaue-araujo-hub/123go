@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { GameShell, useGameEngine, FeedbackOverlay, PhaseCompleteCard } from '../engine/GameEngine';
 import { AppleEmoji } from '../utils/AppleEmoji';
+import { useIsDesktop } from '../hooks/useIsDesktop';
 
 /* ── Phase definitions ───────────────────────────────────────────────────────
    nexts: array of correct answers for each empty slot (in order)
@@ -42,6 +43,7 @@ const PHASES = [
 
 export function JardimPadroes() {
   const { phase, score, phaseComplete, gameComplete, onCorrect, onPhaseComplete, nextPhase, restart } = useGameEngine(5);
+  const isDesktop = useIsDesktop();
 
   const [feedback,     setFeedback]     = useState<'correct' | 'wrong' | null>(null);
   const [filled,       setFilled]       = useState<Record<number, string>>({}); // slotIdx → emoji
@@ -55,9 +57,11 @@ export function JardimPadroes() {
 
   const phaseData = PHASES[phase - 1];
 
-  /* tile size: smaller when more slots to keep row on one line */
+  /* tile size: desktop = ~1.7× mobile */
   const totalItems = phaseData.pattern.length + phaseData.nexts.length;
-  const tileSize   = totalItems <= 6 ? 54 : 46;
+  const tileSize   = isDesktop
+    ? (totalItems <= 6 ? 90 : 76)
+    : (totalItems <= 6 ? 54 : 46);
   const emojiSize  = tileSize - 18;
 
   /* ── 1. completion — must be BEFORE the phase-reset effect ── */
@@ -179,9 +183,9 @@ export function JardimPadroes() {
       {/* Pattern + slots row */}
       <div style={{
         background: '#fff', borderRadius: 'var(--radius)', border: '1.5px solid var(--border)',
-        padding: 14, marginBottom: 28,
+        padding: isDesktop ? 22 : 14, marginBottom: isDesktop ? 36 : 28,
         display: 'flex', alignItems: 'center',
-        gap: totalItems <= 6 ? 8 : 6,
+        gap: isDesktop ? (totalItems <= 6 ? 16 : 12) : (totalItems <= 6 ? 8 : 6),
         justifyContent: 'center',
         flexWrap: 'nowrap',
       }}>
@@ -240,15 +244,17 @@ export function JardimPadroes() {
       </div>
 
       {/* Draggable options bank */}
-      <div style={{ display: 'flex', gap: 16, justifyContent: 'center' }}>
+      <div style={{ display: 'flex', gap: isDesktop ? 28 : 16, justifyContent: 'center' }}>
         {phaseData.options.map(opt => {
           const isDraggingMe = draggingOpt === opt;
+          const optSize = isDesktop ? 144 : 90;
+          const optEmoji = isDesktop ? 96 : 54;
           return (
             <div
               key={opt}
               onPointerDown={e => startDrag(e, opt)}
               style={{
-                width: 90, height: 90, borderRadius: 22,
+                width: optSize, height: optSize, borderRadius: isDesktop ? 32 : 22,
                 border: '3px solid var(--border)',
                 background: '#fff',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -260,7 +266,7 @@ export function JardimPadroes() {
                 boxShadow: isDraggingMe ? 'none' : '0 2px 8px rgba(0,0,0,0.08)',
               }}
             >
-              <AppleEmoji emoji={opt} size={54} />
+              <AppleEmoji emoji={opt} size={optEmoji} />
             </div>
           );
         })}
