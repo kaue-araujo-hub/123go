@@ -1028,15 +1028,29 @@ export function PhaseCompleteCard({ phase, totalPhases, score, isGameComplete, o
           onClose={() => setShowShare(false)}
         />
       )}
+      {/* Full-screen centered overlay */}
+      <div style={{
+        position: 'fixed',
+        inset: 0,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 200,
+        padding: '0 24px',
+        background: 'rgba(255,255,255,0.55)',
+        backdropFilter: 'blur(4px)',
+      }}>
       <div
         className="entry-pop"
         style={{
           background: '#fff',
           borderRadius: 'var(--radius)',
-          padding: 22,
+          padding: 32,
           textAlign: 'center',
           boxShadow: 'var(--shadow-hover)',
           border: '1.5px solid var(--border)',
+          width: '100%',
+          maxWidth: 340,
         }}
       >
         <div style={{ marginBottom: 12, lineHeight: 1 }}>
@@ -1049,11 +1063,11 @@ export function PhaseCompleteCard({ phase, totalPhases, score, isGameComplete, o
         <h2 className="entry-pop" style={{ fontFamily: 'Nunito', fontWeight: 900, fontSize: 22, color: 'var(--text)', marginBottom: 6 }}>
           {isGameComplete ? 'Parabéns! Jogo completo!' : `Fase ${phase} completa!`}
         </h2>
-        <p className="entry-pop" style={{ color: 'var(--text2)', fontSize: 14, marginBottom: 18 }}>
-          {isGameComplete
-            ? `Você completou todas as ${totalPhases} fases com ${score} acertos!`
-            : `Continue para a próxima fase!`}
-        </p>
+        {isGameComplete && (
+          <p className="entry-pop" style={{ color: 'var(--text2)', fontSize: 14, marginBottom: 18 }}>
+            {`Você completou todas as ${totalPhases} fases com ${score} acertos!`}
+          </p>
+        )}
         <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
           {!isGameComplete && (
             <button
@@ -1116,6 +1130,7 @@ export function PhaseCompleteCard({ phase, totalPhases, score, isGameComplete, o
             </>
           )}
         </div>
+      </div>
       </div>
     </>
   );
