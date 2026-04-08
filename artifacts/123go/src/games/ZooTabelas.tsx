@@ -146,12 +146,14 @@ export function ZooTabelas() {
       {/* ── Animal icon buttons for phases 1, 2, 4 ── */}
       {isTappablePhase && (
         <div>
-          {phaseData.type === 'moreThan5' && (
-            <p style={{ textAlign: 'center', color: 'var(--text2)', fontSize: 12, marginBottom: 8 }}>
-              Selecione todos os animais com mais de 5
-            </p>
-          )}
-          <div style={{ display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 10 }}>
+          <p style={{ textAlign: 'center', color: 'var(--text2)', fontSize: 12, marginBottom: 8 }}>
+            {phaseData.type === 'moreThan5'
+              ? 'Selecione todos os animais com MAIS de 5'
+              : 'Toque no animal correto'}
+          </p>
+
+          {/* Single horizontal row — no wrap */}
+          <div style={{ display: 'flex', gap: 6, marginBottom: 10 }}>
             {ZOO_DATA.map((animal, idx) => {
               const isSelected = selectedIdxs.has(idx);
               return (
@@ -159,19 +161,24 @@ export function ZooTabelas() {
                   key={idx}
                   onPointerUp={() => phaseData.type === 'moreThan5' ? toggleAnimal(idx) : handleAnimalTap(idx)}
                   style={{
-                    display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
-                    padding: '10px 12px', borderRadius: 16,
+                    flex: 1,
+                    display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3,
+                    padding: '8px 4px', borderRadius: 14,
                     border: `2.5px solid ${isSelected ? 'var(--c2)' : 'var(--border)'}`,
-                    background: isSelected ? '#E3F2FD' : '#fff',
+                    background: isSelected ? '#FCE4EC' : '#fff',
                     cursor: 'pointer', touchAction: 'manipulation',
-                    minWidth: 60, minHeight: 72,
+                    minHeight: 68,
                     transition: 'all 0.15s',
-                    transform: isSelected ? 'scale(1.08)' : 'scale(1)',
-                    boxShadow: isSelected ? '0 2px 10px rgba(233,30,99,0.18)' : '0 1px 4px rgba(0,0,0,0.07)',
+                    transform: isSelected ? 'scale(1.06)' : 'scale(1)',
+                    boxShadow: isSelected ? '0 2px 10px rgba(233,30,99,0.2)' : '0 1px 4px rgba(0,0,0,0.07)',
                   }}
                 >
-                  <AppleEmoji emoji={animal.emoji} size={36} />
-                  <span style={{ fontFamily: 'Nunito', fontWeight: 700, fontSize: 11, color: isSelected ? 'var(--c2)' : 'var(--text2)' }}>
+                  <AppleEmoji emoji={animal.emoji} size={30} />
+                  <span style={{
+                    fontFamily: 'Nunito', fontWeight: 700, fontSize: 10,
+                    color: isSelected ? 'var(--c2)' : 'var(--text2)',
+                    textAlign: 'center', lineHeight: 1.2,
+                  }}>
                     {animal.animal}
                   </span>
                 </button>
@@ -184,10 +191,11 @@ export function ZooTabelas() {
               onPointerUp={checkMoreThan5}
               style={{
                 width: '100%', padding: 13, borderRadius: 'var(--radius-pill)',
-                background: 'var(--c2)', color: '#fff', fontFamily: 'Nunito',
-                fontWeight: 800, fontSize: 15, border: 'none', cursor: 'pointer',
-                minHeight: 50, touchAction: 'manipulation',
-                opacity: selectedIdxs.size === 0 ? 0.5 : 1, transition: 'opacity 0.15s',
+                background: selectedIdxs.size === 0 ? 'var(--border)' : 'var(--c2)',
+                color: selectedIdxs.size === 0 ? 'var(--text3)' : '#fff',
+                fontFamily: 'Nunito', fontWeight: 800, fontSize: 15,
+                border: 'none', cursor: selectedIdxs.size === 0 ? 'default' : 'pointer',
+                minHeight: 50, touchAction: 'manipulation', transition: 'all 0.2s',
               }}
             >
               ✅ Verificar ({selectedIdxs.size} selecionados)
