@@ -59,7 +59,7 @@ export function PizzariaMagica() {
   const plateRef          = useRef<HTMLDivElement>(null);
 
   const phaseData = PHASES[phase - 1];
-  const { theme, name, need: target, total } = phaseData;
+  const { theme, need: target, total } = phaseData;
   const placed = placedSet.size;
 
   const itemPositions = useMemo(
@@ -133,7 +133,7 @@ export function PizzariaMagica() {
 
   if (phaseComplete) {
     return (
-      <GameShell title="Pizzaria Mágica" emoji="🍕" color="var(--c1)" currentPhase={phase} totalPhases={5} score={score} onRestart={restart}>
+      <GameShell title="Restaurante Mágico" emoji="🍴" color="var(--c1)" currentPhase={phase} totalPhases={5} score={score} onRestart={restart}>
         <PhaseCompleteCard phase={phase} totalPhases={5} score={score} isGameComplete={gameComplete} onNext={nextPhase} onRestart={restart} color="var(--c1)" />
       </GameShell>
     );
@@ -142,7 +142,7 @@ export function PizzariaMagica() {
   const pct = Math.min((placed / target) * 100, 100);
 
   return (
-    <GameShell title="Pizzaria Mágica" emoji="🍕" color="var(--c1)" currentPhase={phase} totalPhases={5} score={score} onRestart={restart}>
+    <GameShell title="Restaurante Mágico" emoji="🍴" color="var(--c1)" currentPhase={phase} totalPhases={5} score={score} onRestart={restart}>
       <FeedbackOverlay type={feedback} />
 
       {/* Drag ghost */}
@@ -159,17 +159,6 @@ export function PizzariaMagica() {
       )}
 
       <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
-
-        {/* Phase label */}
-        <div style={{ textAlign: 'center', flexShrink: 0, marginBottom: 6 }}>
-          <span style={{
-            background: 'var(--c1)', color: '#fff',
-            padding: '3px 14px', borderRadius: 'var(--radius-pill)',
-            fontSize: 12, fontWeight: 700,
-          }}>
-            {theme} {name} — arraste {target} porções para o prato
-          </span>
-        </div>
 
         {/* Scattered food area + plate — relative container */}
         <div style={{ position: 'relative', flex: 1, overflow: 'hidden' }}>

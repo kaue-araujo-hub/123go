@@ -163,9 +163,9 @@ export const games: Game[] = [
   },
   {
     id: 8,
-    title: "Pizzaria Mágica",
-    desc: "Arraste fatias para completar o pedido mágico do cliente!",
-    emoji: "🍕",
+    title: "Restaurante Mágico",
+    desc: "Arraste os pratos para completar o pedido mágico do cliente!",
+    emoji: "🍴",
     bg: "#FFF8E1",
     ano: 1,
     periodo: 2,
@@ -178,7 +178,7 @@ export const games: Game[] = [
     ageMin: 5, ageMax: 6,
     path: "/games/g08-pizzaria-magica",
     interactionType: "drag",
-    tutorialTheme: { bg: "#FFF8E1", color: "#FFC107", emoji: "🍕" },
+    tutorialTheme: { bg: "#FFF8E1", color: "#FFC107", emoji: "🍴" },
   },
   {
     id: 9,
