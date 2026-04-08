@@ -348,7 +348,7 @@ export function GameShell({ title, emoji, color, currentPhase, totalPhases, chil
             }}
           >←</button>
           <AppleEmoji emoji={emoji} size={22} style={{ flexShrink: 0 }} />
-          <h1 style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 13, color: 'var(--text)', minWidth: 0, lineHeight: 1.25 }}>{title}</h1>
+          <h1 style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 13, color: 'var(--text)', minWidth: 0, lineHeight: 1.25, textTransform: 'uppercase', letterSpacing: '0.03em' }}>{title}</h1>
         </div>
 
         {/* RIGHT: score only */}

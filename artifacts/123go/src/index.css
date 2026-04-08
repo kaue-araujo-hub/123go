@@ -269,6 +269,7 @@ input {
   -webkit-user-select: none;
   user-select: none;
   overscroll-behavior: none;
+  text-transform: uppercase;
 }
 
 /* --- Responsive controls visibility --- */
