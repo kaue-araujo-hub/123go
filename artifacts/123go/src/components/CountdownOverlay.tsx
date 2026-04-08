@@ -112,7 +112,7 @@ export function CountdownOverlay({ countdownKey, onComplete, onBack }: Props) {
               onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.color = 'var(--text)'; }}
               onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.color = 'var(--text3)'; }}
             >
-              ← Voltar
+              ←
             </button>
           )}
 
