@@ -14,7 +14,7 @@ const PHASES = [
   { label: 'Qual animal tem MAIS?',          type: 'most'       },
   { label: 'Qual animal tem MENOS?',         type: 'least'      },
   { label: 'Quantos animais ao todo?',       type: 'total',     correctVal: 4 + 7 + 12 + 3 + 5 },
-  { label: 'Quais animais têm MAIS de 5?',   type: 'moreThan5', correctIdxs: [1, 2] },
+  { label: 'Quais animais têm 5 ou MAIS?',    type: 'moreThan5' },
   { label: 'Adicione novos animais à tabela!', type: 'add'      },
 ];
 
@@ -75,8 +75,8 @@ export function ZooTabelas() {
   };
 
   const checkMoreThan5 = () => {
-    if (phaseCompletedRef.current) return;
-    const expected = ZOO_DATA.map((a, i) => a.count > 5 ? i : -1).filter(i => i >= 0);
+    if (answered || phaseCompletedRef.current) return;
+    const expected = ZOO_DATA.map((a, i) => a.count >= 5 ? i : -1).filter(i => i >= 0);
     const correct = expected.length === selectedIdxs.size && expected.every(i => selectedIdxs.has(i));
     setFeedback(correct ? 'correct' : 'wrong');
     setAnswered(true);
@@ -148,7 +148,7 @@ export function ZooTabelas() {
         <div>
           <p style={{ textAlign: 'center', color: 'var(--text2)', fontSize: 12, marginBottom: 8 }}>
             {phaseData.type === 'moreThan5'
-              ? 'Selecione todos os animais com MAIS de 5'
+              ? 'Selecione os animais com 5 ou mais'
               : 'Toque no animal correto'}
           </p>
 
