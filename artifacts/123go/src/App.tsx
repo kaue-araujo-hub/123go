@@ -21,7 +21,6 @@ import { EscondeEscondeAnimal } from "./games/EscondeEscondeAnimal";
 import { CasteloPosicoes }      from "./games/CasteloPosicoes";
 import { SolLuaEstrelas }       from "./games/SolLuaEstrelas";
 import { CalendarioVivo }       from "./games/CalendarioVivo";
-import { MaquinaTempo }         from "./games/MaquinaTempo";
 import { SorveteriaDados }      from "./games/SorveteriaDados";
 import { ZooTabelas }           from "./games/ZooTabelas";
 import { PesquisaTurma }        from "./games/PesquisaTurma";
@@ -62,7 +61,6 @@ function Router() {
       <Route path="/games/g15-castelo-posicoes"    component={CasteloPosicoes} />
       <Route path="/games/g16-sol-lua-estrelas"    component={SolLuaEstrelas} />
       <Route path="/games/g17-calendario-vivo"     component={CalendarioVivo} />
-      <Route path="/games/g18-maquina-tempo"       component={MaquinaTempo} />
       <Route path="/games/g19-sorveteria-dados"    component={SorveteriaDados} />
       <Route path="/games/g20-zoo-tabelas"         component={ZooTabelas} />
       <Route path="/games/g21-pesquisa-turma"      component={PesquisaTurma} />
