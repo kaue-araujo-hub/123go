@@ -4,21 +4,26 @@ import { AppleEmoji } from '../utils/AppleEmoji';
 import { playBalloonPop } from '../utils/sounds';
 
 const PHASES = [
-  { total: 20, pop: 8,  question: 'Estoure 8 balões azuis!' },
-  { total: 18, pop: 7,  question: 'Estoure 7 balões rosa!' },
-  { total: 14, pop: 4,  question: 'Estoure 4 balões verdes!' },
-  { total: 18, pop: 6,  question: 'Estoure 6 balões laranja!' },
-  { total: 16, pop: 8,  question: 'Estoure 8 balões roxos!' },
+  { total: 20, pop: 8,  question: 'Estoure 8 balões!' },
+  { total: 18, pop: 7,  question: 'Estoure 7 balões!' },
+  { total: 14, pop: 4,  question: 'Estoure 4 balões!' },
+  { total: 18, pop: 6,  question: 'Estoure 6 balões!' },
+  { total: 16, pop: 8,  question: 'Estoure 8 balões!' },
 ];
 
-const COLOR   = ['#5B4FCF', '#E91E8C', '#4CAF50', '#FF9800', '#9C27B0'];
-const BG      = ['#EEF0FF', '#FDE8F4', '#E8F5E9', '#FFF3E0', '#F3E8FF'];
-const HUE     = [
-  'hue-rotate(220deg) saturate(2) brightness(1.1)',
-  'hue-rotate(310deg) saturate(1.6) brightness(1.05)',
-  'hue-rotate(120deg) saturate(1.5)',
-  'hue-rotate(20deg)  saturate(1.8) brightness(1.1)',
-  'hue-rotate(265deg) saturate(1.6)',
+const COLOR = ['#5B4FCF', '#E91E8C', '#4CAF50', '#FF9800', '#9C27B0'];
+const BG    = ['#F8F7FF', '#FFF5FB', '#F3FFF5', '#FFF8F0', '#FAF3FF'];
+
+/* Rich palette of hue filters — one assigned randomly per balloon */
+const BALLOON_HUES = [
+  'hue-rotate(0deg)   saturate(2)   brightness(1.05)', // red
+  'hue-rotate(30deg)  saturate(2)   brightness(1.1)',  // orange
+  'hue-rotate(55deg)  saturate(2)   brightness(1.1)',  // yellow
+  'hue-rotate(120deg) saturate(1.6) brightness(1.0)',  // green
+  'hue-rotate(175deg) saturate(1.8) brightness(1.0)',  // teal
+  'hue-rotate(210deg) saturate(2)   brightness(1.1)',  // blue
+  'hue-rotate(260deg) saturate(1.8) brightness(1.1)',  // violet
+  'hue-rotate(310deg) saturate(1.8) brightness(1.05)', // pink
 ];
 
 function seededRandom(seed: number) {
@@ -40,19 +45,19 @@ export function BaloesdaFesta() {
   const ci        = phase - 1;
   const color     = COLOR[ci];
   const bg        = BG[ci];
-  const hue       = HUE[ci];
   const popped    = poppedSet.size;
   const remaining = phaseData.pop - popped;
 
-  /* Stable random layout + float params per phase */
+  /* Stable random layout + float params + individual color per phase */
   const balloons = useMemo(() => {
     const rand = seededRandom(phase * 997 + phaseData.total * 31);
-    return Array.from({ length: phaseData.total }, (_, i) => ({
-      left:     6  + rand() * 78,          // 6 – 84 %
-      top:      4  + rand() * 76,          // 4 – 80 %
-      duration: 2.2 + rand() * 2.0,        // 2.2 – 4.2 s
-      delay:    -(rand() * 3.0),           // –3 – 0 s  (start mid-cycle)
-      amp:      10  + rand() * 16,         // 10 – 26 px vertical travel
+    return Array.from({ length: phaseData.total }, () => ({
+      left:     6  + rand() * 78,                                       // 6 – 84 %
+      top:      4  + rand() * 76,                                       // 4 – 80 %
+      duration: 1.8 + rand() * 1.6,                                     // 1.8 – 3.4 s
+      delay:    -(rand() * 3.0),                                        // –3 – 0 s
+      amp:      30  + rand() * 40,                                      // 30 – 70 px
+      hue:      BALLOON_HUES[Math.floor(rand() * BALLOON_HUES.length)], // random color
     }));
   }, [phase, phaseData.total]);
 
@@ -152,7 +157,7 @@ export function BaloesdaFesta() {
                   ? <span style={{ fontSize: 28 }}>💥</span>
                   : isPopped
                   ? null
-                  : <AppleEmoji emoji="🎈" size={38} style={{ filter: hue, display: 'block' }} />
+                  : <AppleEmoji emoji="🎈" size={38} style={{ filter: b.hue, display: 'block' }} />
                 }
               </button>
             );
