@@ -88,6 +88,50 @@ export function playCountdownTick(): void {
   osc.stop(now + 0.18);
 }
 
+/** Sharp pop — balloon burst */
+export function playBalloonPop(): void {
+  if (_muted) return;
+  const ac  = ctx();
+  const now = ac.currentTime;
+
+  // White-noise burst (the "bang")
+  const bufLen = Math.floor(ac.sampleRate * 0.06);
+  const buf    = ac.createBuffer(1, bufLen, ac.sampleRate);
+  const data   = buf.getChannelData(0);
+  for (let i = 0; i < bufLen; i++) data[i] = Math.random() * 2 - 1;
+
+  const src    = ac.createBufferSource();
+  src.buffer   = buf;
+
+  const filter = ac.createBiquadFilter();
+  filter.type  = 'bandpass';
+  filter.frequency.setValueAtTime(900, now);
+  filter.Q.setValueAtTime(0.6, now);
+
+  const gain   = ac.createGain();
+  gain.gain.setValueAtTime(0.55, now);
+  gain.gain.exponentialRampToValueAtTime(0.001, now + 0.07);
+
+  src.connect(filter);
+  filter.connect(gain);
+  gain.connect(ac.destination);
+  src.start(now);
+  src.stop(now + 0.08);
+
+  // Low "thud" underneath
+  const osc  = ac.createOscillator();
+  const og   = ac.createGain();
+  osc.connect(og);
+  og.connect(ac.destination);
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(120, now);
+  osc.frequency.exponentialRampToValueAtTime(40, now + 0.06);
+  og.gain.setValueAtTime(0.3, now);
+  og.gain.exponentialRampToValueAtTime(0.001, now + 0.07);
+  osc.start(now);
+  osc.stop(now + 0.08);
+}
+
 /** Rising shimmer — GO! moment */
 export function playCountdownGo(): void {
   if (_muted) return;
