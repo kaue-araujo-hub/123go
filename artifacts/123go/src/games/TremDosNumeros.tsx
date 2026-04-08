@@ -26,20 +26,21 @@ function shuffle<T>(arr: T[]): T[] {
   return a;
 }
 
-const PHASE_LABELS   = ['Adição até 5', 'Adição até 10', 'Subtração até 5', 'Subtração até 10', 'Mix'];
+const PHASE_LABELS    = ['Adição até 5', 'Adição até 10', 'Subtração até 5', 'Subtração até 10', 'Mix'];
 const TOTAL_PER_PHASE = [3, 3, 3, 3, 4];
 
 export function TremDosNumeros() {
   const { phase, score, phaseComplete, gameComplete, onCorrect, onPhaseComplete, nextPhase, restart } = useGameEngine(5);
-  const [problem, setProblem]     = useState(() => generateProblem(1));
-  const [options, setOptions]     = useState<number[]>([]);
-  const [round, setRound]         = useState(1);
-  const [feedback, setFeedback]   = useState<'correct' | 'wrong' | null>(null);
+  const [problem, setProblem]         = useState(() => generateProblem(1));
+  const [options,  setOptions]        = useState<number[]>([]);
+  const [round,    setRound]          = useState(1);
+  const [correct,  setCorrect]        = useState(0); // answers correct in this phase
+  const [feedback, setFeedback]       = useState<'correct' | 'wrong' | null>(null);
 
   /* Drag state */
-  const [dragging, setDragging]   = useState<number | null>(null);
-  const [dragPos,  setDragPos]    = useState<{ x: number; y: number } | null>(null);
-  const [isOver,   setIsOver]     = useState(false);
+  const [dragging, setDragging] = useState<number | null>(null);
+  const [dragPos,  setDragPos]  = useState<{ x: number; y: number } | null>(null);
+  const [isOver,   setIsOver]   = useState(false);
 
   const phaseCompletedRef = useRef(false);
   const roundRef          = useRef(1);
@@ -58,6 +59,7 @@ export function TremDosNumeros() {
     phaseCompletedRef.current = false;
     roundRef.current = 1;
     setRound(1);
+    setCorrect(0);
     setFeedback(null);
     setDragging(null);
     setDragPos(null);
@@ -72,6 +74,7 @@ export function TremDosNumeros() {
     onCorrect();
     const total     = TOTAL_PER_PHASE[phase - 1];
     const nextRound = roundRef.current + 1;
+    setCorrect(c => c + 1); // advance train
     setTimeout(() => {
       setFeedback(null);
       setIsOver(false);
@@ -88,7 +91,7 @@ export function TremDosNumeros() {
 
   const checkDrop = useCallback((x: number, y: number, val: number) => {
     const zone = dropZoneRef.current;
-    if (!zone) return false;
+    if (!zone) return;
     const rect = zone.getBoundingClientRect();
     const hit  = x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
     if (hit) {
@@ -99,35 +102,27 @@ export function TremDosNumeros() {
         setTimeout(() => setFeedback(null), 700);
       }
     }
-    return hit;
   }, [problem.ans, handleCorrect]);
 
-  /* Global pointer move + up while dragging */
+  /* Global pointer listeners while dragging */
   useEffect(() => {
     if (dragging === null) return;
-
     const onMove = (e: PointerEvent) => {
-      const x = e.clientX;
-      const y = e.clientY;
-      setDragPos({ x, y });
+      setDragPos({ x: e.clientX, y: e.clientY });
       const zone = dropZoneRef.current;
       if (zone) {
-        const rect = zone.getBoundingClientRect();
-        setIsOver(x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom);
+        const r = zone.getBoundingClientRect();
+        setIsOver(e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom);
       }
     };
-
     const onUp = (e: PointerEvent) => {
       const val = draggingRef.current;
-      if (val !== null) {
-        checkDrop(e.clientX, e.clientY, val);
-      }
+      if (val !== null) checkDrop(e.clientX, e.clientY, val);
       setDragging(null);
       setDragPos(null);
       setIsOver(false);
       draggingRef.current = null;
     };
-
     window.addEventListener('pointermove', onMove);
     window.addEventListener('pointerup',   onUp);
     return () => {
@@ -152,54 +147,91 @@ export function TremDosNumeros() {
     );
   }
 
-  const total = TOTAL_PER_PHASE[phase - 1];
+  const total        = TOTAL_PER_PHASE[phase - 1];
+  /* Train goes from 0% → ~88% of track (leaving room for star at the right end) */
+  const trainPct     = (correct / total) * 88;
 
   return (
     <GameShell title="Trem dos Números" emoji="🚂" color="var(--c3)" currentPhase={phase} totalPhases={5} score={score} onRestart={restart}>
       <FeedbackOverlay type={feedback} />
 
-      {/* Ghost element that follows pointer */}
+      {/* Ghost element following the pointer */}
       {dragging !== null && dragPos && (
         <div style={{
           position: 'fixed',
-          left: dragPos.x - 44,
-          top:  dragPos.y - 44,
-          width: 88, height: 88,
-          borderRadius: 20,
-          background: '#fff',
-          border: '2.5px solid var(--c3)',
+          left: dragPos.x - 44, top: dragPos.y - 44,
+          width: 88, height: 88, borderRadius: 20,
+          background: '#fff', border: '2.5px solid var(--c3)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           fontFamily: 'Nunito', fontWeight: 900, fontSize: 44, color: 'var(--c3)',
           boxShadow: '0 8px 32px rgba(0,0,0,0.22)',
-          opacity: 0.92,
-          pointerEvents: 'none',
-          zIndex: 9999,
+          opacity: 0.92, pointerEvents: 'none', zIndex: 9999,
           transform: 'scale(1.08)',
-          transition: 'transform 0.1s',
         }}>
           {dragging}
         </div>
       )}
 
-      <div style={{ textAlign: 'center', marginBottom: 14 }}>
+      <div style={{ textAlign: 'center', marginBottom: 12 }}>
         <span style={{ background: 'var(--c3)', color: '#fff', padding: '4px 14px', borderRadius: 'var(--radius-pill)', fontSize: 12, fontWeight: 700 }}>
           {PHASE_LABELS[phase - 1]} • Conta {round}/{total}
         </span>
       </div>
 
-      {/* Train equation */}
-      <div style={{ background: '#fff', borderRadius: 'var(--radius)', border: '1.5px solid var(--border)', padding: 20, marginBottom: 20, textAlign: 'center' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4, marginBottom: 10 }}>
-          <AppleEmoji emoji="🚂" size={26} />
-          <span style={{ color: 'var(--text3)', fontSize: 12 }}>——————</span>
-          <AppleEmoji emoji="🚃" size={26} />
+      {/* Train track — trem avança a cada acerto */}
+      <div style={{
+        background: '#fff', borderRadius: 'var(--radius)',
+        border: '1.5px solid var(--border)',
+        padding: '14px 16px 10px',
+        marginBottom: 16,
+      }}>
+        {/* Track */}
+        <div style={{ position: 'relative', height: 48, marginBottom: 8 }}>
+          {/* Rail line */}
+          <div style={{
+            position: 'absolute', top: '50%', left: '5%', right: '5%',
+            height: 4, background: '#E5E7EB', borderRadius: 2,
+            transform: 'translateY(-50%)',
+          }} />
+          {/* Rail ties */}
+          {Array.from({ length: 8 }, (_, i) => (
+            <div key={i} style={{
+              position: 'absolute', top: 'calc(50% - 6px)',
+              left: `${8 + i * 11}%`, width: 3, height: 12,
+              background: '#D1D5DB', borderRadius: 1,
+            }} />
+          ))}
+          {/* Train emoji — moves right with each correct answer */}
+          <div style={{
+            position: 'absolute', top: '50%',
+            left: `${trainPct}%`,
+            transform: 'translateY(-50%)',
+            transition: 'left 0.7s cubic-bezier(0.34, 1.56, 0.64, 1)',
+            fontSize: 30, lineHeight: 1,
+            filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.15))',
+          }}>
+            🚂
+          </div>
+          {/* Star at the right end */}
+          <div style={{
+            position: 'absolute', top: '50%', right: '2%',
+            transform: 'translateY(-50%)',
+            fontSize: 28,
+            filter: correct === total
+              ? 'drop-shadow(0 0 8px gold)'
+              : 'grayscale(0.3) opacity(0.7)',
+            transition: 'filter 0.4s ease',
+          }}>
+            ⭐
+          </div>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, flexWrap: 'wrap' }}>
+
+        {/* Equation */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
           <div style={{ fontFamily: 'Nunito', fontWeight: 900, fontSize: 46, color: 'var(--text)' }}>{problem.a}</div>
           <div style={{ fontFamily: 'Nunito', fontWeight: 700, fontSize: 34, color: problem.op === '+' ? 'var(--c5)' : 'var(--c2)' }}>{problem.op}</div>
           <div style={{ fontFamily: 'Nunito', fontWeight: 900, fontSize: 46, color: 'var(--text)' }}>{problem.b}</div>
           <div style={{ fontFamily: 'Nunito', fontWeight: 700, fontSize: 34, color: 'var(--text3)' }}>=</div>
-
           {/* Drop zone */}
           <div
             ref={dropZoneRef}
@@ -216,7 +248,7 @@ export function TremDosNumeros() {
         </div>
       </div>
 
-      {/* Number options — drag only, no tap */}
+      {/* Number options — drag only */}
       <div style={{ display: 'flex', gap: 14, justifyContent: 'center' }}>
         {options.map(val => (
           <div
@@ -229,12 +261,9 @@ export function TremDosNumeros() {
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               fontFamily: 'Nunito', fontWeight: 900, fontSize: 44,
               color: dragging === val ? 'var(--c3)' : 'var(--text)',
-              cursor: 'grab',
-              boxShadow: dragging === val ? 'none' : 'var(--shadow)',
-              minHeight: 88, minWidth: 88,
-              transition: 'all 0.15s',
-              touchAction: 'none',
-              userSelect: 'none',
+              cursor: 'grab', boxShadow: dragging === val ? 'none' : 'var(--shadow)',
+              minHeight: 88, minWidth: 88, transition: 'all 0.15s',
+              touchAction: 'none', userSelect: 'none',
               opacity: dragging === val ? 0.45 : 1,
             }}
           >{val}</div>
@@ -242,7 +271,7 @@ export function TremDosNumeros() {
       </div>
 
       <p style={{ textAlign: 'center', color: 'var(--text3)', fontSize: 12, marginTop: 10 }}>
-        Arraste o número correto para o vagão 🚃
+        Arraste o número correto para o vagão ⬆
       </p>
 
       <style>{`
