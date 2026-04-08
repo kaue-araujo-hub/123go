@@ -90,7 +90,20 @@ export function NaveOrganizadora() {
   const isMystery = phase === 5;
   const mysteryHints: Record<string, string> = { circle: '⭕ Círculo', square: '⬛ Quadrado' };
 
-  /* ── Reset on phase change ── */
+  const allPlacedIds = Object.values(placed).flat();
+  const remaining    = phaseData.items.filter(a => !allPlacedIds.includes(a.id));
+
+  /* ── 1. Completion — declared FIRST so it runs before reset ── */
+  useEffect(() => {
+    if (remaining.length === 0 && allPlacedIds.length > 0 && !phaseCompletedRef.current) {
+      phaseCompletedRef.current = true;
+      setFeedback('correct');
+      onCorrect();
+      setTimeout(() => { setFeedback(null); onPhaseComplete(); }, 1000);
+    }
+  }, [remaining.length, allPlacedIds.length, onCorrect, onPhaseComplete]);
+
+  /* ── 2. Reset on phase change — declared AFTER completion effect ── */
   useEffect(() => {
     phaseCompletedRef.current = false;
     correctRef.current = 0;
@@ -102,19 +115,6 @@ export function NaveOrganizadora() {
     setCorrectCount(0);
     compRefs.current = {};
   }, [phase]);
-
-  const allPlacedIds = Object.values(placed).flat();
-  const remaining    = phaseData.items.filter(a => !allPlacedIds.includes(a.id));
-
-  /* ── Completion effect — BEFORE phase reset effect ── */
-  useEffect(() => {
-    if (remaining.length === 0 && !phaseCompletedRef.current) {
-      phaseCompletedRef.current = true;
-      setFeedback('correct');
-      onCorrect();
-      setTimeout(() => { setFeedback(null); onPhaseComplete(); }, 1000);
-    }
-  }, [remaining.length, onCorrect, onPhaseComplete]);
 
   /* ── Drag helpers ── */
   const getHoveredComp = (x: number, y: number): string | null => {
