@@ -17,6 +17,9 @@ import { HowToPlayScreen } from '../components/HowToPlay/HowToPlayScreen';
 import { GameModeSelectScreen } from '../components/GameModeSelect/GameModeSelectScreen';
 import { SessionManager } from '../auth/SessionManager';
 
+/* ── Shell context — lets PhaseCompleteCard trigger a restart-with-countdown ── */
+const GameShellContext = React.createContext<{ shellRestart?: () => void }>({});
+
 interface PhaseConfig {
   speed: number;
   elements: number;
@@ -419,7 +422,9 @@ export function GameShell({ title, emoji, color, currentPhase, totalPhases, chil
 
       {/* Game content */}
       <div className="game-area" style={{ flex: 1, minHeight: 0, overflow: 'hidden', padding: '14px 14px', maxWidth: 720, margin: '0 auto', width: '100%', position: 'relative', boxSizing: 'border-box' }}>
+        <GameShellContext.Provider value={{ shellRestart: handleRestart }}>
         {children}
+        </GameShellContext.Provider>
 
         {/* Paused overlay */}
         {paused && (
@@ -1011,6 +1016,7 @@ export function PhaseCompleteCard({ phase, totalPhases, score, isGameComplete, o
   const [, setLocation] = useLocation();
   const catalogPath = SessionManager.isStudent() ? '/student' : '/catalog';
   const [showShare, setShowShare] = useState(false);
+  const { shellRestart } = React.useContext(GameShellContext);
 
   useEffect(() => {
     if (isGameComplete) {
@@ -1019,6 +1025,11 @@ export function PhaseCompleteCard({ phase, totalPhases, score, isGameComplete, o
     }
     return undefined;
   }, [isGameComplete]);
+
+  const handlePlayAgain = () => {
+    onRestart();           /* reset game engine state */
+    shellRestart?.();      /* show countdown + restart shell */
+  };
 
   return (
     <>
@@ -1091,44 +1102,67 @@ export function PhaseCompleteCard({ phase, totalPhases, score, isGameComplete, o
             </button>
           )}
           {isGameComplete && (
-            <>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, width: '100%', alignItems: 'center' }}>
               <button
                 className="btn-interactive action-btn"
-                onClick={() => setShowShare(true)}
+                onClick={handlePlayAgain}
                 style={{
-                  padding: '12px 22px',
-                  borderRadius: 'var(--radius-pill)',
-                  border: 'none',
-                  background: '#7C3AED',
-                  color: '#fff',
-                  fontFamily: 'Nunito',
-                  fontWeight: 800,
-                  fontSize: 15,
-                  cursor: 'pointer',
-                  minHeight: 52,
-                }}
-              >
-                Compartilhar
-              </button>
-              <button
-                className="btn-interactive action-btn"
-                onClick={() => setLocation(catalogPath)}
-                style={{
-                  padding: '12px 22px',
+                  width: '100%',
+                  padding: '13px 22px',
                   borderRadius: 'var(--radius-pill)',
                   border: 'none',
                   background: color,
                   color: '#fff',
                   fontFamily: 'Nunito',
-                  fontWeight: 700,
-                  fontSize: 15,
+                  fontWeight: 800,
+                  fontSize: 16,
                   cursor: 'pointer',
                   minHeight: 52,
                 }}
               >
-                Ver outros jogos →
+                🔄 Jogar de novo
               </button>
-            </>
+              <div style={{ display: 'flex', gap: 10, width: '100%' }}>
+                <button
+                  className="btn-interactive action-btn"
+                  onClick={() => setShowShare(true)}
+                  style={{
+                    flex: 1,
+                    padding: '11px 14px',
+                    borderRadius: 'var(--radius-pill)',
+                    border: 'none',
+                    background: '#7C3AED',
+                    color: '#fff',
+                    fontFamily: 'Nunito',
+                    fontWeight: 800,
+                    fontSize: 14,
+                    cursor: 'pointer',
+                    minHeight: 46,
+                  }}
+                >
+                  Compartilhar
+                </button>
+                <button
+                  className="btn-interactive action-btn"
+                  onClick={() => setLocation(catalogPath)}
+                  style={{
+                    flex: 1,
+                    padding: '11px 14px',
+                    borderRadius: 'var(--radius-pill)',
+                    border: '1.5px solid var(--border)',
+                    background: '#fff',
+                    color: 'var(--text)',
+                    fontFamily: 'Nunito',
+                    fontWeight: 700,
+                    fontSize: 14,
+                    cursor: 'pointer',
+                    minHeight: 46,
+                  }}
+                >
+                  Ver outros jogos →
+                </button>
+              </div>
+            </div>
           )}
         </div>
       </div>
