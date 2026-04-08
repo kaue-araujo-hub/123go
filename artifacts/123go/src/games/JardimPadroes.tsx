@@ -2,35 +2,40 @@ import React, { useState, useEffect, useRef } from 'react';
 import { GameShell, useGameEngine, FeedbackOverlay, PhaseCompleteCard } from '../engine/GameEngine';
 import { AppleEmoji } from '../utils/AppleEmoji';
 
+/* ── Phase definitions ───────────────────────────────────────────────────────
+   nexts: array of correct answers for each empty slot (in order)
+   options: draggable bank of tiles (reusable, includes correct + distractors)
+   Tile counts: ph1=1 slot, ph2=2, ph3=3, ph4=3, ph5=4
+────────────────────────────────────────────────────────────────────────── */
 const PHASES = [
   {
     label: 'Qual é o próximo?',
     pattern: ['🌹', '🌼', '🌹', '🌼', '🌹'],
-    next: '🌼',
+    nexts:   ['🌼'],
     options: ['🌹', '🌼', '🌸'],
   },
   {
     label: 'Qual é o próximo?',
-    pattern: ['🌹', '🌼', '🌸', '🌹', '🌼'],
-    next: '🌸',
-    options: ['🌹', '🌸', '🌺'],
+    pattern: ['🌹', '🌼', '🌸', '🌹'],
+    nexts:   ['🌼', '🌸'],
+    options: ['🌼', '🌸', '🌺'],
   },
   {
     label: 'Qual é o próximo?',
-    pattern: ['🐜', '🐞', '🐜', '🐞', '🐜'],
-    next: '🐞',
+    pattern: ['🐜', '🐞', '🐜', '🐞'],
+    nexts:   ['🐜', '🐞', '🐜'],
     options: ['🐜', '🐞', '🐌'],
   },
   {
     label: 'Qual é o próximo?',
-    pattern: ['🌸', '🌺', '🌸', '🌺', '🌸'],
-    next: '🌺',
+    pattern: ['🌸', '🌺', '🌸', '🌺'],
+    nexts:   ['🌸', '🌺', '🌸'],
     options: ['🌸', '🌺', '🌻'],
   },
   {
     label: 'Qual é o próximo?',
-    pattern: ['🦋', '🐝', '🦋', '🐝', '🦋'],
-    next: '🐝',
+    pattern: ['🦋', '🐝', '🦋'],
+    nexts:   ['🐝', '🦋', '🐝', '🦋'],
     options: ['🦋', '🐝', '🐛'],
   },
 ];
@@ -38,46 +43,72 @@ const PHASES = [
 export function JardimPadroes() {
   const { phase, score, phaseComplete, gameComplete, onCorrect, onPhaseComplete, nextPhase, restart } = useGameEngine(5);
 
-  const [feedback,    setFeedback]    = useState<'correct' | 'wrong' | null>(null);
-  const [answered,   setAnswered]    = useState(false);
+  const [feedback,     setFeedback]     = useState<'correct' | 'wrong' | null>(null);
+  const [filled,       setFilled]       = useState<Record<number, string>>({}); // slotIdx → emoji
+  const [draggingOpt,  setDraggingOpt]  = useState<string | null>(null);
+  const [ghostPos,     setGhostPos]     = useState<{ x: number; y: number } | null>(null);
+  const [hoveredSlot,  setHoveredSlot]  = useState<number | null>(null);
 
-  /* drag state */
-  const [draggingOpt, setDraggingOpt] = useState<string | null>(null);
-  const [ghostPos,    setGhostPos]    = useState<{ x: number; y: number } | null>(null);
-  const [isOver,      setIsOver]      = useState(false);
-
-  const dropRef       = useRef<HTMLDivElement>(null);
-  const draggingRef   = useRef<string | null>(null);
+  const draggingRef       = useRef<string | null>(null);
+  const slotRefs          = useRef<(HTMLDivElement | null)[]>([]);
   const phaseCompletedRef = useRef(false);
 
   const phaseData = PHASES[phase - 1];
 
+  /* tile size: smaller when more slots to keep row on one line */
+  const totalItems = phaseData.pattern.length + phaseData.nexts.length;
+  const tileSize   = totalItems <= 6 ? 54 : 46;
+  const emojiSize  = tileSize - 18;
+
+  /* ── 1. completion — must be BEFORE the phase-reset effect ── */
+  useEffect(() => {
+    if (
+      Object.keys(filled).length === phaseData.nexts.length &&
+      phaseData.nexts.length > 0 &&
+      !phaseCompletedRef.current
+    ) {
+      phaseCompletedRef.current = true;
+      setFeedback('correct');
+      onCorrect();
+      setTimeout(() => { setFeedback(null); onPhaseComplete(); }, 900);
+    }
+  }, [filled, phaseData.nexts.length, onCorrect, onPhaseComplete]);
+
+  /* ── 2. phase reset — declared AFTER completion effect ── */
   useEffect(() => {
     phaseCompletedRef.current = false;
-    setAnswered(false);
+    setFilled({});
     setFeedback(null);
     setDraggingOpt(null);
     setGhostPos(null);
-    setIsOver(false);
+    setHoveredSlot(null);
+    slotRefs.current = [];
   }, [phase]);
 
-  const handleChoice = (choice: string) => {
-    if (answered || phaseCompletedRef.current) return;
-    const correct = choice === phaseData.next;
-    setFeedback(correct ? 'correct' : 'wrong');
-    setAnswered(true);
-    if (correct) {
-      phaseCompletedRef.current = true;
-      onCorrect();
-      setTimeout(() => { setFeedback(null); onPhaseComplete(); }, 1000);
+  /* ── helpers ── */
+  const getHoveredSlot = (x: number, y: number): number | null => {
+    for (let i = 0; i < slotRefs.current.length; i++) {
+      const el = slotRefs.current[i];
+      if (!el) continue;
+      const r = el.getBoundingClientRect();
+      if (x >= r.left && x <= r.right && y >= r.top && y <= r.bottom) return i;
+    }
+    return null;
+  };
+
+  const handleDrop = (slotIdx: number, emoji: string) => {
+    if (filled[slotIdx] !== undefined || phaseCompletedRef.current) return;
+    if (emoji === phaseData.nexts[slotIdx]) {
+      setFilled(prev => ({ ...prev, [slotIdx]: emoji }));
     } else {
-      setTimeout(() => { setFeedback(null); setAnswered(false); }, 800);
+      setFeedback('wrong');
+      setTimeout(() => setFeedback(null), 600);
     }
   };
 
-  /* ── Drag handlers ── */
+  /* ── drag ── */
   const startDrag = (e: React.PointerEvent, opt: string) => {
-    if (answered || phaseCompletedRef.current) return;
+    if (phaseCompletedRef.current) return;
     e.currentTarget.setPointerCapture(e.pointerId);
     draggingRef.current = opt;
     setDraggingOpt(opt);
@@ -85,33 +116,23 @@ export function JardimPadroes() {
 
     const onMove = (ev: PointerEvent) => {
       setGhostPos({ x: ev.clientX, y: ev.clientY });
-      if (dropRef.current) {
-        const r = dropRef.current.getBoundingClientRect();
-        setIsOver(
-          ev.clientX >= r.left && ev.clientX <= r.right &&
-          ev.clientY >= r.top  && ev.clientY <= r.bottom
-        );
-      }
+      setHoveredSlot(getHoveredSlot(ev.clientX, ev.clientY));
     };
 
     const onUp = (ev: PointerEvent) => {
       window.removeEventListener('pointermove', onMove);
       window.removeEventListener('pointerup',   onUp);
 
-      if (dropRef.current) {
-        const r = dropRef.current.getBoundingClientRect();
-        const landed =
-          ev.clientX >= r.left && ev.clientX <= r.right &&
-          ev.clientY >= r.top  && ev.clientY <= r.bottom;
-        if (landed && draggingRef.current) {
-          handleChoice(draggingRef.current);
-        }
-      }
-
+      const slot = getHoveredSlot(ev.clientX, ev.clientY);
+      const opt  = draggingRef.current;
       draggingRef.current = null;
       setDraggingOpt(null);
       setGhostPos(null);
-      setIsOver(false);
+      setHoveredSlot(null);
+
+      if (slot !== null && opt !== null) {
+        handleDrop(slot, opt);
+      }
     };
 
     window.addEventListener('pointermove', onMove);
@@ -126,101 +147,121 @@ export function JardimPadroes() {
     );
   }
 
+  const allFilled = Object.keys(filled).length === phaseData.nexts.length;
+
   return (
     <GameShell title="Jardim de Padrões" emoji="🌸" color="var(--c2)" currentPhase={phase} totalPhases={5} score={score} onRestart={restart}>
       <FeedbackOverlay type={feedback} />
 
-      {/* Ghost element — follows pointer */}
+      {/* Ghost */}
       {ghostPos && draggingOpt && (
         <div style={{
           position: 'fixed',
-          left: ghostPos.x - 36, top: ghostPos.y - 36,
-          width: 72, height: 72,
-          background: '#fff', borderRadius: 18,
+          left: ghostPos.x - 34, top: ghostPos.y - 34,
+          width: 68, height: 68,
+          background: '#fff', borderRadius: 16,
           border: '3px solid var(--c2)',
-          boxShadow: '0 8px 24px rgba(0,0,0,0.2)',
+          boxShadow: '0 8px 24px rgba(0,0,0,0.22)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           zIndex: 9999, pointerEvents: 'none',
           transform: 'scale(1.12)',
         }}>
-          <AppleEmoji emoji={draggingOpt} size={46} />
+          <AppleEmoji emoji={draggingOpt} size={44} />
         </div>
       )}
 
       <div style={{ textAlign: 'center', marginBottom: 16 }}>
-        <h2 style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 17, color: 'var(--text)', marginBottom: 0 }}>
+        <h2 style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 17, color: 'var(--text)', margin: 0 }}>
           {phaseData.label}
         </h2>
       </div>
 
-      {/* Pattern sequence */}
+      {/* Pattern + slots row */}
       <div style={{
         background: '#fff', borderRadius: 'var(--radius)', border: '1.5px solid var(--border)',
-        padding: 16, marginBottom: 24, display: 'flex', alignItems: 'center',
-        gap: 8, flexWrap: 'wrap', justifyContent: 'center',
+        padding: 14, marginBottom: 28,
+        display: 'flex', alignItems: 'center',
+        gap: totalItems <= 6 ? 8 : 6,
+        justifyContent: 'center',
+        flexWrap: 'nowrap',
       }}>
+        {/* Fixed pattern items */}
         {phaseData.pattern.map((item, i) => (
-          <div key={i} style={{
-            width: 54, height: 54, borderRadius: 12, background: 'var(--bg)',
-            border: '2px solid var(--border)', display: 'flex',
-            alignItems: 'center', justifyContent: 'center',
+          <div key={`p-${i}`} style={{
+            width: tileSize, height: tileSize, borderRadius: 12,
+            background: 'var(--bg)', border: '2px solid var(--border)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            flexShrink: 0,
           }}>
-            <AppleEmoji emoji={item} size={34} />
+            <AppleEmoji emoji={item} size={emojiSize} />
           </div>
         ))}
 
-        {/* Drop zone — the ? slot */}
-        <div
-          ref={dropRef}
-          style={{
-            width: 58, height: 58, borderRadius: 14,
-            background: answered
-              ? '#E8F5E9'
-              : isOver
-                ? 'rgba(var(--c2-rgb, 245,158,11), 0.12)'
-                : 'var(--bg)',
-            border: answered
-              ? '3px solid #4CAF50'
-              : isOver
-                ? '3px solid var(--c2)'
-                : `3px dashed var(--c2)`,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            transition: 'border 0.15s, background 0.15s, transform 0.15s',
-            transform: isOver ? 'scale(1.12)' : answered ? 'scale(1.05)' : 'scale(1)',
-            boxShadow: isOver ? '0 0 14px rgba(245,158,11,0.35)' : 'none',
-            animation: answered || draggingOpt ? undefined : 'vasoPulse 1.2s ease-in-out infinite',
-          }}
-        >
-          {answered
-            ? <AppleEmoji emoji={phaseData.next} size={36} />
-            : <span style={{ fontSize: 24, color: isOver ? 'var(--c2)' : 'rgba(0,0,0,0.3)', fontWeight: 900, fontFamily: 'Nunito', transition: 'color 0.15s' }}>?</span>
-          }
-        </div>
+        {/* Drop slots */}
+        {phaseData.nexts.map((expected, i) => {
+          const isFilled   = filled[i] !== undefined;
+          const isHovered  = hoveredSlot === i && !isFilled;
+          return (
+            <div
+              key={`s-${i}`}
+              ref={el => { slotRefs.current[i] = el; }}
+              style={{
+                width: tileSize + 4, height: tileSize + 4,
+                borderRadius: 13, flexShrink: 0,
+                background: isFilled
+                  ? '#E8F5E9'
+                  : isHovered
+                    ? 'rgba(245,158,11,0.12)'
+                    : 'var(--bg)',
+                border: isFilled
+                  ? '3px solid #4CAF50'
+                  : isHovered
+                    ? '3px solid var(--c2)'
+                    : '3px dashed var(--c2)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                transition: 'border 0.15s, background 0.15s, transform 0.15s',
+                transform: isHovered ? 'scale(1.1)' : isFilled ? 'scale(1.04)' : 'scale(1)',
+                boxShadow: isHovered ? '0 0 12px rgba(245,158,11,0.4)' : 'none',
+                animation: isFilled || draggingOpt ? undefined : 'vasoPulse 1.4s ease-in-out infinite',
+                animationDelay: `${i * 0.18}s`,
+              }}
+            >
+              {isFilled
+                ? <AppleEmoji emoji={filled[i]} size={emojiSize} />
+                : <span style={{
+                    fontSize: tileSize <= 46 ? 18 : 22,
+                    color: isHovered ? 'var(--c2)' : 'rgba(0,0,0,0.28)',
+                    fontWeight: 900, fontFamily: 'Nunito',
+                    transition: 'color 0.15s',
+                  }}>?</span>
+              }
+            </div>
+          );
+        })}
       </div>
 
-      {/* Draggable option tiles */}
+      {/* Draggable options bank */}
       <div style={{ display: 'flex', gap: 16, justifyContent: 'center' }}>
         {phaseData.options.map(opt => {
           const isDraggingMe = draggingOpt === opt;
-          const isCorrectAndAnswered = opt === phaseData.next && answered;
           return (
             <div
               key={opt}
               onPointerDown={e => startDrag(e, opt)}
               style={{
-                width: 96, height: 96, borderRadius: 22,
-                border: `3px solid ${isCorrectAndAnswered ? '#4CAF50' : 'var(--border)'}`,
-                background: isCorrectAndAnswered ? '#E8F5E9' : '#fff',
+                width: 90, height: 90, borderRadius: 22,
+                border: '3px solid var(--border)',
+                background: '#fff',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                cursor: answered ? 'default' : 'grab',
+                cursor: allFilled ? 'default' : 'grab',
                 touchAction: 'none', userSelect: 'none',
                 opacity: isDraggingMe ? 0.3 : 1,
-                transform: isDraggingMe ? 'scale(0.92)' : 'scale(1)',
-                transition: 'opacity 0.15s, transform 0.15s, border 0.15s',
+                transform: isDraggingMe ? 'scale(0.9)' : 'scale(1)',
+                transition: 'opacity 0.15s, transform 0.15s',
                 boxShadow: isDraggingMe ? 'none' : '0 2px 8px rgba(0,0,0,0.08)',
               }}
             >
-              <AppleEmoji emoji={opt} size={56} />
+              <AppleEmoji emoji={opt} size={54} />
             </div>
           );
         })}
