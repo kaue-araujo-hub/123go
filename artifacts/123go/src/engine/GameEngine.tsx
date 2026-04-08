@@ -347,55 +347,8 @@ export function GameShell({ title, emoji, color, currentPhase, totalPhases, chil
           <h1 style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 14, color: 'var(--text)', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{title}</h1>
         </div>
 
-        {/* CENTER: playback controls — desktop only */}
-        <div className="game-controls-desktop" style={{
-          position: 'absolute',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          display: 'flex',
-          gap: 6,
-          alignItems: 'center',
-        }}>
-          <ControlBtn onClick={handlePlay} title="Jogar" active={!isPlaying}>
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
-          </ControlBtn>
-          <ControlBtn onClick={handlePause} title="Pausar" active={isPlaying}>
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
-          </ControlBtn>
-          <ControlBtn onClick={handleStop} title="Parar" active={!stopped}>
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="4" width="16" height="16" rx="2"/></svg>
-          </ControlBtn>
-          <ControlBtn onClick={handleRestart} title="Reiniciar">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.5"/>
-            </svg>
-          </ControlBtn>
-
-          {/* Divider */}
-          <div style={{ width: 1, height: 20, background: 'var(--border)', margin: '0 2px' }} />
-
-          {/* Sound toggle */}
-          <ControlBtn
-            onClick={toggleMuted}
-            title={muted ? 'Ativar som' : 'Desativar som'}
-            active={!muted}
-          >
-            <SoundIcon muted={muted} />
-          </ControlBtn>
-        </div>
-
-        {/* RIGHT: mode badge + timer + score */}
-        <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 8 }}>
-          {/* Mode badge — visible to students (practice mode hidden) */}
-          <ModeBadge />
-
-          {/* Timer display — countdown in Modo Tempo, stopwatch otherwise */}
-          <TimerDisplay
-            formatted={isTime ? gameCountdownFmt : formatted}
-            isRunning={isTime ? (countdownDone && !paused && !stopped) : isRunning}
-            compact
-            lowTime={isTime && gameCountdown <= 10 && gameCountdown > 0}
-          />
+        {/* RIGHT: score only */}
+        <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
           {score !== undefined && (
             <span className="entry-pop" style={{
               background: color,
@@ -414,8 +367,8 @@ export function GameShell({ title, emoji, color, currentPhase, totalPhases, chil
         </div>
       </div>
 
-      {/* Mobile controls bar — shown only on small screens */}
-      <div className="game-controls-mobile" style={{
+      {/* Controls bar — single row, always visible */}
+      <div style={{
         background: '#fff',
         borderBottom: '1px solid var(--border)',
         padding: '10px 16px',
@@ -424,25 +377,18 @@ export function GameShell({ title, emoji, color, currentPhase, totalPhases, chil
         justifyContent: 'center',
         gap: 12,
       }}>
-        <ControlBtn onClick={handlePlay} title="Jogar" active={!isPlaying}>
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
-        </ControlBtn>
-        <ControlBtn onClick={handlePause} title="Pausar" active={isPlaying}>
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
-        </ControlBtn>
-        <ControlBtn onClick={handleStop} title="Parar" active={!stopped}>
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="4" width="16" height="16" rx="2"/></svg>
+        {/* Single play/pause toggle */}
+        <ControlBtn onClick={isPlaying ? handlePause : handlePlay} title={isPlaying ? 'Pausar' : 'Jogar'}>
+          {isPlaying
+            ? <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+            : <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
+          }
         </ControlBtn>
         <ControlBtn onClick={handleRestart} title="Reiniciar">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.5"/>
           </svg>
         </ControlBtn>
-
-        {/* Divider */}
-        <div style={{ width: 1, height: 20, background: 'var(--border)', margin: '0 2px' }} />
-
-        {/* Sound toggle */}
         <ControlBtn
           onClick={toggleMuted}
           title={muted ? 'Ativar som' : 'Desativar som'}
@@ -451,58 +397,6 @@ export function GameShell({ title, emoji, color, currentPhase, totalPhases, chil
           <SoundIcon muted={muted} />
         </ControlBtn>
       </div>
-
-      {/* Progress bar + difficulty chip */}
-      {(() => {
-        const diff = getDifficulty(currentPhase);
-        return (
-          <div style={{ background: '#fff', padding: '5px 16px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
-            <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-              {Array.from({ length: totalPhases }).map((_, i) => {
-                const phaseNum = i + 1;
-                const dotDiff = getDifficulty(phaseNum);
-                const done = phaseNum < currentPhase;
-                const current = phaseNum === currentPhase;
-                return (
-                  <div
-                    key={i}
-                    style={{
-                      width: done || current ? 28 : 20,
-                      height: 10,
-                      borderRadius: 5,
-                      background: done ? dotDiff.color : current ? dotDiff.color : 'var(--border)',
-                      opacity: current ? 1 : done ? 0.8 : 0.25,
-                      transition: 'all 0.35s ease',
-                      animation: current && isPlaying ? 'pulseDot 1.2s ease-in-out infinite' : 'none',
-                    }}
-                  />
-                );
-              })}
-            </div>
-            {/* Difficulty chip — remounts on phase change to retrigger popIn */}
-            <span
-              key={`diff-chip-${currentPhase}`}
-              style={{
-                display: 'inline-flex', alignItems: 'center', gap: 4,
-                background: diff.bg,
-                color: diff.color,
-                border: `1.5px solid ${diff.color}`,
-                borderRadius: 'var(--radius-pill)',
-                fontFamily: 'Nunito', fontWeight: 800,
-                fontSize: 13,
-                padding: '2px 10px',
-                whiteSpace: 'nowrap',
-                animation: 'popIn 0.35s cubic-bezier(.34,1.56,.64,1)',
-              }}
-            >
-              {diff.emoji} {diff.label}
-            </span>
-            <span style={{ color: 'var(--text2)', fontSize: 12, fontWeight: 700, fontFamily: 'Nunito', whiteSpace: 'nowrap' }}>
-              {currentPhase}/{totalPhases}
-            </span>
-          </div>
-        );
-      })()}
 
       {/* Difficulty level-up toast */}
       {diffToast && (
