@@ -17,7 +17,6 @@ import { AtelieOrdem }          from "./games/AtelieOrdem";
 import { JardimPadroes }        from "./games/JardimPadroes";
 import { NaveOrganizadora }     from "./games/NaveOrganizadora";
 import { RoboPerdido }          from "./games/RoboPerdido";
-import { CasteloPosicoes }      from "./games/CasteloPosicoes";
 import { SolLuaEstrelas }       from "./games/SolLuaEstrelas";
 import { CalendarioVivo }       from "./games/CalendarioVivo";
 import { SorveteriaDados }      from "./games/SorveteriaDados";
@@ -56,7 +55,6 @@ function Router() {
       <Route path="/games/g11-jardim-padroes"      component={JardimPadroes} />
       <Route path="/games/g12-nave-organizadora"   component={NaveOrganizadora} />
       <Route path="/games/g13-robo-perdido"        component={RoboPerdido} />
-      <Route path="/games/g15-castelo-posicoes"    component={CasteloPosicoes} />
       <Route path="/games/g16-sol-lua-estrelas"    component={SolLuaEstrelas} />
       <Route path="/games/g17-calendario-vivo"     component={CalendarioVivo} />
       <Route path="/games/g19-sorveteria-dados"    component={SorveteriaDados} />
