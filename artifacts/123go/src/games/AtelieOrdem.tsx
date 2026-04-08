@@ -104,7 +104,22 @@ export function AtelieOrdem() {
 
   const phaseData = PHASES[phase - 1];
 
-  /* shuffle objects fresh each phase */
+  const remaining = shuffled.filter(o => !Object.values(placed).flat().includes(o.emoji));
+
+  /* 1. completion detection — MUST be declared before the phase-reset effect
+        so it runs first: phaseCompletedRef is still true when the next phase
+        mounts (remaining is still 0 with stale state), preventing a false
+        auto-complete of the new phase. */
+  useEffect(() => {
+    if (remaining.length === 0 && shuffled.length > 0 && !phaseCompletedRef.current) {
+      phaseCompletedRef.current = true;
+      setFeedback('correct');
+      onCorrect();
+      setTimeout(() => { setFeedback(null); onPhaseComplete(); }, 900);
+    }
+  }, [remaining.length, shuffled.length, onCorrect, onPhaseComplete]);
+
+  /* 2. phase reset — declared after completion so it runs second */
   useEffect(() => {
     phaseCompletedRef.current = false;
     setPlaced({});
@@ -114,18 +129,6 @@ export function AtelieOrdem() {
     setHoveredKey(null);
     setShuffled(shuffle(phaseData.objects));
   }, [phase]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const remaining = shuffled.filter(o => !Object.values(placed).flat().includes(o.emoji));
-
-  /* complete detection */
-  useEffect(() => {
-    if (remaining.length === 0 && shuffled.length > 0 && !phaseCompletedRef.current) {
-      phaseCompletedRef.current = true;
-      setFeedback('correct');
-      onCorrect();
-      setTimeout(() => { setFeedback(null); onPhaseComplete(); }, 900);
-    }
-  }, [remaining.length, shuffled.length, onCorrect, onPhaseComplete]);
 
   /* ── drag helpers ── */
   const getHoveredDrawer = (x: number, y: number): string | null => {
