@@ -51,7 +51,7 @@ function BarChart({ highlightIdx }: { highlightIdx?: number }) {
                 width: '100%', height: h,
                 borderRadius: '6px 6px 0 0',
                 background: d.color,
-                opacity: isHighlight !== undefined ? (isHighlight ? 1 : 0.35) : 1,
+                opacity: highlightIdx !== undefined ? (isHighlight ? 1 : 0.35) : 1,
                 transition: 'opacity 0.2s',
                 outline: isHighlight ? `3px solid ${d.color}` : 'none',
                 outlineOffset: 2,
@@ -84,7 +84,6 @@ export function PesquisaTurma() {
     }
   }, [phase]);
 
-  /* single-select — most / least */
   const handleAnimalTap = (idx: number) => {
     if (answered || phaseCompletedRef.current) return;
     let correct = false;
@@ -103,7 +102,6 @@ export function PesquisaTurma() {
     }
   };
 
-  /* count — number buttons */
   const handleCountTap = (val: number) => {
     if (answered || phaseCompletedRef.current) return;
     const correct = val === (phaseData.correct ?? 0);
@@ -117,7 +115,6 @@ export function PesquisaTurma() {
     }
   };
 
-  /* multi-select — toggle + verify */
   const toggleAnimal = (idx: number) => {
     if (answered || phaseCompletedRef.current) return;
     const ns = new Set(selectedIdxs);
@@ -155,100 +152,108 @@ export function PesquisaTurma() {
     <GameShell title="Meus Pets" emoji="🐾" color="var(--c2)" currentPhase={phase} totalPhases={5} score={score} onRestart={restart}>
       <FeedbackOverlay type={feedback} />
 
-      <div style={{ textAlign: 'center', marginBottom: 12 }}>
-        <h2 style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 17, color: 'var(--text)' }}>
-          {phaseData.label}
-        </h2>
-      </div>
+      {/* Outer column: title pinned top, chart+options centered */}
+      <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
 
-      {/* Bar chart — always visible */}
-      <BarChart highlightIdx={phaseData.type === 'count' ? phaseData.targetIdx : undefined} />
+        {/* Title — fixed at top */}
+        <div style={{ textAlign: 'center', marginBottom: 12 }}>
+          <h2 style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 17, color: 'var(--text)' }}>
+            {phaseData.label}
+          </h2>
+        </div>
 
-      {/* Animal icon buttons — phases 1, 2, 5 */}
-      {isAnimalPhase && (
-        <div style={{ marginTop: 14 }}>
-          {isMulti && (
-            <p style={{ textAlign: 'center', color: 'var(--text2)', fontSize: 12, marginBottom: 8 }}>
-              Selecione todos os animais com mais de 5 votos
-            </p>
-          )}
+        {/* Centering wrapper — takes remaining height */}
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
 
-          <div style={{ display: 'flex', gap: 8, marginBottom: 10 }}>
-            {CHART_DATA.map((animal, idx) => {
-              const isSelected = selectedIdxs.has(idx);
-              return (
+          {/* Bar chart */}
+          <BarChart highlightIdx={phaseData.type === 'count' ? phaseData.targetIdx : undefined} />
+
+          {/* Animal icon buttons — phases 1, 2, 5 */}
+          {isAnimalPhase && (
+            <div style={{ marginTop: 14 }}>
+              {isMulti && (
+                <p style={{ textAlign: 'center', color: 'var(--text2)', fontSize: 12, marginBottom: 8 }}>
+                  Selecione todos os animais com mais de 5 votos
+                </p>
+              )}
+              <div style={{ display: 'flex', gap: 8, marginBottom: 10 }}>
+                {CHART_DATA.map((animal, idx) => {
+                  const isSelected = selectedIdxs.has(idx);
+                  return (
+                    <button
+                      key={idx}
+                      onPointerUp={() => isMulti ? toggleAnimal(idx) : handleAnimalTap(idx)}
+                      style={{
+                        flex: 1,
+                        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3,
+                        padding: '8px 4px', borderRadius: 14,
+                        border: `2.5px solid ${isSelected ? 'var(--c2)' : 'var(--border)'}`,
+                        background: isSelected ? '#FCE4EC' : '#fff',
+                        cursor: 'pointer', touchAction: 'manipulation',
+                        minHeight: 68,
+                        transition: 'all 0.15s',
+                        transform: isSelected ? 'scale(1.06)' : 'scale(1)',
+                        boxShadow: isSelected ? '0 2px 10px rgba(233,30,99,0.2)' : '0 1px 4px rgba(0,0,0,0.07)',
+                      }}
+                    >
+                      <AppleEmoji emoji={animal.emoji} size={30} />
+                      <span style={{
+                        fontFamily: 'Nunito', fontWeight: 700, fontSize: 10,
+                        color: isSelected ? 'var(--c2)' : 'var(--text2)',
+                        textAlign: 'center', lineHeight: 1.2,
+                      }}>
+                        {animal.name}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+              {isMulti && (
                 <button
-                  key={idx}
-                  onPointerUp={() => isMulti ? toggleAnimal(idx) : handleAnimalTap(idx)}
+                  onPointerUp={checkMulti}
                   style={{
-                    flex: 1,
-                    display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3,
-                    padding: '8px 4px', borderRadius: 14,
-                    border: `2.5px solid ${isSelected ? 'var(--c2)' : 'var(--border)'}`,
-                    background: isSelected ? '#FCE4EC' : '#fff',
-                    cursor: 'pointer', touchAction: 'manipulation',
-                    minHeight: 68,
-                    transition: 'all 0.15s',
-                    transform: isSelected ? 'scale(1.06)' : 'scale(1)',
-                    boxShadow: isSelected ? '0 2px 10px rgba(233,30,99,0.2)' : '0 1px 4px rgba(0,0,0,0.07)',
+                    width: '100%', padding: 13, borderRadius: 'var(--radius-pill)',
+                    background: selectedIdxs.size === 0 ? 'var(--border)' : 'var(--c2)',
+                    color: selectedIdxs.size === 0 ? 'var(--text3)' : '#fff',
+                    fontFamily: 'Nunito', fontWeight: 800, fontSize: 15,
+                    border: 'none', cursor: selectedIdxs.size === 0 ? 'default' : 'pointer',
+                    minHeight: 50, touchAction: 'manipulation', transition: 'all 0.2s',
                   }}
                 >
-                  <AppleEmoji emoji={animal.emoji} size={30} />
-                  <span style={{
-                    fontFamily: 'Nunito', fontWeight: 700, fontSize: 10,
-                    color: isSelected ? 'var(--c2)' : 'var(--text2)',
-                    textAlign: 'center', lineHeight: 1.2,
-                  }}>
-                    {animal.name}
-                  </span>
+                  ✅ Verificar ({selectedIdxs.size} selecionados)
                 </button>
-              );
-            })}
-          </div>
-
-          {isMulti && (
-            <button
-              onPointerUp={checkMulti}
-              style={{
-                width: '100%', padding: 13, borderRadius: 'var(--radius-pill)',
-                background: selectedIdxs.size === 0 ? 'var(--border)' : 'var(--c2)',
-                color: selectedIdxs.size === 0 ? 'var(--text3)' : '#fff',
-                fontFamily: 'Nunito', fontWeight: 800, fontSize: 15,
-                border: 'none', cursor: selectedIdxs.size === 0 ? 'default' : 'pointer',
-                minHeight: 50, touchAction: 'manipulation', transition: 'all 0.2s',
-              }}
-            >
-              ✅ Verificar ({selectedIdxs.size} selecionados)
-            </button>
+              )}
+            </div>
           )}
-        </div>
-      )}
 
-      {/* Number buttons — phases 3 & 4 */}
-      {phaseData.type === 'count' && (
-        <div style={{ marginTop: 14 }}>
-          <p style={{ textAlign: 'center', color: 'var(--text2)', fontSize: 12, marginBottom: 12 }}>
-            Olhe o gráfico e escolha o número certo:
-          </p>
-          <div style={{ display: 'flex', gap: 14, justifyContent: 'center' }}>
-            {countOptions.map(val => (
-              <button
-                key={val}
-                onPointerUp={() => handleCountTap(val)}
-                style={{
-                  width: 86, height: 86, borderRadius: 20,
-                  border: '2.5px solid var(--border)', background: '#fff',
-                  fontFamily: 'Nunito', fontWeight: 900, fontSize: 40, color: 'var(--text)',
-                  cursor: 'pointer', minHeight: 86, touchAction: 'manipulation',
-                  boxShadow: '0 1px 4px rgba(0,0,0,0.07)',
-                }}
-              >
-                {val}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
+          {/* Number buttons — phases 3 & 4 */}
+          {phaseData.type === 'count' && (
+            <div style={{ marginTop: 14 }}>
+              <p style={{ textAlign: 'center', color: 'var(--text2)', fontSize: 12, marginBottom: 12 }}>
+                Olhe o gráfico e escolha o número certo:
+              </p>
+              <div style={{ display: 'flex', gap: 14, justifyContent: 'center' }}>
+                {countOptions.map(val => (
+                  <button
+                    key={val}
+                    onPointerUp={() => handleCountTap(val)}
+                    style={{
+                      width: 86, height: 86, borderRadius: 20,
+                      border: '2.5px solid var(--border)', background: '#fff',
+                      fontFamily: 'Nunito', fontWeight: 900, fontSize: 40, color: 'var(--text)',
+                      cursor: 'pointer', minHeight: 86, touchAction: 'manipulation',
+                      boxShadow: '0 1px 4px rgba(0,0,0,0.07)',
+                    }}
+                  >
+                    {val}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+        </div>{/* end centering wrapper */}
+      </div>{/* end outer column */}
     </GameShell>
   );
 }
