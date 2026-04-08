@@ -13,6 +13,7 @@ const ITEMS = [
   { emoji: '🎁', color: 'yellow', shape: 'square', id: 'i7' }, // fase 2
   { emoji: '🍬', color: 'green',  shape: 'circle', id: 'i8' }, // fase 2
   { emoji: '☀️', color: 'blue',   shape: 'circle', id: 'i9' }, // fase 2
+  { emoji: '🌿', color: 'green',  shape: 'circle', id: 'i10' }, // fase 4
 ];
 
 type Item = typeof ITEMS[0];
@@ -55,7 +56,7 @@ const PHASES = [
       { key: 'green',  label: '🟢 Verde',   color: '#4CAF50' },
     ],
     getAttr: (a: Item) => a.color,
-    items: [ITEMS[0], ITEMS[1], ITEMS[2], ITEMS[3], ITEMS[5]], // ⭐ 🟢 🤖 🔵 🟡
+    items: [ITEMS[0], ITEMS[1], ITEMS[2], ITEMS[3], ITEMS[5], ITEMS[9]], // ⭐ 🟢 🤖 🔵 🟡 🌿
   },
   {
     label: 'Compartimento misterioso — descubra o padrão!',
