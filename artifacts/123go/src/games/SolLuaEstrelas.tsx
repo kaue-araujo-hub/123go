@@ -4,9 +4,9 @@ import { AppleEmoji } from '../utils/AppleEmoji';
 
 const PERIODS = [
   { name: 'Manhã',     emoji: '🌅', bg: '#FFF9C4', textColor: '#E65100',
-    activities: [{ emoji: '🪥', label: 'escovar dentes' }, { emoji: '☕', label: 'café da manhã' }] },
+    activities: [{ emoji: '🍽️', label: 'almoçar' }, { emoji: '☕', label: 'café da manhã' }] },
   { name: 'Tarde',     emoji: '☀️', bg: '#FFE0B2', textColor: '#BF360C',
-    activities: [{ emoji: '📚', label: 'escola' }, { emoji: '🍱', label: 'almoço' }] },
+    activities: [{ emoji: '🥘', label: 'jantar' }, { emoji: '🍱', label: 'almoço' }] },
   { name: 'Noite',     emoji: '🌙', bg: '#1A237E', textColor: '#fff',
     activities: [{ emoji: '🛁', label: 'banho' }, { emoji: '📖', label: 'história' }] },
   { name: 'Madrugada', emoji: '⭐', bg: '#0D1B2A', textColor: '#B0BEC5',

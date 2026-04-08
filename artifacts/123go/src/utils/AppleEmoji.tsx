@@ -66,6 +66,7 @@ const EMOJI_MAP: Record<string, string> = {
   '🎄': '1f384',
   '❤️': '2764-fe0f',
   '🍽️': '1f37d-fe0f',
+  '🥘': '1f958',
   '📺': '1f4fa',
   '😴': '1f634',
   // ZooTabelas animals
