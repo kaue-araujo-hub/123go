@@ -57,6 +57,7 @@ const EMOJI_MAP: Record<string, string> = {
   '🍌': '1f34c',
   '🐇': '1f407',
   '🍄': '1f344',
+  '⚪': '26aa',
   '🐜': '1f41c',
   '🐞': '1f41e',
   '🐌': '1f40c',

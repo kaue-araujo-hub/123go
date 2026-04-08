@@ -14,6 +14,7 @@ const ITEMS = [
   { emoji: '🍬', color: 'green',  shape: 'circle', id: 'i8' }, // fase 2
   { emoji: '☀️', color: 'blue',   shape: 'circle', id: 'i9' }, // fase 2
   { emoji: '🌿', color: 'green',  shape: 'circle', id: 'i10' }, // fase 4
+  { emoji: '⚪', color: 'white',  shape: 'circle', id: 'i11' }, // fase 1
 ];
 
 type Item = typeof ITEMS[0];
@@ -28,7 +29,7 @@ const PHASES = [
       { key: 'white',  label: '⚪ Branco',  color: '#9E9E9E' },
     ],
     getAttr: (a: Item) => a.color,
-    items: [ITEMS[0], ITEMS[2], ITEMS[3], ITEMS[4], ITEMS[5]], // ⭐ 🤖 🔵 👻 🟡
+    items: [ITEMS[0], ITEMS[2], ITEMS[3], ITEMS[4], ITEMS[5], ITEMS[10]], // ⭐ 🤖 🔵 👻 🟡 ⚪
   },
   {
     label: 'Organize por FORMA!',
