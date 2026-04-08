@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react'
 import { useLocation } from 'wouter';
 import { games } from '../data/games';
 import { temaLabels, temaColors } from '../data/games';
+import { useLogoColors } from '../hooks/useLogoColors';
 
 /* ── Constants ─────────────────────────────────────────────────────── */
 
@@ -542,6 +543,7 @@ export function Header({ onSearch }: HeaderProps) {
   const [, setLocation] = useLocation();
   const [query,            setQuery]            = useState('');
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+  const logoColors = useLogoColors();
   const mobileInputRef = useRef<HTMLInputElement>(null);
 
   const handleSetQuery = useCallback((v: string) => {
@@ -601,12 +603,12 @@ export function Header({ onSearch }: HeaderProps) {
               cursor: 'pointer', userSelect: 'none',
             }}
           >
-            <span style={{ color: 'var(--c3)' }}>1</span>
-            <span style={{ color: 'var(--c2)' }}>2</span>
-            <span style={{ color: 'var(--c1)' }}>3</span>
-            <span style={{ color: 'var(--text)' }}>G</span>
-            <span style={{ color: 'var(--c5)' }}>O</span>
-            <span style={{ color: 'var(--c2)' }}>!</span>
+            <span style={{ color: logoColors[0], transition: 'color 1.2s ease' }}>1</span>
+            <span style={{ color: logoColors[1], transition: 'color 1.2s ease' }}>2</span>
+            <span style={{ color: logoColors[2], transition: 'color 1.2s ease' }}>3</span>
+            <span style={{ color: logoColors[3], transition: 'color 1.2s ease' }}>G</span>
+            <span style={{ color: logoColors[4], transition: 'color 1.2s ease' }}>O</span>
+            <span style={{ color: logoColors[5], transition: 'color 1.2s ease' }}>!</span>
           </div>
 
           {/* Search bar (desktop) */}

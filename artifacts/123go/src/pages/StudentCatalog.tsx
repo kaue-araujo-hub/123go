@@ -4,11 +4,13 @@ import { games } from '../data/games';
 import { StudentGameCard } from '../components/StudentGameCard';
 import { SessionManager } from '../auth/SessionManager';
 import { startBGM, stopBGM } from '../utils/bgm';
+import { useLogoColors } from '../hooks/useLogoColors';
 import styles from './StudentCatalog.module.css';
 
 export function StudentCatalog() {
   const [, setLocation] = useLocation();
   const [searchQuery, setSearchQuery] = useState('');
+  const logoColors = useLogoColors();
 
   /* Always enforce student role on this page */
   useEffect(() => {
@@ -126,12 +128,12 @@ export function StudentCatalog() {
               fontSize: 'clamp(42px, 12vw, 62px)',
               letterSpacing: '-1px', lineHeight: 1, margin: '0 0 4px',
             }}>
-              <span style={{ color: '#F97316' }}>1</span>
-              <span style={{ color: '#6366F1' }}>2</span>
-              <span style={{ color: '#22C55E' }}>3</span>
-              <span style={{ color: '#1A1A2E' }}>G</span>
-              <span style={{ color: '#E91E8C' }}>O</span>
-              <span style={{ color: '#E91E8C' }}>!</span>
+              <span style={{ color: logoColors[0], transition: 'color 1.2s ease' }}>1</span>
+              <span style={{ color: logoColors[1], transition: 'color 1.2s ease' }}>2</span>
+              <span style={{ color: logoColors[2], transition: 'color 1.2s ease' }}>3</span>
+              <span style={{ color: logoColors[3], transition: 'color 1.2s ease' }}>G</span>
+              <span style={{ color: logoColors[4], transition: 'color 1.2s ease' }}>O</span>
+              <span style={{ color: logoColors[5], transition: 'color 1.2s ease' }}>!</span>
             </h1>
 
             <p style={{
