@@ -37,11 +37,9 @@ const PHASES = [
     correct: 8,
   },
   {
-    type: 'bar',
+    type: 'count',
     label: 'Quantos sabores têm MAIS de 4 bolas?',
-    question: 'MAIS que 4',
-    correct: 0,
-    multiAnswer: true,
+    correct: 3,
   },
   {
     type: 'bar',
@@ -158,7 +156,7 @@ export function SorveteriaDados() {
         {phaseData.type === 'count' && (
           <div>
             <p style={{ textAlign: 'center', color: 'var(--text2)', fontSize: 13, marginBottom: 12 }}>
-              Olhe o gráfico — escolha o número certo:
+              Olhe o gráfico e escolha o número certo:
             </p>
             <div style={{ display: 'flex', gap: 14, justifyContent: 'center' }}>
               {countOptions.map(val => (
