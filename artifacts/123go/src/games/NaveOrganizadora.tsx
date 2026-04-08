@@ -10,6 +10,9 @@ const ITEMS = [
   { emoji: '🔵', color: 'blue',   shape: 'circle', id: 'i4' },
   { emoji: '👻', color: 'white',  shape: 'circle', id: 'i5' },
   { emoji: '🟡', color: 'yellow', shape: 'circle', id: 'i6' },
+  { emoji: '🎁', color: 'yellow', shape: 'square', id: 'i7' }, // fase 2
+  { emoji: '🍬', color: 'green',  shape: 'circle', id: 'i8' }, // fase 2
+  { emoji: '☀️', color: 'blue',   shape: 'circle', id: 'i9' }, // fase 2
 ];
 
 type Item = typeof ITEMS[0];
@@ -33,7 +36,7 @@ const PHASES = [
       { key: 'square', label: '⬛ Quadrado', color: '#5B4FCF' },
     ],
     getAttr: (a: Item) => a.shape,
-    items: [ITEMS[0], ITEMS[1], ITEMS[2], ITEMS[3]], // ⭐ 🟢 🤖 🔵
+    items: [ITEMS[6], ITEMS[7], ITEMS[2], ITEMS[8]], // 🎁 🍬 🤖 ☀️
   },
   {
     label: 'Organize por COR!',
