@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>123GO! — Sem conexão</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Nunito Sans', Arial, sans-serif;
+      background:  #1A1A2E;
+      color:       #ffffff;
+      min-height:  100dvh;
+      display:     flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap:         24px;
+      padding:     24px;
+      text-align:  center;
+    }
+    .icon   { font-size: 72px; line-height: 1; }
+    h1 {
+      font-family: 'Nunito', Arial Black, sans-serif;
+      font-weight: 900;
+      font-size:   32px;
+      letter-spacing: -1px;
+    }
+    h1 span:nth-child(1) { color: #F97316; }
+    h1 span:nth-child(2) { color: #6366F1; }
+    h1 span:nth-child(3) { color: #22C55E; }
+    h1 span:nth-child(4) { color: #ffffff; }
+    h1 span:nth-child(5) { color: #E91E8C; }
+    h1 span:nth-child(6) { color: #E91E8C; }
+    p { font-size: 16px; color: rgba(255,255,255,0.65); max-width: 300px; line-height: 1.6; }
+    .btn {
+      background:    linear-gradient(135deg, #5B4FCF, #E91E8C);
+      color:         white;
+      border:        none;
+      border-radius: 50px;
+      padding:       14px 32px;
+      font-family:   'Nunito', Arial Black, sans-serif;
+      font-weight:   800;
+      font-size:     16px;
+      cursor:        pointer;
+      min-height:    52px;
+      touch-action:  manipulation;
+    }
+    .hint { font-size: 13px; color: rgba(255,255,255,0.35); }
+  </style>
+</head>
+<body>
+  <div class="icon">📶</div>
+  <h1>
+    <span>1</span><span>2</span><span>3</span><span>G</span><span>O</span><span>!</span>
+  </h1>
+  <p>Você está sem internet no momento.</p>
+  <button class="btn" onclick="window.location.reload()">
+    Tentar novamente
+  </button>
+  <p class="hint">
+    Após carregar o site uma vez com internet,<br>
+    os jogos funcionam completamente offline.
+  </p>
+</body>
+</html>
