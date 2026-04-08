@@ -160,6 +160,28 @@ export function PizzariaMagica() {
 
       <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
 
+        {/* Portion counter + progress bar — fixed at top */}
+        <div style={{ flexShrink: 0, textAlign: 'center', paddingBottom: 8 }}>
+          <div style={{
+            fontFamily: 'Nunito', fontWeight: 900, fontSize: 22,
+            color: placed >= target ? '#10B981' : 'var(--c1)',
+            marginBottom: 5, transition: 'color 0.3s',
+          }}>
+            {placed} / {target} porções
+          </div>
+          <div style={{
+            width: '80%', height: 8, background: '#F0F0F0',
+            borderRadius: 8, overflow: 'hidden', margin: '0 auto',
+          }}>
+            <div style={{
+              height: '100%', borderRadius: 8,
+              background: placed >= target ? '#10B981' : 'var(--c1)',
+              width: `${pct}%`,
+              transition: 'width 0.4s ease, background 0.3s',
+            }} />
+          </div>
+        </div>
+
         {/* Scattered food area + plate — relative container */}
         <div style={{ position: 'relative', flex: 1, overflow: 'hidden' }}>
 
@@ -191,35 +213,13 @@ export function PizzariaMagica() {
             );
           })}
 
-          {/* Plate — centered in the bottom 40% */}
+          {/* Plate — centered at bottom */}
           <div style={{
             position: 'absolute',
             bottom: 0, left: 0, right: 0,
             display: 'flex', flexDirection: 'column', alignItems: 'center',
             paddingBottom: 8,
           }}>
-            {/* Portion counter */}
-            <div style={{
-              fontFamily: 'Nunito', fontWeight: 900, fontSize: 20,
-              color: placed >= target ? '#10B981' : 'var(--c1)',
-              marginBottom: 4, transition: 'color 0.3s',
-            }}>
-              {placed} / {target} porções
-            </div>
-
-            {/* Progress arc */}
-            <div style={{
-              width: 180, height: 8, background: '#F0F0F0',
-              borderRadius: 8, overflow: 'hidden', marginBottom: 10,
-            }}>
-              <div style={{
-                height: '100%', borderRadius: 8,
-                background: placed >= target ? '#10B981' : 'var(--c1)',
-                width: `${pct}%`,
-                transition: 'width 0.4s ease, background 0.3s',
-              }} />
-            </div>
-
             {/* Plate drop zone */}
             <div
               ref={plateRef}
