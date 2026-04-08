@@ -2,37 +2,48 @@ import React, { useState, useEffect, useRef } from 'react';
 import { GameShell, useGameEngine, FeedbackOverlay, PhaseCompleteCard } from '../engine/GameEngine';
 import { AppleEmoji } from '../utils/AppleEmoji';
 
+/* ── helpers ── */
+function shuffle<T>(arr: T[]): T[] {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+/* ── phase data ── */
 const PHASES = [
   {
-    attribute: 'cor', label: 'Organize por COR!',
+    label: 'Organize por COR!',
     drawers: [
       { label: '🔴 Vermelho', key: 'red',    color: '#EF5350' },
       { label: '🔵 Azul',    key: 'blue',   color: '#42A5F5' },
       { label: '🟡 Amarelo', key: 'yellow', color: '#FFA726' },
     ],
     objects: [
-      { emoji: '🍎', attr: 'red' },    { emoji: '🌹', attr: 'red' },    { emoji: '❤️', attr: 'red' },
-      { emoji: '💙', attr: 'blue' },   { emoji: '🫐', attr: 'blue' },   { emoji: '🐋', attr: 'blue' },
+      { emoji: '🍎', attr: 'red' },    { emoji: '🌹', attr: 'red' },    { emoji: '❤️',  attr: 'red' },
+      { emoji: '💙', attr: 'blue' },   { emoji: '🫐', attr: 'blue' },   { emoji: '🐋',  attr: 'blue' },
       { emoji: '⭐', attr: 'yellow' }, { emoji: '🌟', attr: 'yellow' }, { emoji: '🌻', attr: 'yellow' },
     ],
     mystery: false,
   },
   {
-    attribute: 'forma', label: 'Organize por FORMA!',
+    label: 'Organize por FORMA!',
     drawers: [
-      { label: '⬛ Quadrado', key: 'square',   color: '#5B4FCF' },
-      { label: '⭕ Círculo',  key: 'circle',   color: '#E91E8C' },
-      { label: '🔺 Triângulo',key: 'triangle', color: '#FF6B35' },
+      { label: '⬛ Quadrado',  key: 'square',   color: '#5B4FCF' },
+      { label: '⭕ Círculo',   key: 'circle',   color: '#E91E8C' },
+      { label: '🔺 Triângulo', key: 'triangle', color: '#FF6B35' },
     ],
     objects: [
-      { emoji: '📦', attr: 'square' },   { emoji: '🎁', attr: 'square' },   { emoji: '📱', attr: 'square' },
-      { emoji: '🌍', attr: 'circle' },   { emoji: '⚽', attr: 'circle' },   { emoji: '🎱', attr: 'circle' },
+      { emoji: '📦', attr: 'square' },   { emoji: '🎁', attr: 'square' },   { emoji: '📱',  attr: 'square' },
+      { emoji: '🌍', attr: 'circle' },   { emoji: '⚽', attr: 'circle' },   { emoji: '🎱',  attr: 'circle' },
       { emoji: '🍕', attr: 'triangle' }, { emoji: '⛰️', attr: 'triangle' }, { emoji: '🎄', attr: 'triangle' },
     ],
     mystery: false,
   },
   {
-    attribute: 'tamanho', label: 'Organize por TAMANHO!',
+    label: 'Organize por TAMANHO!',
     drawers: [
       { label: '🔹 Pequeno', key: 'small',  color: '#4CAF50' },
       { label: '🔷 Médio',   key: 'medium', color: '#FF9800' },
@@ -46,25 +57,25 @@ const PHASES = [
     mystery: false,
   },
   {
-    attribute: 'cor+forma', label: 'Organize por COR e FORMA!',
+    label: 'Organize por COR e FORMA!',
     drawers: [
-      { label: '🔴⬛ Vermelho Quadrado', key: 'red-square',       color: '#EF5350' },
-      { label: '🔵⭕ Azul Círculo',      key: 'blue-circle',      color: '#42A5F5' },
-      { label: '🟡🔺 Amarelo Triângulo', key: 'yellow-triangle',  color: '#FFA726' },
+      { label: '🔴⬛ Verm. Quad.', key: 'red-square',      color: '#EF5350' },
+      { label: '🔵⭕ Azul Circ.',  key: 'blue-circle',     color: '#42A5F5' },
+      { label: '🟡🔺 Amar. Tri.',  key: 'yellow-triangle', color: '#FFA726' },
     ],
     objects: [
-      { emoji: '🟥', attr: 'red-square' },      { emoji: '❤️', attr: 'red-square' },       { emoji: '🔴', attr: 'red-square' },
-      { emoji: '🔵', attr: 'blue-circle' },     { emoji: '💙', attr: 'blue-circle' },      { emoji: '🫐', attr: 'blue-circle' },
+      { emoji: '🟥', attr: 'red-square' },      { emoji: '❤️',  attr: 'red-square' },      { emoji: '🔴', attr: 'red-square' },
+      { emoji: '🔵', attr: 'blue-circle' },     { emoji: '💙',  attr: 'blue-circle' },     { emoji: '🫐', attr: 'blue-circle' },
       { emoji: '⭐', attr: 'yellow-triangle' }, { emoji: '🌟', attr: 'yellow-triangle' },  { emoji: '🏔️', attr: 'yellow-triangle' },
     ],
     mystery: false,
   },
   {
-    attribute: 'mistério', label: 'Descubra o atributo misterioso!',
+    label: 'Descubra o habitat misterioso!',
     drawers: [
-      { label: '?', key: 'water', color: '#00B4D8' },
-      { label: '?', key: 'land',  color: '#4CAF50' },
-      { label: '?', key: 'sky',   color: '#5B4FCF' },
+      { label: '🌊 Água', key: 'water', color: '#00B4D8' },
+      { label: '🌿 Terra', key: 'land',  color: '#4CAF50' },
+      { label: '☁️ Céu',  key: 'sky',   color: '#5B4FCF' },
     ],
     objects: [
       { emoji: '🐟', attr: 'water' }, { emoji: '🐠', attr: 'water' }, { emoji: '🦈', attr: 'water' },
@@ -75,56 +86,93 @@ const PHASES = [
   },
 ];
 
-const MYSTERY_HINTS: Record<string, string> = { water: '🌊 Água', land: '🌿 Terra', sky: '☁️ Céu' };
-
 export function AtelieOrdem() {
   const { phase, score, phaseComplete, gameComplete, onCorrect, onPhaseComplete, nextPhase, restart } = useGameEngine(5);
-  const [feedback, setFeedback] = useState<'correct' | 'wrong' | null>(null);
-  const [placed, setPlaced] = useState<Record<string, string[]>>({});
-  const [selected, setSelected] = useState<{ emoji: string; attr: string } | null>(null);
-  const [correctCount, setCorrectCount] = useState(0);
+
+  const [feedback,    setFeedback]    = useState<'correct' | 'wrong' | null>(null);
+  const [placed,      setPlaced]      = useState<Record<string, string[]>>({});
+  const [shuffled,    setShuffled]    = useState<{ emoji: string; attr: string }[]>([]);
+
+  /* drag state */
+  const [draggingObj, setDraggingObj] = useState<{ emoji: string; attr: string } | null>(null);
+  const [ghostPos,    setGhostPos]    = useState<{ x: number; y: number } | null>(null);
+  const [hoveredKey,  setHoveredKey]  = useState<string | null>(null);
+
+  const draggingRef       = useRef<{ emoji: string; attr: string } | null>(null);
+  const drawerNodeRefs    = useRef<Record<string, HTMLDivElement | null>>({});
   const phaseCompletedRef = useRef(false);
-  const correctRef = useRef(0);
+
   const phaseData = PHASES[phase - 1];
 
+  /* shuffle objects fresh each phase */
   useEffect(() => {
     phaseCompletedRef.current = false;
-    correctRef.current = 0;
     setPlaced({});
     setFeedback(null);
-    setSelected(null);
-    setCorrectCount(0);
-  }, [phase]);
+    setDraggingObj(null);
+    setGhostPos(null);
+    setHoveredKey(null);
+    setShuffled(shuffle(phaseData.objects));
+  }, [phase]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const remaining = phaseData.objects.filter(o => !Object.values(placed).flat().includes(o.emoji));
+  const remaining = shuffled.filter(o => !Object.values(placed).flat().includes(o.emoji));
 
+  /* complete detection */
   useEffect(() => {
-    if (remaining.length === 0 && !phaseCompletedRef.current) {
+    if (remaining.length === 0 && shuffled.length > 0 && !phaseCompletedRef.current) {
       phaseCompletedRef.current = true;
       setFeedback('correct');
       onCorrect();
-      setTimeout(() => { setFeedback(null); onPhaseComplete(); }, 1000);
+      setTimeout(() => { setFeedback(null); onPhaseComplete(); }, 900);
     }
-  }, [remaining.length, onCorrect, onPhaseComplete]);
+  }, [remaining.length, shuffled.length, onCorrect, onPhaseComplete]);
 
-  const handleObjectTap = (obj: { emoji: string; attr: string }) => {
-    if (phaseCompletedRef.current) return;
-    setSelected(prev => prev?.emoji === obj.emoji ? null : obj);
+  /* ── drag helpers ── */
+  const getHoveredDrawer = (x: number, y: number): string | null => {
+    for (const key of Object.keys(drawerNodeRefs.current)) {
+      const el = drawerNodeRefs.current[key];
+      if (!el) continue;
+      const r = el.getBoundingClientRect();
+      if (x >= r.left && x <= r.right && y >= r.top && y <= r.bottom) return key;
+    }
+    return null;
   };
 
-  const handleDrawerTap = (drawerKey: string) => {
-    if (!selected || phaseCompletedRef.current) return;
-    const correct = selected.attr === drawerKey;
-    if (correct) {
-      setPlaced(prev => ({ ...prev, [drawerKey]: [...(prev[drawerKey] || []), selected.emoji] }));
-      const nc = correctRef.current + 1;
-      correctRef.current = nc;
-      setCorrectCount(nc);
-      setSelected(null);
-    } else {
-      setFeedback('wrong');
-      setTimeout(() => setFeedback(null), 600);
-    }
+  const startDrag = (e: React.PointerEvent, obj: { emoji: string; attr: string }) => {
+    if (phaseCompletedRef.current || feedback) return;
+    e.currentTarget.setPointerCapture(e.pointerId);
+    draggingRef.current = obj;
+    setDraggingObj(obj);
+    setGhostPos({ x: e.clientX, y: e.clientY });
+
+    const onMove = (ev: PointerEvent) => {
+      setGhostPos({ x: ev.clientX, y: ev.clientY });
+      setHoveredKey(getHoveredDrawer(ev.clientX, ev.clientY));
+    };
+
+    const onUp = (ev: PointerEvent) => {
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerup',   onUp);
+
+      const key = getHoveredDrawer(ev.clientX, ev.clientY);
+      const obj = draggingRef.current;
+      draggingRef.current = null;
+      setDraggingObj(null);
+      setGhostPos(null);
+      setHoveredKey(null);
+
+      if (!key || !obj) return;
+
+      if (obj.attr === key) {
+        setPlaced(prev => ({ ...prev, [key]: [...(prev[key] || []), obj.emoji] }));
+      } else {
+        setFeedback('wrong');
+        setTimeout(() => setFeedback(null), 600);
+      }
+    };
+
+    window.addEventListener('pointermove', onMove);
+    window.addEventListener('pointerup',   onUp);
   };
 
   if (phaseComplete) {
@@ -138,72 +186,106 @@ export function AtelieOrdem() {
   return (
     <GameShell title="Ateliê da Ordem" emoji="🗂️" color="var(--c1)" currentPhase={phase} totalPhases={5} score={score} onRestart={restart}>
       <FeedbackOverlay type={feedback} />
-      <div style={{ textAlign: 'center', marginBottom: 12 }}>
-        <h2 style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 17, color: 'var(--text)', marginBottom: 4 }}>
+
+      {/* Ghost */}
+      {ghostPos && draggingObj && (
+        <div style={{
+          position: 'fixed',
+          left: ghostPos.x - 36, top: ghostPos.y - 36,
+          width: 72, height: 72,
+          background: '#fff', borderRadius: 18,
+          border: '3px solid var(--c1)',
+          boxShadow: '0 8px 24px rgba(0,0,0,0.2)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          zIndex: 9999, pointerEvents: 'none',
+          transform: 'scale(1.15)',
+        }}>
+          <AppleEmoji emoji={draggingObj.emoji} size={46} />
+        </div>
+      )}
+
+      <div style={{ textAlign: 'center', marginBottom: 10 }}>
+        <h2 style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 17, color: 'var(--text)', margin: 0 }}>
           {phaseData.label}
         </h2>
-        {selected && <p style={{ color: 'var(--c3)', fontSize: 13, fontWeight: 700 }}>Agora toque na gaveta correta!</p>}
-        {!selected && remaining.length > 0 && <p style={{ color: 'var(--text2)', fontSize: 13 }}>Toque em um objeto para selecionar</p>}
-        {phaseData.mystery && correctCount >= 2 && (
-          <p style={{ color: '#00B4D8', fontSize: 12, fontWeight: 700, marginTop: 4 }}>
-            💡 Dica: cada gaveta representa um habitat — {Object.keys(MYSTERY_HINTS).map(k => MYSTERY_HINTS[k]).join(', ')}
-          </p>
+        <p style={{ color: 'var(--text2)', fontSize: 12, marginTop: 4 }}>
+          Arraste cada objeto até a gaveta correta
+        </p>
+      </div>
+
+      {/* Objects area */}
+      <div style={{
+        background: '#fff', borderRadius: 'var(--radius)',
+        border: '1.5px solid var(--border)',
+        padding: '10px 8px', marginBottom: 14,
+        display: 'flex', flexWrap: 'wrap', gap: 8,
+        justifyContent: 'center', minHeight: 82,
+      }}>
+        {remaining.length === 0 && (
+          <p style={{ color: 'var(--c5)', fontWeight: 700, margin: 'auto' }}>✅ Tudo organizado!</p>
         )}
+        {remaining.map(obj => {
+          const isDraggingMe = draggingObj?.emoji === obj.emoji;
+          return (
+            <div
+              key={obj.emoji}
+              onPointerDown={e => startDrag(e, obj)}
+              style={{
+                width: 64, height: 64,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                cursor: 'grab', background: 'var(--bg)', borderRadius: 16,
+                border: '2px solid var(--border)',
+                boxShadow: isDraggingMe ? 'none' : '0 2px 6px rgba(0,0,0,0.08)',
+                touchAction: 'none', userSelect: 'none',
+                opacity: isDraggingMe ? 0.3 : 1,
+                transition: 'opacity 0.15s, transform 0.15s',
+                transform: isDraggingMe ? 'scale(0.9)' : 'scale(1)',
+              }}
+            >
+              <AppleEmoji emoji={obj.emoji} size={44} />
+            </div>
+          );
+        })}
       </div>
 
-      {/* Objects */}
-      <div style={{ background: '#fff', borderRadius: 'var(--radius)', border: '1.5px solid var(--border)', padding: 12, marginBottom: 12, display: 'flex', flexWrap: 'wrap', gap: 8, justifyContent: 'center', minHeight: 72 }}>
-        {remaining.map(obj => (
-          <div
-            key={obj.emoji}
-            onPointerUp={() => handleObjectTap(obj)}
-            style={{
-              width: 62, height: 62, display: 'flex', alignItems: 'center', justifyContent: 'center',
-              cursor: 'pointer', background: selected?.emoji === obj.emoji ? '#E3F2FD' : 'var(--bg)',
-              borderRadius: 16, border: `2.5px solid ${selected?.emoji === obj.emoji ? 'var(--c3)' : 'var(--border)'}`,
-              boxShadow: selected?.emoji === obj.emoji ? '0 0 0 3px rgba(91,79,207,0.3)' : '0 2px 6px rgba(0,0,0,0.07)',
-              transition: 'all 0.15s', touchAction: 'manipulation',
-              transform: selected?.emoji === obj.emoji ? 'scale(1.1) translateZ(0)' : 'scale(1) translateZ(0)',
-            }}
-          >
-            <AppleEmoji emoji={obj.emoji} size={44} />
-          </div>
-        ))}
-        {remaining.length === 0 && <p style={{ color: 'var(--c5)', fontWeight: 700, margin: 0 }}>✅ Tudo organizado!</p>}
-      </div>
-
-      {/* Drawers */}
+      {/* Drawer drop zones */}
       <div style={{ display: 'flex', gap: 8 }}>
         {phaseData.drawers.map(drawer => {
-          const hint = phaseData.mystery && correctCount >= 2 ? MYSTERY_HINTS[drawer.key] : null;
+          const isHovered = hoveredKey === drawer.key;
           return (
             <div
               key={drawer.key}
-              onPointerUp={() => handleDrawerTap(drawer.key)}
+              ref={el => { drawerNodeRefs.current[drawer.key] = el; }}
               style={{
                 flex: 1, padding: '8px 6px', borderRadius: 16,
-                border: `3px solid ${selected ? drawer.color : `${drawer.color}88`}`,
-                background: selected ? `${drawer.color}22` : `${drawer.color}10`,
-                minHeight: 130, display: 'flex', flexDirection: 'column', gap: 5,
-                alignItems: 'center', cursor: selected ? 'pointer' : 'default',
-                transition: 'all 0.2s', touchAction: 'manipulation',
+                border: `3px solid ${isHovered ? drawer.color : `${drawer.color}88`}`,
+                background: isHovered ? `${drawer.color}33` : `${drawer.color}12`,
+                minHeight: 130,
+                display: 'flex', flexDirection: 'column', gap: 5,
+                alignItems: 'center',
+                transition: 'border 0.15s, background 0.15s, transform 0.15s',
+                transform: isHovered ? 'scale(1.04)' : 'scale(1)',
+                boxShadow: isHovered ? `0 0 16px ${drawer.color}55` : 'none',
               }}
             >
-              <span style={{ fontSize: 12, fontWeight: 800, color: drawer.color, textAlign: 'center', fontFamily: 'Nunito', lineHeight: 1.2 }}>
-                {hint ?? drawer.label}
+              <span style={{
+                fontSize: 11, fontWeight: 800, color: drawer.color,
+                textAlign: 'center', fontFamily: 'Nunito', lineHeight: 1.2,
+              }}>
+                {drawer.label}
               </span>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 3, justifyContent: 'center', flex: 1, alignContent: 'center' }}>
+              <div style={{
+                display: 'flex', flexWrap: 'wrap', gap: 3,
+                justifyContent: 'center', flex: 1, alignContent: 'center',
+              }}>
                 {(placed[drawer.key] || []).map((emoji, i) => (
-                  <AppleEmoji key={i} emoji={emoji} size={28} />
+                  <AppleEmoji key={i} emoji={emoji} size={26} />
                 ))}
               </div>
             </div>
           );
         })}
       </div>
-      <p style={{ textAlign: 'center', color: 'var(--text3)', fontSize: 11, marginTop: 6 }}>
-        {selected ? `"${selected.emoji}" selecionado — toque na gaveta certa` : 'Toque nos objetos para organizar'}
-      </p>
     </GameShell>
   );
 }
