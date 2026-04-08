@@ -1,26 +1,30 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useRef, useCallback } from 'react';
 import { GameShell, useGameEngine, FeedbackOverlay, PhaseCompleteCard } from '../engine/GameEngine';
-import { AppleEmoji } from '../utils/AppleEmoji';
 
 const ALL_DAYS = [
-  { name: 'Segunda',  emoji: '📘', color: '#5B4FCF' },
-  { name: 'Terça',    emoji: '📗', color: '#4CAF50' },
-  { name: 'Quarta',   emoji: '📙', color: '#FF9800' },
-  { name: 'Quinta',   emoji: '📕', color: '#EF5350' },
-  { name: 'Sexta',    emoji: '📓', color: '#E91E8C' },
-  { name: 'Sábado',   emoji: '📔', color: '#00BCD4' },
-  { name: 'Domingo',  emoji: '📒', color: '#9C27B0' },
+  { name: 'Segunda',  color: '#7C3AED' },
+  { name: 'Terça',    color: '#EF5350' },
+  { name: 'Quarta',   color: '#FF9800' },
+  { name: 'Quinta',   color: '#E91E8C' },
+  { name: 'Sexta',    color: '#4CAF50' },
+  { name: 'Sábado',   color: '#00BCD4' },
+  { name: 'Domingo',  color: '#5B4FCF' },
 ];
 
 const PHASES = [
-  { label: 'Ordene os 2 primeiros dias!',  days: ALL_DAYS.slice(0, 2) },
-  { label: 'Ordene os 5 dias da semana!', days: ALL_DAYS.slice(0, 5) },
-  { label: 'Um dia está faltando!',        days: ALL_DAYS.slice(0, 4), missingIdx: 2 },
-  { label: 'Ordene a semana completa!',   days: ALL_DAYS },
-  { label: 'Ordene todos os 7 dias!',     days: ALL_DAYS },
+  { label: 'Qual é a ordem dos dias?', days: ALL_DAYS.slice(0, 2) },
+  { label: 'Qual é a ordem dos dias?', days: ALL_DAYS.slice(0, 3) },
+  { label: 'Qual é a ordem dos dias?', days: ALL_DAYS.slice(0, 4) },
+  { label: 'Qual é a ordem dos dias?', days: ALL_DAYS.slice(0, 5) },
+  { label: 'Qual é a ordem dos dias?', days: ALL_DAYS },
 ];
 
-function shuffle<T>(arr: T[]): T[] {
+const PLAY_H   = 380;
+const BUBBLE_W = 114;
+const BUBBLE_H = 42;
+const PAD      = 12;
+
+function shuffleArr<T>(arr: T[]): T[] {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -29,100 +33,85 @@ function shuffle<T>(arr: T[]): T[] {
   return a;
 }
 
-const CARD_H = 52;   /* approx card height (px) */
-const CARD_GAP = 7;
+function genPositions(n: number, areaW: number, areaH: number) {
+  const positions: { x: number; y: number }[] = [];
+  for (let i = 0; i < n; i++) {
+    let best = { x: PAD, y: PAD };
+    let bestDist = -1;
+    for (let attempt = 0; attempt < 80; attempt++) {
+      const x = PAD + Math.random() * Math.max(0, areaW - BUBBLE_W - 2 * PAD);
+      const y = PAD + Math.random() * Math.max(0, areaH - BUBBLE_H - 2 * PAD);
+      const minDist = positions.reduce((min, p) => Math.min(min, Math.hypot(p.x - x, p.y - y)), Infinity);
+      if (minDist > bestDist) { bestDist = minDist; best = { x, y }; }
+      if (minDist > BUBBLE_W + PAD) break;
+    }
+    positions.push(best);
+  }
+  return positions;
+}
 
 export function CalendarioVivo() {
   const { phase, score, phaseComplete, gameComplete, onCorrect, onPhaseComplete, nextPhase, restart } = useGameEngine(5);
-  const [order,       setOrder]       = useState<typeof ALL_DAYS>([]);
-  const [feedback,    setFeedback]    = useState<'correct' | 'wrong' | null>(null);
-  const [draggingIdx, setDraggingIdx] = useState<number | null>(null);
-  const [ghostPos,    setGhostPos]    = useState<{ x: number; y: number } | null>(null);
-  const [insertPos,   setInsertPos]   = useState<number | null>(null);   // 0..n inclusive
-
+  const [feedback,       setFeedback]       = useState<'correct' | 'wrong' | null>(null);
+  const [clickedCount,   setClickedCount]   = useState(0);
+  const [remainingDays,  setRemainingDays]  = useState<typeof ALL_DAYS>([]);
+  const [positions,      setPositions]      = useState<{ x: number; y: number }[]>([]);
+  const [correctBubble,  setCorrectBubble]  = useState<string | null>(null);
+  const [wrongBubble,    setWrongBubble]    = useState<string | null>(null);
+  const [areaW,          setAreaW]          = useState(290);
   const phaseCompletedRef = useRef(false);
-  const draggingRef       = useRef<number | null>(null);
-  const cardRefs          = useRef<(HTMLDivElement | null)[]>([]);
+  const containerRef      = useRef<HTMLDivElement>(null);
   const phaseData = PHASES[phase - 1];
 
-  /* ── reset ── */
+  /* measure play area width after mount */
+  useLayoutEffect(() => {
+    if (containerRef.current) setAreaW(containerRef.current.clientWidth);
+  }, []);
+
+  /* reset on phase change */
   useEffect(() => {
     phaseCompletedRef.current = false;
     setFeedback(null);
-    setDraggingIdx(null);
-    setGhostPos(null);
-    setInsertPos(null);
-    cardRefs.current = [];
-    setOrder(shuffle([...phaseData.days]));
-  }, [phase]);
+    setClickedCount(0);
+    setCorrectBubble(null);
+    setWrongBubble(null);
+    const shuffled = shuffleArr([...phaseData.days]);
+    setRemainingDays(shuffled);
+    setPositions(genPositions(shuffled.length, areaW, PLAY_H));
+  }, [phase, areaW]);
 
-  /* ── auto-check after reorder ── */
-  const checkOrder = useCallback((currentOrder: typeof ALL_DAYS) => {
-    if (phaseCompletedRef.current) return;
-    const correct = currentOrder.every((d, i) => d.name === phaseData.days[i].name);
-    if (correct) {
-      phaseCompletedRef.current = true;
-      setFeedback('correct');
-      onCorrect();
-      setTimeout(() => { setFeedback(null); onPhaseComplete(); }, 1000);
+  const reshufflePositions = useCallback((days: typeof ALL_DAYS) => {
+    setPositions(genPositions(days.length, areaW, PLAY_H));
+  }, [areaW]);
+
+  const handleTap = (dayName: string) => {
+    if (phaseCompletedRef.current || correctBubble || wrongBubble) return;
+    const expectedName = phaseData.days[clickedCount].name;
+
+    if (dayName === expectedName) {
+      setCorrectBubble(dayName);
+      setTimeout(() => {
+        setCorrectBubble(null);
+        const newCount = clickedCount + 1;
+        const newRemaining = remainingDays.filter(d => d.name !== dayName);
+        setClickedCount(newCount);
+        setRemainingDays(newRemaining);
+        reshufflePositions(newRemaining);
+
+        if (newCount === phaseData.days.length) {
+          if (!phaseCompletedRef.current) {
+            phaseCompletedRef.current = true;
+            setFeedback('correct');
+            onCorrect();
+            setTimeout(() => { setFeedback(null); onPhaseComplete(); }, 900);
+          }
+        }
+      }, 350);
     } else {
+      setWrongBubble(dayName);
       setFeedback('wrong');
-      setTimeout(() => setFeedback(null), 600);
+      setTimeout(() => { setWrongBubble(null); setFeedback(null); }, 600);
     }
-  }, [phaseData, onCorrect, onPhaseComplete]);
-
-  /* ── get insert position from pointer Y ── */
-  const getInsertPos = useCallback((clientY: number): number => {
-    const rects = cardRefs.current.map(el => el?.getBoundingClientRect() ?? null);
-    for (let i = 0; i < rects.length; i++) {
-      const r = rects[i];
-      if (!r) continue;
-      if (clientY < r.top + r.height / 2) return i;
-    }
-    return rects.length;
-  }, []);
-
-  /* ── drag start ── */
-  const startDrag = (e: React.PointerEvent, idx: number) => {
-    if (phaseCompletedRef.current) return;
-    e.currentTarget.setPointerCapture(e.pointerId);
-    draggingRef.current = idx;
-    setDraggingIdx(idx);
-    setGhostPos({ x: e.clientX, y: e.clientY });
-    setInsertPos(idx);
-
-    const onMove = (ev: PointerEvent) => {
-      setGhostPos({ x: ev.clientX, y: ev.clientY });
-      setInsertPos(getInsertPos(ev.clientY));
-    };
-
-    const onUp = (ev: PointerEvent) => {
-      window.removeEventListener('pointermove', onMove);
-      window.removeEventListener('pointerup',   onUp);
-
-      const from = draggingRef.current!;
-      const to   = getInsertPos(ev.clientY);
-
-      draggingRef.current = null;
-      setDraggingIdx(null);
-      setGhostPos(null);
-      setInsertPos(null);
-
-      if (to === from || to === from + 1) return; /* no movement */
-
-      setOrder(prev => {
-        const next = [...prev];
-        const [removed] = next.splice(from, 1);
-        const insertAt  = to > from ? to - 1 : to;
-        next.splice(insertAt, 0, removed);
-        /* auto-check with new order */
-        setTimeout(() => checkOrder(next), 200);
-        return next;
-      });
-    };
-
-    window.addEventListener('pointermove', onMove);
-    window.addEventListener('pointerup',   onUp);
   };
 
   if (phaseComplete) {
@@ -133,121 +122,59 @@ export function CalendarioVivo() {
     );
   }
 
-  const missingDayName = phaseData.missingIdx !== undefined ? ALL_DAYS[phaseData.missingIdx].name : null;
-  const isDragging     = draggingIdx !== null;
-  const draggedDay     = isDragging ? order[draggingIdx!] : null;
-
   return (
     <GameShell title="Calendário Vivo" emoji="📅" color="var(--c4)" currentPhase={phase} totalPhases={5} score={score} onRestart={restart}>
       <FeedbackOverlay type={feedback} />
 
-      {/* Ghost — follows pointer */}
-      {ghostPos && draggedDay && (
-        <div style={{
-          position: 'fixed',
-          left: ghostPos.x - 140, top: ghostPos.y - CARD_H / 2,
-          width: 280, height: CARD_H,
-          background: '#fff', borderRadius: 14,
-          border: `2.5px solid ${draggedDay.color}`,
-          boxShadow: '0 10px 28px rgba(0,0,0,0.2)',
-          display: 'flex', alignItems: 'center', gap: 10, padding: '0 12px',
-          zIndex: 9999, pointerEvents: 'none',
-          transform: 'scale(1.06)',
-        }}>
-          <AppleEmoji emoji={draggedDay.emoji} size={28} />
-          <span style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 15, color: draggedDay.color, flex: 1 }}>
-            {draggedDay.name}
-          </span>
-        </div>
-      )}
-
-      <div style={{ textAlign: 'center', marginBottom: 12 }}>
+      <div style={{ textAlign: 'center', marginBottom: 10 }}>
         <h2 style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 17, color: 'var(--text)', margin: 0 }}>
           {phaseData.label}
         </h2>
         <p style={{ color: 'var(--text2)', fontSize: 12, marginTop: 4 }}>
-          Arraste os cards para reordenar
+          Toque os dias na ordem certa! &nbsp;
+          <strong style={{ color: 'var(--c4)' }}>{clickedCount}/{phaseData.days.length}</strong>
         </p>
-        {missingDayName && (
-          <div style={{ marginTop: 8, background: '#FFF9C4', border: '2px dashed #F9A825', borderRadius: 12, padding: '6px 14px', display: 'inline-block' }}>
-            <span style={{ fontFamily: 'Nunito', fontWeight: 700, fontSize: 13, color: '#E65100' }}>
-              ❓ Qual dia está faltando?
-            </span>
-          </div>
-        )}
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: CARD_GAP }}>
-        {order.map((day, idx) => {
-          const isBeingDragged = isDragging && draggingIdx === idx;
-
-          /* shift cards to visually preview insert position */
-          let extraTop = 0;
-          if (isDragging && insertPos !== null && draggingIdx !== null) {
-            if (insertPos <= idx && draggingIdx > idx) extraTop = CARD_H + CARD_GAP;
-            if (insertPos > idx && draggingIdx < idx) extraTop = -(CARD_H + CARD_GAP);
-          }
-
+      {/* Play area */}
+      <div
+        ref={containerRef}
+        style={{ position: 'relative', width: '100%', height: PLAY_H, overflow: 'hidden' }}
+      >
+        {remainingDays.map((day, idx) => {
+          const pos = positions[idx] ?? { x: 0, y: 0 };
+          const isCorrect = correctBubble === day.name;
+          const isWrong   = wrongBubble   === day.name;
           return (
-            <div key={day.name} style={{ position: 'relative' }}>
-              {/* insert indicator line — above this card */}
-              {isDragging && insertPos === idx && (
-                <div style={{
-                  height: 3, borderRadius: 2, marginBottom: 4,
-                  background: 'var(--c4)',
-                  animation: 'insertPulse 0.6s ease-in-out infinite',
-                }} />
-              )}
-
-              <div
-                ref={el => { cardRefs.current[idx] = el; }}
-                onPointerDown={e => startDrag(e, idx)}
-                style={{
-                  display: 'flex', alignItems: 'center', gap: 10,
-                  background: isBeingDragged ? 'var(--bg)' : '#fff',
-                  borderRadius: 14,
-                  padding: `9px 12px`,
-                  border: isBeingDragged
-                    ? `2px dashed ${day.color}88`
-                    : `2px solid ${day.color}44`,
-                  opacity: isBeingDragged ? 0.35 : 1,
-                  cursor: 'grab',
-                  touchAction: 'none', userSelect: 'none',
-                  transform: `translateY(${extraTop}px)`,
-                  transition: isDragging && !isBeingDragged ? 'transform 0.15s ease' : 'none',
-                  boxShadow: isBeingDragged ? 'none' : '0 1px 4px rgba(0,0,0,0.07)',
-                }}
-              >
-                <span style={{ fontFamily: 'Nunito', fontWeight: 700, fontSize: 13, color: 'var(--text3)', width: 20 }}>
-                  {idx + 1}.
-                </span>
-                <AppleEmoji emoji={day.emoji} size={28} />
-                <span style={{ fontFamily: 'Nunito', fontWeight: 700, fontSize: 15, flex: 1, color: day.color }}>
-                  {day.name}
-                </span>
-                {/* drag handle */}
-                <span style={{ color: '#ccc', fontSize: 16, letterSpacing: 1 }}>⠿</span>
-              </div>
-
-              {/* insert indicator line — after last card */}
-              {isDragging && insertPos === order.length && idx === order.length - 1 && (
-                <div style={{
-                  height: 3, borderRadius: 2, marginTop: 4,
-                  background: 'var(--c4)',
-                  animation: 'insertPulse 0.6s ease-in-out infinite',
-                }} />
-              )}
+            <div
+              key={day.name}
+              onPointerUp={() => handleTap(day.name)}
+              style={{
+                position: 'absolute',
+                left:     pos.x,
+                top:      pos.y,
+                width:    BUBBLE_W,
+                height:   BUBBLE_H,
+                transition: 'left 0.28s ease, top 0.28s ease, background 0.15s, transform 0.15s',
+                background: isCorrect ? '#4CAF50' : isWrong ? '#EF5350' : day.color,
+                borderRadius: 30,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                cursor: 'pointer',
+                touchAction: 'manipulation', userSelect: 'none',
+                transform: isCorrect ? 'scale(1.12)' : isWrong ? 'scale(0.94)' : 'scale(1)',
+                boxShadow: '0 3px 10px rgba(0,0,0,0.18)',
+              }}
+            >
+              <span style={{
+                fontFamily: 'Nunito', fontWeight: 800, fontSize: 15, color: '#fff',
+                pointerEvents: 'none',
+              }}>
+                {isCorrect ? '✓' : day.name}
+              </span>
             </div>
           );
         })}
       </div>
-
-      <style>{`
-        @keyframes insertPulse {
-          0%, 100% { opacity: 0.5; }
-          50%       { opacity: 1; }
-        }
-      `}</style>
     </GameShell>
   );
 }
