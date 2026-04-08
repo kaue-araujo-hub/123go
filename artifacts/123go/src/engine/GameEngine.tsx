@@ -315,12 +315,13 @@ export function GameShell({ title, emoji, color, currentPhase, totalPhases, chil
         background: '#fff',
         borderBottom: '1px solid var(--border)',
         padding: '0 12px',
-        height: 52,
+        minHeight: 52,
         display: 'flex',
         alignItems: 'center',
         position: 'sticky',
         top: 0,
         zIndex: 50,
+        gap: 8,
       }}>
         {/* LEFT: back + title */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1, minWidth: 0 }}>
@@ -344,11 +345,11 @@ export function GameShell({ title, emoji, color, currentPhase, totalPhases, chil
             }}
           >←</button>
           <AppleEmoji emoji={emoji} size={22} style={{ flexShrink: 0 }} />
-          <h1 style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 14, color: 'var(--text)', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{title}</h1>
+          <h1 style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 13, color: 'var(--text)', minWidth: 0, lineHeight: 1.25 }}>{title}</h1>
         </div>
 
         {/* RIGHT: score only */}
-        <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
+        <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center' }}>
           {score !== undefined && (
             <span className="entry-pop" style={{
               background: color,
