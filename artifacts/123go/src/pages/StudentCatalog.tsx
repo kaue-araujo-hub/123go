@@ -335,6 +335,29 @@ export function StudentCatalog() {
         )}
       </main>
 
+      {/* Subtle teacher area link */}
+      <footer style={{ textAlign: 'center', padding: '10px 0 14px', flexShrink: 0 }}>
+        <button
+          onClick={() => setLocation('/teacher-pin')}
+          style={{
+            background: 'none', border: 'none', cursor: 'pointer',
+            fontFamily: 'Nunito', fontWeight: 600, fontSize: 12,
+            color: '#C4C4C4', letterSpacing: '0.01em',
+            display: 'inline-flex', alignItems: 'center', gap: 5,
+            padding: '4px 10px', borderRadius: 8,
+            transition: 'color 0.15s ease',
+          }}
+          onPointerEnter={e => (e.currentTarget.style.color = '#9CA3AF')}
+          onPointerLeave={e => (e.currentTarget.style.color = '#C4C4C4')}
+        >
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+          </svg>
+          Área do Professor
+        </button>
+      </footer>
+
       <style>{`
         @keyframes scStudentBurst {
           0%   { transform: scale(1); }
