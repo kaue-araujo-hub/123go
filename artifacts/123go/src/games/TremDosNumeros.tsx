@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { GameShell, useGameEngine, FeedbackOverlay, PhaseCompleteCard } from '../engine/GameEngine';
 import { AppleEmoji } from '../utils/AppleEmoji';
 
@@ -18,31 +18,40 @@ function generateProblem(phase: number): { a: number; b: number; op: '+' | '-'; 
 }
 
 function shuffle<T>(arr: T[]): T[] {
-  const a = [...arr]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a;
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
 }
 
-const PHASE_LABELS = ['Adição até 5', 'Adição até 10', 'Subtração até 5', 'Subtração até 10', 'Mix Adição e Subtração'];
+const PHASE_LABELS   = ['Adição até 5', 'Adição até 10', 'Subtração até 5', 'Subtração até 10', 'Mix'];
 const TOTAL_PER_PHASE = [3, 3, 3, 3, 4];
 
 export function TremDosNumeros() {
   const { phase, score, phaseComplete, gameComplete, onCorrect, onPhaseComplete, nextPhase, restart } = useGameEngine(5);
-  const [problem, setProblem] = useState(() => generateProblem(1));
-  const [options, setOptions] = useState<number[]>([]);
-  const [round, setRound] = useState(1);
-  const [feedback, setFeedback] = useState<'correct' | 'wrong' | null>(null);
-  const [dragOver, setDragOver] = useState(false);
-  const [draggingVal, setDraggingVal] = useState<number | null>(null);
+  const [problem, setProblem]     = useState(() => generateProblem(1));
+  const [options, setOptions]     = useState<number[]>([]);
+  const [round, setRound]         = useState(1);
+  const [feedback, setFeedback]   = useState<'correct' | 'wrong' | null>(null);
+
+  /* Drag state */
+  const [dragging, setDragging]   = useState<number | null>(null);
+  const [dragPos,  setDragPos]    = useState<{ x: number; y: number } | null>(null);
+  const [isOver,   setIsOver]     = useState(false);
+
   const phaseCompletedRef = useRef(false);
-  const roundRef = useRef(1);
-  const dropZoneRef = useRef<HTMLDivElement>(null);
+  const roundRef          = useRef(1);
+  const dropZoneRef       = useRef<HTMLDivElement>(null);
+  const draggingRef       = useRef<number | null>(null);
 
   const newProblem = (p: number) => {
-    const prob = generateProblem(p);
+    const prob   = generateProblem(p);
     const decoy1 = prob.ans === 1 ? 2 : prob.ans - 1;
     const decoy2 = prob.ans + 1;
-    const opts = shuffle([prob.ans, decoy1, decoy2]);
     setProblem(prob);
-    setOptions(opts);
+    setOptions(shuffle([prob.ans, decoy1, decoy2]));
   };
 
   useEffect(() => {
@@ -50,51 +59,89 @@ export function TremDosNumeros() {
     roundRef.current = 1;
     setRound(1);
     setFeedback(null);
-    setDragOver(false);
+    setDragging(null);
+    setDragPos(null);
+    setIsOver(false);
+    draggingRef.current = null;
     newProblem(phase <= 4 ? phase : Math.random() > 0.5 ? 1 : 3);
-  }, [phase]);
+  }, [phase]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const handleCorrect = () => {
+  const handleCorrect = useCallback(() => {
     if (phaseCompletedRef.current) return;
     setFeedback('correct');
     onCorrect();
-    const total = TOTAL_PER_PHASE[phase - 1];
+    const total     = TOTAL_PER_PHASE[phase - 1];
     const nextRound = roundRef.current + 1;
     setTimeout(() => {
       setFeedback(null);
-      setDragOver(false);
+      setIsOver(false);
       if (nextRound > total) {
         phaseCompletedRef.current = true;
         onPhaseComplete();
       } else {
         roundRef.current = nextRound;
         setRound(nextRound);
-        const nextOp = phase <= 4 ? phase : Math.random() > 0.5 ? 1 : 3;
-        newProblem(nextOp);
+        newProblem(phase <= 4 ? phase : Math.random() > 0.5 ? 1 : 3);
       }
     }, 800);
-  };
+  }, [phase, onCorrect, onPhaseComplete]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const handleTap = (val: number) => {
-    if (feedback || phaseCompletedRef.current) return;
-    if (val === problem.ans) {
-      handleCorrect();
-    } else {
-      setFeedback('wrong');
-      setTimeout(() => setFeedback(null), 700);
+  const checkDrop = useCallback((x: number, y: number, val: number) => {
+    const zone = dropZoneRef.current;
+    if (!zone) return false;
+    const rect = zone.getBoundingClientRect();
+    const hit  = x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
+    if (hit) {
+      if (val === problem.ans) {
+        handleCorrect();
+      } else {
+        setFeedback('wrong');
+        setTimeout(() => setFeedback(null), 700);
+      }
     }
-  };
+    return hit;
+  }, [problem.ans, handleCorrect]);
 
-  const handleDrop = () => {
-    if (draggingVal === null) return;
-    if (draggingVal === problem.ans) {
-      handleCorrect();
-    } else {
-      setFeedback('wrong');
-      setTimeout(() => setFeedback(null), 700);
-    }
-    setDraggingVal(null);
-    setDragOver(false);
+  /* Global pointer move + up while dragging */
+  useEffect(() => {
+    if (dragging === null) return;
+
+    const onMove = (e: PointerEvent) => {
+      const x = e.clientX;
+      const y = e.clientY;
+      setDragPos({ x, y });
+      const zone = dropZoneRef.current;
+      if (zone) {
+        const rect = zone.getBoundingClientRect();
+        setIsOver(x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom);
+      }
+    };
+
+    const onUp = (e: PointerEvent) => {
+      const val = draggingRef.current;
+      if (val !== null) {
+        checkDrop(e.clientX, e.clientY, val);
+      }
+      setDragging(null);
+      setDragPos(null);
+      setIsOver(false);
+      draggingRef.current = null;
+    };
+
+    window.addEventListener('pointermove', onMove);
+    window.addEventListener('pointerup',   onUp);
+    return () => {
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerup',   onUp);
+    };
+  }, [dragging, checkDrop]);
+
+  const startDrag = (e: React.PointerEvent, val: number) => {
+    e.preventDefault();
+    (e.target as HTMLElement).setPointerCapture(e.pointerId);
+    draggingRef.current = val;
+    setDragging(val);
+    setDragPos({ x: e.clientX, y: e.clientY });
   };
 
   if (phaseComplete) {
@@ -110,6 +157,30 @@ export function TremDosNumeros() {
   return (
     <GameShell title="Trem dos Números" emoji="🚂" color="var(--c3)" currentPhase={phase} totalPhases={5} score={score} onRestart={restart}>
       <FeedbackOverlay type={feedback} />
+
+      {/* Ghost element that follows pointer */}
+      {dragging !== null && dragPos && (
+        <div style={{
+          position: 'fixed',
+          left: dragPos.x - 44,
+          top:  dragPos.y - 44,
+          width: 88, height: 88,
+          borderRadius: 20,
+          background: '#fff',
+          border: '2.5px solid var(--c3)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          fontFamily: 'Nunito', fontWeight: 900, fontSize: 44, color: 'var(--c3)',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.22)',
+          opacity: 0.92,
+          pointerEvents: 'none',
+          zIndex: 9999,
+          transform: 'scale(1.08)',
+          transition: 'transform 0.1s',
+        }}>
+          {dragging}
+        </div>
+      )}
+
       <div style={{ textAlign: 'center', marginBottom: 14 }}>
         <span style={{ background: 'var(--c3)', color: '#fff', padding: '4px 14px', borderRadius: 'var(--radius-pill)', fontSize: 12, fontWeight: 700 }}>
           {PHASE_LABELS[phase - 1]} • Conta {round}/{total}
@@ -128,47 +199,52 @@ export function TremDosNumeros() {
           <div style={{ fontFamily: 'Nunito', fontWeight: 700, fontSize: 34, color: problem.op === '+' ? 'var(--c5)' : 'var(--c2)' }}>{problem.op}</div>
           <div style={{ fontFamily: 'Nunito', fontWeight: 900, fontSize: 46, color: 'var(--text)' }}>{problem.b}</div>
           <div style={{ fontFamily: 'Nunito', fontWeight: 700, fontSize: 34, color: 'var(--text3)' }}>=</div>
+
           {/* Drop zone */}
           <div
             ref={dropZoneRef}
-            onDragOver={e => { e.preventDefault(); setDragOver(true); }}
-            onDragLeave={() => setDragOver(false)}
-            onDrop={handleDrop}
             style={{
               width: 68, height: 68, borderRadius: 14,
-              border: `3px dashed ${dragOver ? 'var(--c3)' : 'var(--border)'}`,
-              background: dragOver ? '#EDE9FF' : 'var(--bg)',
+              border: `3px dashed ${isOver ? 'var(--c3)' : 'var(--border)'}`,
+              background: isOver ? '#EDE9FF' : 'var(--bg)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               fontFamily: 'Nunito', fontWeight: 900, fontSize: 26, color: 'var(--text3)',
-              transition: 'all 0.2s', animation: dragOver ? 'dropPulse 0.8s ease infinite' : undefined,
+              transition: 'all 0.2s',
+              animation: isOver ? 'dropPulse 0.8s ease infinite' : undefined,
             }}
           >?</div>
         </div>
       </div>
 
-      {/* Number options */}
+      {/* Number options — drag only, no tap */}
       <div style={{ display: 'flex', gap: 14, justifyContent: 'center' }}>
         {options.map(val => (
           <div
             key={val}
-            draggable
-            onDragStart={() => setDraggingVal(val)}
-            onPointerUp={() => handleTap(val)}
+            onPointerDown={e => startDrag(e, val)}
             style={{
-              width: 88, height: 88, borderRadius: 20, background: '#fff',
-              border: '2.5px solid var(--border)', display: 'flex',
-              alignItems: 'center', justifyContent: 'center',
-              fontFamily: 'Nunito', fontWeight: 900, fontSize: 44, color: 'var(--text)',
-              cursor: 'pointer', boxShadow: 'var(--shadow)',
-              minHeight: 88, minWidth: 88, transition: 'all 0.15s',
-              touchAction: 'manipulation', userSelect: 'none',
+              width: 88, height: 88, borderRadius: 20,
+              background: dragging === val ? '#F3F0FF' : '#fff',
+              border: `2.5px solid ${dragging === val ? 'var(--c3)' : 'var(--border)'}`,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontFamily: 'Nunito', fontWeight: 900, fontSize: 44,
+              color: dragging === val ? 'var(--c3)' : 'var(--text)',
+              cursor: 'grab',
+              boxShadow: dragging === val ? 'none' : 'var(--shadow)',
+              minHeight: 88, minWidth: 88,
+              transition: 'all 0.15s',
+              touchAction: 'none',
+              userSelect: 'none',
+              opacity: dragging === val ? 0.45 : 1,
             }}
           >{val}</div>
         ))}
       </div>
+
       <p style={{ textAlign: 'center', color: 'var(--text3)', fontSize: 12, marginTop: 10 }}>
-        Toque no número certo ou arraste para o vagão
+        Arraste o número correto para o vagão 🚃
       </p>
+
       <style>{`
         @keyframes dropPulse { 50% { opacity: 0.5; } }
       `}</style>
