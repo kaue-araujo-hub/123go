@@ -62,13 +62,8 @@ export function BaloesdaFesta() {
     }));
   }, [phase, phaseData.total]);
 
-  useEffect(() => {
-    phaseCompletedRef.current = false;
-    setPoppedSet(new Set());
-    setSplashing(new Set());
-    setFeedback(null);
-  }, [phase]);
-
+  /* Completion check runs FIRST so it sees phaseCompletedRef=true from previous phase
+     and does not auto-fire when poppedSet is still carrying the previous phase's items */
   useEffect(() => {
     if (popped >= phaseData.pop && !phaseCompletedRef.current) {
       phaseCompletedRef.current = true;
@@ -77,6 +72,15 @@ export function BaloesdaFesta() {
       setTimeout(() => { setFeedback(null); onPhaseComplete(); }, 1000);
     }
   }, [popped, phaseData.pop, onCorrect, onPhaseComplete]);
+
+  /* Reset runs AFTER completion check — by this point phaseCompletedRef is still true
+     from the previous phase, so the completion effect above skips correctly */
+  useEffect(() => {
+    phaseCompletedRef.current = false;
+    setPoppedSet(new Set());
+    setSplashing(new Set());
+    setFeedback(null);
+  }, [phase]);
 
   const handlePop = useCallback((i: number) => {
     if (phaseCompletedRef.current || popped >= phaseData.pop || poppedSet.has(i) || splashing.has(i)) return;
