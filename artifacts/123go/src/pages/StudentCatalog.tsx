@@ -2,78 +2,17 @@ import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react'
 import { useLocation } from 'wouter';
 import { games } from '../data/games';
 import { StudentGameCard } from '../components/StudentGameCard';
-import { touchStreak, getStreak, getStarsToday, getTotalStars, getLevelInfo } from '../utils/progress';
 import { startBGM, stopBGM } from '../utils/bgm';
 import styles from './StudentCatalog.module.css';
-
-function StatRow({ icon, label, value, highlight = false, flash = false }: {
-  icon: string; label: string; value: string; highlight?: boolean; flash?: boolean;
-}) {
-  return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        <span style={{ fontSize: 16 }}>{icon}</span>
-        <span style={{ fontFamily: 'Nunito', fontSize: 13, color: 'var(--text2)', fontWeight: 600 }}>{label}</span>
-      </div>
-      <span style={{
-        fontFamily: 'Nunito', fontWeight: 800, fontSize: 14,
-        color: highlight ? '#7C3AED' : 'var(--text)',
-        animation: flash ? 'scStudentBurst 0.6s cubic-bezier(.34,1.56,.64,1)' : 'none',
-      }}>
-        {value}
-      </span>
-    </div>
-  );
-}
 
 export function StudentCatalog() {
   const [, setLocation] = useLocation();
   const [searchQuery, setSearchQuery] = useState('');
 
-  /* ── Gamification state ─────────────────────────────── */
-  const [streak,       setStreak]      = useState(() => getStreak());
-  const [starsToday,   setStarsToday]  = useState(() => getStarsToday());
-  const [totalStars,   setTotalStars]  = useState(() => getTotalStars());
-  const [levelInfo,    setLevelInfo]   = useState(() => getLevelInfo());
-  const [progressOpen, setProgressOpen] = useState(false);
-  const [starFlash,    setStarFlash]   = useState(false);
-  const progressRef = useRef<HTMLDivElement>(null);
-
   /* Catalog background music */
   useEffect(() => {
     startBGM('catalog');
     return () => { stopBGM(); };
-  }, []);
-
-  /* Touch streak on first load */
-  useEffect(() => {
-    const s = touchStreak();
-    setStreak(s);
-  }, []);
-
-  /* Listen for star events from games */
-  useEffect(() => {
-    const handler = () => {
-      setStarsToday(getStarsToday());
-      setTotalStars(getTotalStars());
-      setLevelInfo(getLevelInfo());
-      setStreak(getStreak());
-      setStarFlash(true);
-      setTimeout(() => setStarFlash(false), 800);
-    };
-    window.addEventListener('123go-progress-update', handler);
-    return () => window.removeEventListener('123go-progress-update', handler);
-  }, []);
-
-  /* Close progress popover when clicking outside */
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (progressRef.current && !progressRef.current.contains(e.target as Node)) {
-        setProgressOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
   }, []);
 
   const [searchOpen, setSearchOpen] = useState(false);
@@ -104,14 +43,13 @@ export function StudentCatalog() {
 
       <header className={styles.header}>
 
-        {/* ── Search overlay state ── */}
+        {/* ── Search overlay ── */}
         {searchOpen && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1, padding: '10px 14px' }}>
             <div style={{
               flex: 1, display: 'flex', alignItems: 'center', gap: 8,
               background: '#F3F4F6', border: '1.5px solid #E5E7EB',
               borderRadius: 9999, padding: '0 12px 0 14px',
-              transition: 'border-color 0.2s',
             }}>
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
@@ -152,162 +90,51 @@ export function StudentCatalog() {
           </div>
         )}
 
-        {/* ── Default state ── */}
+        {/* ── Default: large centered logo + search icon ── */}
         {!searchOpen && (
-          <>
-            <button
-              className={styles.backBtn}
-              onPointerUp={() => setLocation('/')}
-              aria-label="Voltar à tela inicial"
-              style={{ touchAction: 'manipulation' }}
-            >
-              ←
-            </button>
+          <div style={{ width: '100%', position: 'relative', textAlign: 'center', padding: '20px 16px 12px' }}>
 
-            <h1 className={styles.logo} aria-label="123GO!">
-              <span style={{ color: '#5B4FCF' }}>1</span>
-              <span style={{ color: '#E91E8C' }}>2</span>
-              <span style={{ color: '#FF6B35' }}>3</span>
-              <span style={{ color: '#1A1A2E' }}>G</span>
-              <span style={{ color: '#4CAF50' }}>O</span>
-              <span style={{ color: '#E91E8C' }}>!</span>
-            </h1>
-
-            {/* ── Meu Progresso button + popover ── */}
-        <div ref={progressRef} style={{ position: 'relative', flexShrink: 0 }}>
-          <button
-            onClick={() => setProgressOpen(o => !o)}
-            aria-label="Meu Progresso"
-            style={{
-              display: 'flex', alignItems: 'center', gap: 6,
-              padding: '7px 13px',
-              borderRadius: 9999,
-              border: `1.5px solid ${progressOpen ? '#7C3AED' : '#DDD6FE'}`,
-              background: progressOpen ? '#7C3AED' : '#F5F3FF',
-              color: progressOpen ? '#fff' : '#5B21B6',
-              fontFamily: 'Nunito', fontWeight: 800, fontSize: 13,
-              cursor: 'pointer',
-              transition: 'all 0.18s ease',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            <svg width="20" height="20" viewBox="0 0 20 20">
-              <circle cx="10" cy="10" r="8" fill="none" stroke={progressOpen ? 'rgba(255,255,255,0.3)' : '#DDD6FE'} strokeWidth="2.5" />
-              <circle cx="10" cy="10" r="8" fill="none" stroke={progressOpen ? '#FFD700' : '#7C3AED'}
-                strokeWidth="2.5"
-                strokeDasharray={`${(levelInfo.progressPct / 100) * 50.3} 50.3`}
-                strokeLinecap="round"
-                transform="rotate(-90 10 10)"
-                style={{ transition: 'stroke-dasharray 0.5s ease' }}
-              />
-              <text x="10" y="13.5" textAnchor="middle" fontSize="7" fontWeight="bold"
-                fill={progressOpen ? '#FFD700' : '#7C3AED'} fontFamily="Nunito">
-                {levelInfo.level}
-              </text>
-            </svg>
-            <span className={styles.progressBtnLabel}>Meu Progresso</span>
-            {starsToday > 0 && (
-              <span style={{
-                background: progressOpen ? 'rgba(255,255,255,0.25)' : '#EDE9FE',
-                color: progressOpen ? '#fff' : '#5B21B6',
-                fontSize: 11, fontWeight: 800,
-                padding: '1px 6px', borderRadius: 6,
-                animation: starFlash ? 'scStudentBurst 0.6s cubic-bezier(.34,1.56,.64,1)' : 'none',
-              }}>
-                ⭐ {starsToday}
-              </span>
-            )}
-          </button>
-
-          {/* ── Popover panel (fixed, centered on screen) ── */}
-          {progressOpen && (
-            <div style={{
-              position: 'fixed',
-              top: 62,
-              left: '50%',
-              transform: 'translateX(-50%)',
-              width: 'min(288px, calc(100vw - 32px))',
-              background: '#fff',
-              border: '1.5px solid #E5E7EB',
-              borderRadius: 20,
-              boxShadow: '0 10px 40px rgba(0,0,0,0.16)',
-              zIndex: 400,
-              overflow: 'hidden',
-              animation: 'scSlideDown 0.2s ease',
-            }}>
-              <div style={{
-                background: 'linear-gradient(135deg, #7C3AED, #5B21B6)',
-                padding: '16px 18px 14px',
-                color: '#fff',
-              }}>
-                <div style={{ fontFamily: 'Nunito', fontWeight: 900, fontSize: 15, marginBottom: 10 }}>
-                  🏆 Meu Progresso
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 8 }}>
-                  <span style={{ fontFamily: 'Nunito', fontWeight: 700, fontSize: 13, opacity: 0.9 }}>
-                    Nível {levelInfo.level}
-                  </span>
-                  <span style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 13, color: '#FDE68A' }}>
-                    {levelInfo.progressPct}%
-                  </span>
-                </div>
-                <div style={{ height: 8, background: 'rgba(255,255,255,0.2)', borderRadius: 9999, overflow: 'hidden' }}>
-                  <div style={{
-                    height: '100%',
-                    width: `${levelInfo.progressPct}%`,
-                    background: 'linear-gradient(90deg, #FDE68A, #FCD34D)',
-                    borderRadius: 9999,
-                    transition: 'width 0.6s cubic-bezier(.34,1.56,.64,1)',
-                    boxShadow: '0 0 8px rgba(253,211,77,0.6)',
-                  }} />
-                </div>
-                <div style={{ fontFamily: 'Nunito', fontSize: 11, opacity: 0.7, marginTop: 6 }}>
-                  {levelInfo.starsInLevel} / {levelInfo.starsForLevel} estrelas para o próximo nível
-                </div>
-              </div>
-
-              <div style={{ padding: '14px 18px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-                <StatRow icon="⭐" label="Estrelas hoje" value={starsToday > 0 ? `${starsToday}` : '—'} highlight={starsToday > 0} flash={starFlash} />
-                <StatRow icon="🌟" label="Total de estrelas" value={`${totalStars}`} />
-                <StatRow icon="🔥" label="Sequência de dias" value={`${streak} dia${streak !== 1 ? 's' : ''}`} />
-              </div>
-
-              <div style={{
-                borderTop: '1px solid #E5E7EB',
-                padding: '10px 18px',
-                background: '#FAFAFA',
-                fontFamily: 'Nunito', fontSize: 12, color: '#6B7280',
-                fontWeight: 600, textAlign: 'center',
-              }}>
-                {starsToday === 0
-                  ? '🚀 Jogue um jogo para ganhar sua primeira estrela hoje!'
-                  : starsToday < 3
-                  ? `✨ Ótimo! Você já ganhou ${starsToday} estrela${starsToday !== 1 ? 's' : ''} hoje. Continue!`
-                  : '🎉 Incrível! Você está arrasando hoje!'}
-              </div>
-            </div>
-          )}
-        </div>
-
-            {/* Search icon button */}
+            {/* Search icon — top right */}
             <button
               onPointerUp={openSearch}
               aria-label="Abrir busca"
               style={{
-                marginLeft: 'auto',
-                width: 40, height: 40, borderRadius: '50%',
-                border: '1px solid #E5E7EB',
-                background: '#F9FAFB',
+                position: 'absolute', top: 12, right: 12,
+                width: 38, height: 38, borderRadius: '50%',
+                border: '1.5px solid #E5E7EB',
+                background: '#fff',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                cursor: 'pointer', flexShrink: 0, touchAction: 'manipulation',
+                cursor: 'pointer', touchAction: 'manipulation',
                 transition: 'background 0.15s ease',
+                boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
               }}
             >
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#6B7280" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B7280" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
               </svg>
             </button>
-          </>
+
+            {/* Big logo */}
+            <h1 aria-label="123GO!" style={{
+              fontFamily: 'Nunito', fontWeight: 900,
+              fontSize: 'clamp(42px, 12vw, 62px)',
+              letterSpacing: '-1px', lineHeight: 1, margin: '0 0 4px',
+            }}>
+              <span style={{ color: '#F97316' }}>1</span>
+              <span style={{ color: '#6366F1' }}>2</span>
+              <span style={{ color: '#22C55E' }}>3</span>
+              <span style={{ color: '#1A1A2E' }}>G</span>
+              <span style={{ color: '#E91E8C' }}>O</span>
+              <span style={{ color: '#E91E8C' }}>!</span>
+            </h1>
+
+            <p style={{
+              fontFamily: 'Nunito', fontWeight: 600, fontSize: 13,
+              color: '#9CA3AF', margin: 0,
+            }}>
+              Jogos de matemática
+            </p>
+          </div>
         )}
       </header>
 
@@ -358,20 +185,6 @@ export function StudentCatalog() {
         </button>
       </footer>
 
-      <style>{`
-        @keyframes scStudentBurst {
-          0%   { transform: scale(1); }
-          40%  { transform: scale(1.5); }
-          100% { transform: scale(1); }
-        }
-        @keyframes scSlideDown {
-          from { opacity: 0; transform: translateX(-50%) translateY(-8px); }
-          to   { opacity: 1; transform: translateX(-50%) translateY(0); }
-        }
-        @media (max-width: 520px) {
-          .${styles.progressBtnLabel} { display: none !important; }
-        }
-      `}</style>
     </div>
   );
 }

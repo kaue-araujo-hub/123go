@@ -41,7 +41,7 @@ function NotFound() {
 function Router() {
   return (
     <Switch>
-      <Route path="/"            component={EntryScreen} />
+      <Route path="/"            component={StudentCatalog} />
       <Route path="/student"     component={StudentCatalog} />
       <Route path="/teacher-pin" component={TeacherPinScreen} />
       <Route path="/catalog"     component={Catalog} />
