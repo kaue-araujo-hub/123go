@@ -1,9 +1,17 @@
 /**
  * bgm.ts — Procedural Background Music Engine for 123GO!
  *
- * 7 distinct game tracks (max 3 games each) + 1 catalog track.
- * Synthesised with the Web Audio API — no external files needed.
- * Global volume: 30 %. Seamless looping via scheduled oscillators.
+ * 6 thematic game tracks + 1 catalog track.
+ * All synthesised with Web Audio API — no external files needed.
+ *
+ * Track → Theme mapping:
+ *   natureza  — Nature/Animals  : g01 g05 g11 g20 g21
+ *   espaco    — Space/Tech      : g09 g12 g13
+ *   aliment   — Food/Daily      : g04 g06 g08 g10 g19
+ *   trem      — Train           : g07
+ *   galaxia   — Galaxy/Stars    : g02 g03
+ *   ventania  — Wind/Celestial  : g16 g17
+ *   catalog   — Catalog page
  */
 
 // ── Shared AudioContext ───────────────────────────────────────────────
@@ -15,7 +23,6 @@ let _playing = false;
 
 const BASE_VOL = 0.15;
 
-// Read mute state from localStorage (shared with sounds.ts)
 let _muted = (() => {
   try { return localStorage.getItem('123go-muted') === 'true'; } catch { return false; }
 })();
@@ -38,108 +45,150 @@ function getMaster(): GainNode {
 
 // ── Note frequency table ──────────────────────────────────────────────
 const N = {
-  R:0,
+  R: 0,
   C4:261.63, D4:293.66, E4:329.63, F4:349.23, G4:392.00, A4:440.00, Bb4:466.16, B4:493.88,
   C5:523.25, D5:587.33, Eb5:622.25, E5:659.25, F5:698.46, G5:783.99, A5:880.00, Bb5:932.33,
   B5:987.77,
 } as const;
 
-// ── Melody definitions ────────────────────────────────────────────────
-// Each step: [frequency, duration-in-seconds]  (N.R = rest)
 type Step = [number, number];
 
-/** Convert beats → seconds at a given BPM (default 132). */
-const b = (beats: number, bpm = 132) => (60 / bpm) * beats;
+/** Convert beats → seconds at a given BPM. */
+const b = (beats: number, bpm = 120) => (60 / bpm) * beats;
 
-const MELODIES: Record<string, { steps: Step[]; wave: OscillatorType }> = {
+interface TrackDef {
+  steps: Step[];
+  wave:  OscillatorType;
+  vol:   number;   // per-note amplitude (master gain sets overall level)
+}
 
-  /** Track 1 — "Festa Alegre" · C major pentatonic, bouncy 8-bit
-   *  Games: g01 Festa da Lagarta · g05 Rã Puladora · g17 Calendário Vivo */
-  track1: {
-    wave: 'square',
+const MELODIES: Record<string, TrackDef> = {
+
+  /**
+   * NATUREZA — pentatonic C major, sine wave, BPM 76
+   * Flauta suave + xilofone, ritmos orgânicos ao ar livre
+   * Games: g01 Festa Lagarta · g05 Rã Puladora · g11 Jardim Padrões · g20 Zoo Tabelas · g21 Meus Pets
+   */
+  natureza: {
+    wave: 'sine',
+    vol: 0.14,
     steps: [
-      [N.G4,b(.5)],[N.C5,b(.5)],[N.E5,b(.5)],[N.G5,b(.5)],
-      [N.E5,b(.5)],[N.C5,b(.5)],[N.D5,b(1)] ,[N.R, b(.5)],
-      [N.C5,b(.5)],[N.E5,b(.5)],[N.G5,b(.5)],[N.E5,b(.5)],
-      [N.D5,b(.5)],[N.C5,b(1)] ,[N.R, b(1)],
+      [N.G4, b(1,76)],  [N.A4, b(.5,76)], [N.C5, b(.5,76)], [N.E5, b(1,76)],
+      [N.G5, b(1.5,76)],[N.E5, b(.5,76)], [N.D5, b(1,76)],  [N.C5, b(2,76)],
+      [N.R,  b(.5,76)], [N.A4, b(.5,76)], [N.C5, b(1,76)],  [N.E5, b(1,76)],
+      [N.G5, b(.5,76)], [N.E5, b(.5,76)], [N.C5, b(1,76)],  [N.A4, b(1,76)],
+      [N.G4, b(.5,76)], [N.A4, b(.5,76)], [N.C5, b(1,76)],  [N.G4, b(2,76)],
+      [N.R,  b(1,76)],
     ],
   },
 
-  /** Track 2 — "Estrelas Brilhantes" · A minor, twinkly triangle
-   *  Games: g02 Par ou Ímpar · g03 Caça Estrelas · g06 Balões da Festa */
-  track2: {
+  /**
+   * ESPACO — D minor arpeggio, sawtooth, BPM 138
+   * Sintetizador futurista, estilo chiptune space-ambient
+   * Games: g09 Batalha Constelações · g12 Nave Organizadora · g13 Robô Perdido
+   */
+  espaco: {
+    wave: 'sawtooth',
+    vol: 0.07,
+    steps: [
+      [N.D4, b(.25,138)],[N.A4, b(.25,138)],[N.D5, b(.25,138)],[N.A5, b(.25,138)],
+      [N.D5, b(.25,138)],[N.A4, b(.25,138)],[N.D5, b(.5, 138)],[N.R,  b(.25,138)],
+      [N.C5, b(.25,138)],[N.G4, b(.25,138)],[N.E4, b(.25,138)],[N.G4, b(.25,138)],
+      [N.C5, b(.25,138)],[N.E5, b(.5, 138)],[N.R,  b(.25,138)],
+      [N.A4, b(.25,138)],[N.D5, b(.25,138)],[N.F5, b(.25,138)],[N.A5, b(.25,138)],
+      [N.G5, b(.5, 138)],[N.E5, b(.25,138)],[N.D5, b(.25,138)],
+      [N.C5, b(.25,138)],[N.A4, b(.25,138)],[N.D4, b(1,  138)],[N.R,  b(.5, 138)],
+    ],
+  },
+
+  /**
+   * ALIMENT — C major jazz, triangle wave, BPM 108
+   * Bossa nova infantil, jazz lúdico, melódico e animado
+   * Games: g04 Loja Balas · g06 Balões · g08 Pizzaria · g10 Ateliê · g19 Sorveteria
+   */
+  aliment: {
     wave: 'triangle',
+    vol: 0.12,
     steps: [
-      [N.A4,b(.5)],[N.C5,b(.5)],[N.E5,b(.5)],[N.A5,b(.5)],
-      [N.G5,b(.5)],[N.E5,b(.5)],[N.C5,b(.5)],[N.A4,b(.5)],
-      [N.E5,b(.5)],[N.G5,b(.5)],[N.A5,b(.5)],[N.G5,b(.5)],
-      [N.E5,b(1)] ,[N.A4,b(.5)],[N.R, b(1)],
+      [N.C5, b(.25,108)],[N.R, b(.25,108)],[N.E5, b(.5,108)],
+      [N.G5, b(.5,108)], [N.E5, b(.25,108)],[N.R, b(.25,108)],
+      [N.D5, b(.5,108)], [N.F5, b(.25,108)],[N.R, b(.25,108)],[N.A5, b(.5,108)],
+      [N.G5, b(.75,108)],[N.R, b(.25,108)],
+      [N.E5, b(.25,108)],[N.R, b(.25,108)],[N.G5, b(.5,108)],
+      [N.E5, b(.5,108)], [N.C5, b(.5,108)],[N.D5, b(.25,108)],[N.R, b(.25,108)],
+      [N.E5, b(.5,108)], [N.G5, b(.5,108)],[N.C5, b(1,108)],
+      [N.R,  b(.5,108)],
     ],
   },
 
-  /** Track 3 — "Trem Express" · F major, march rhythm 8-bit
-   *  Games: g04 Loja de Balas · g07 Trem dos Números · g10 Ateliê da Ordem */
-  track3: {
+  /**
+   * TREM — F major march chugging, square wave, BPM 126
+   * Ritmo de trem: da-da-DUM característico das locomotivas
+   * Games: g07 Trem dos Números
+   */
+  trem: {
     wave: 'square',
+    vol: 0.09,
     steps: [
-      [N.F4,b(.25)],[N.A4,b(.25)],[N.C5,b(.5)],[N.A4,b(.25)],[N.F4,b(.25)],[N.C5,b(.5)],
-      [N.E5,b(.5)] ,[N.C5,b(.5)] ,[N.A4,b(.5)],[N.F4,b(.5)],
-      [N.G4,b(.25)],[N.B4,b(.25)],[N.D5,b(.5)],[N.B4,b(.25)],[N.G4,b(.25)],[N.D5,b(.5)],
-      [N.F5,b(.5)] ,[N.D5,b(.5)] ,[N.B4,b(.5)],[N.G4,b(.5)],
+      // Chug: short-short-LONG pattern
+      [N.F4, b(.25,126)],[N.F4, b(.25,126)],[N.C5, b(.5,126)],
+      [N.F4, b(.25,126)],[N.F4, b(.25,126)],[N.A4, b(.5,126)],
+      [N.G4, b(.25,126)],[N.G4, b(.25,126)],[N.D5, b(.5,126)],
+      [N.F4, b(.25,126)],[N.A4, b(.25,126)],[N.C5, b(.75,126)],[N.R, b(.25,126)],
+      [N.G4, b(.25,126)],[N.G4, b(.25,126)],[N.D5, b(.5,126)],
+      [N.G4, b(.25,126)],[N.G4, b(.25,126)],[N.B4, b(.5,126)],
+      [N.A4, b(.25,126)],[N.A4, b(.25,126)],[N.E5, b(.5,126)],
+      [N.F4, b(.25,126)],[N.A4, b(.25,126)],[N.C5, b(.75,126)],[N.R, b(.25,126)],
+      [N.C5, b(.25,126)],[N.C5, b(.25,126)],[N.G5, b(.5,126)],
+      [N.F5, b(.25,126)],[N.E5, b(.25,126)],[N.D5, b(.5,126)],
+      [N.C5, b(.25,126)],[N.A4, b(.25,126)],[N.F4, b(1, 126)],[N.R, b(.5,126)],
     ],
   },
 
-  /** Track 4 — "Jardim Pop" · G major, playful triangle
-   *  Games: g08 Pizzaria Mágica · g11 Jardim de Padrões · g12 Nave Organizadora */
-  track4: {
+  /**
+   * GALAXIA — A minor sparkle, triangle wave, BPM 96
+   * Brilho estrelado, musica de galáxia com notas agudas tintilantes
+   * Games: g02 Par ou Ímpar · g03 Caça Estrelas
+   */
+  galaxia: {
     wave: 'triangle',
+    vol: 0.11,
     steps: [
-      [N.G4,b(.5)],[N.B4,b(.5)],[N.D5,b(.5)],[N.B4,b(.5)],
-      [N.G4,b(1)] ,[N.A4,b(.5)],[N.B4,b(.5)],
-      [N.C5,b(.5)],[N.E5,b(.5)],[N.G5,b(.5)],[N.E5,b(.5)],
-      [N.D5,b(1)] ,[N.C5,b(.5)],[N.B4,b(.5)],
+      [N.A5, b(.25,96)],[N.E5, b(.25,96)],[N.A5, b(.25,96)],[N.B5, b(.25,96)],
+      [N.A5, b(.5, 96)],[N.G5, b(.5, 96)],[N.E5, b(.5, 96)],
+      [N.R,  b(.25,96)],[N.G5, b(.25,96)],[N.A5, b(.25,96)],[N.E5, b(.25,96)],
+      [N.G5, b(.5, 96)],[N.E5, b(.5, 96)],[N.A4, b(1,  96)],
+      [N.R,  b(.25,96)],[N.B5, b(.25,96)],[N.A5, b(.25,96)],[N.G5, b(.25,96)],
+      [N.E5, b(.5, 96)],[N.A5, b(.5, 96)],[N.G5, b(.25,96)],[N.E5, b(.25,96)],
+      [N.A4, b(1,  96)],[N.R,  b(.5, 96)],
     ],
   },
 
-  /** Track 5 — "Cosmo Épico" · D minor, adventurous 8-bit
-   *  Games: g09 Batalha de Constelações · g13 Robô Perdido · g16 Sol, Lua e Estrelas */
-  track5: {
-    wave: 'square',
+  /**
+   * VENTANIA — C major flowing, sine wave, BPM 54
+   * Melodia fluída como vento, subidas e descidas suaves
+   * Games: g16 Sol Lua Estrelas · g17 Calendário Vivo
+   */
+  ventania: {
+    wave: 'sine',
+    vol: 0.13,
     steps: [
-      [N.D4,b(.5)],[N.F4,b(.5)],[N.A4,b(.5)],[N.C5,b(.5)],
-      [N.D5,b(1)] ,[N.C5,b(.5)],[N.A4,b(.5)],
-      [N.G4,b(.5)],[N.A4,b(.5)],[N.C5,b(.5)],[N.E5,b(.5)],
-      [N.D5,b(1)] ,[N.A4,b(.5)],[N.D4,b(.5)],
+      [N.C5, b(1.5,54)],[N.D5, b(.5,54)],[N.E5, b(1,54)],[N.G5, b(2,54)],
+      [N.A5, b(1,54)],  [N.G5, b(.5,54)],[N.E5, b(.5,54)],[N.D5, b(1.5,54)],
+      [N.C5, b(2,54)],  [N.R,  b(.5,54)],
+      [N.G5, b(1.5,54)],[N.E5, b(.5,54)],[N.D5, b(1,54)], [N.E5, b(1,54)],
+      [N.G5, b(1.5,54)],[N.E5, b(.5,54)],[N.C5, b(2,54)],
+      [N.R,  b(1,54)],
     ],
   },
 
-  /** Track 6 — "Mistério Animal" · E minor, mysterious triangle
-   *  Games: g14 Esconde-esconde Animal · g15 Castelo das Posições · g18 Máquina do Tempo */
-  track6: {
-    wave: 'triangle',
-    steps: [
-      [N.E4,b(.5)],[N.G4,b(.5)],[N.B4,b(.5)],[N.D5,b(.5)],
-      [N.E5,b(1)] ,[N.D5,b(.5)],[N.B4,b(.5)],
-      [N.A4,b(.5)],[N.B4,b(.5)],[N.D5,b(.5)],[N.G5,b(.5)],
-      [N.E5,b(1)] ,[N.B4,b(.5)],[N.E4,b(.5)],
-    ],
-  },
-
-  /** Track 7 — "Zoo Divertido" · C blues, jazzy 8-bit
-   *  Games: g19 Sorveteria dos Dados · g20 Zoo das Tabelas · g21 Pesquisa da Turma */
-  track7: {
-    wave: 'square',
-    steps: [
-      [N.C5,b(.5)] ,[N.Eb5,b(.5)],[N.F5,b(.5)],[N.G5,b(.5)],
-      [N.Bb5,b(.5)],[N.G5,b(.5)] ,[N.F5,b(.5)],[N.Eb5,b(.5)],
-      [N.C5,b(.5)] ,[N.F5,b(.5)] ,[N.Eb5,b(.5)],[N.C5,b(.5)],
-      [N.Bb4,b(1)] ,[N.C5,b(.5)] ,[N.R, b(.5)],
-    ],
-  },
-
-  /** Catalog — "Navegando" · gentle C major, slow sine wave, BPM 72 */
+  /**
+   * CATALOG — gentle C major, sine wave, BPM 72
+   * Navegando pelo catálogo: suave e acolhedor
+   */
   catalog: {
     wave: 'sine',
+    vol: 0.11,
     steps: [
       [N.G4,b(1,72)],[N.A4,b(1,72)],[N.B4,b(1,72)],[N.D5,b(1,72)],
       [N.G5,b(1,72)],[N.D5,b(1,72)],[N.B4,b(1,72)],[N.A4,b(1,72)],
@@ -149,34 +198,39 @@ const MELODIES: Record<string, { steps: Step[]; wave: OscillatorType }> = {
   },
 };
 
-// ── Game-ID → track mapping (max 3 games per track) ──────────────────
+// ── Game-ID → track mapping ───────────────────────────────────────────
 const GAME_TRACK: Record<string, string> = {
-  g01:'track1', g05:'track1', g17:'track1',
-  g02:'track2', g03:'track2', g06:'track2',
-  g04:'track3', g07:'track3', g10:'track3',
-  g08:'track4', g11:'track4', g12:'track4',
-  g09:'track5', g13:'track5', g16:'track5',
-  g14:'track6', g15:'track6', g18:'track6',
-  g19:'track7', g20:'track7', g21:'track7',
+  // Natureza / Animais
+  g01: 'natureza', g05: 'natureza', g11: 'natureza', g20: 'natureza', g21: 'natureza',
+  // Espacial / Tecnologia
+  g09: 'espaco',   g12: 'espaco',   g13: 'espaco',
+  // Cotidiano / Alimentação
+  g04: 'aliment',  g06: 'aliment',  g08: 'aliment',  g10: 'aliment',  g19: 'aliment',
+  // Trem
+  g07: 'trem',
+  // Galáxia / Estrelas
+  g02: 'galaxia',  g03: 'galaxia',
+  // Ventania / Celestial
+  g16: 'ventania', g17: 'ventania',
 };
 
 /** Derive the BGM track ID from a game route path (e.g. /games/g01-festa-lagarta). */
 export function getGameTrackId(gamePath: string): string {
   const m = gamePath.match(/\/games\/(g\d{2})/);
-  if (m) return GAME_TRACK[m[1]] ?? 'track1';
-  return 'track1';
+  if (m) return GAME_TRACK[m[1]] ?? 'natureza';
+  return 'natureza';
 }
 
 // ── Core scheduling loop ──────────────────────────────────────────────
 function scheduleLoop(trackId: string, startAt: number): void {
   if (!_playing || _currentTrack !== trackId) return;
 
-  const ac     = getCtx();
-  const mel    = MELODIES[trackId];
+  const ac  = getCtx();
+  const mel = MELODIES[trackId];
   if (!mel) return;
 
   const master   = getMaster();
-  const NOTE_VOL = 0.11; // per-note amplitude; master gain controls overall level
+  const NOTE_VOL = mel.vol;
   let t = startAt;
 
   for (const [freq, dur] of mel.steps) {
@@ -187,9 +241,8 @@ function scheduleLoop(trackId: string, startAt: number): void {
       osc.type = mel.wave;
       osc.frequency.setValueAtTime(freq, t);
 
-      // Short attack + release to avoid clicks
       const attack  = 0.012;
-      const release = Math.min(0.04, dur * 0.15);
+      const release = Math.min(0.05, dur * 0.18);
       gain.gain.setValueAtTime(0, t);
       gain.gain.linearRampToValueAtTime(NOTE_VOL, t + attack);
       gain.gain.setValueAtTime(NOTE_VOL, Math.max(t + attack, t + dur - release));
@@ -203,7 +256,6 @@ function scheduleLoop(trackId: string, startAt: number): void {
     t += dur;
   }
 
-  // Pre-schedule next loop iteration ~120 ms before this one ends
   const msUntil = (t - ac.currentTime - 0.12) * 1000;
   _loopTimer = setTimeout(() => scheduleLoop(trackId, t), Math.max(0, msUntil));
 }
@@ -250,10 +302,7 @@ function _stopInternal(): void {
   _currentTrack = null;
 }
 
-/**
- * Sync mute state with the global toggle.
- * Call this whenever the user clicks the mute/unmute button.
- */
+/** Sync mute state with the global toggle. */
 export function setBGMMuted(muted: boolean): void {
   _muted = muted;
   if (!_masterGain || !_ctx) return;
@@ -267,10 +316,7 @@ export function setBGMMuted(muted: boolean): void {
   }
 }
 
-/**
- * Re-start BGM after unmute (if a track was playing when muted).
- * Call when the user turns off mute to resume music.
- */
+/** Re-start BGM after unmute. */
 export function resumeBGM(): void {
   if (_muted || !_playing || !_currentTrack) return;
   const ac     = getCtx();
