@@ -343,6 +343,80 @@ input {
 }
 
 /* ================================================================
+   DESKTOP: +80% scale — everything bigger on screens ≥ 768px
+   CSS !important overrides both existing rules and inline styles
+   ================================================================ */
+@media (min-width: 768px) {
+
+  /* Expand the game viewport container */
+  .game-area {
+    max-width: 1100px !important;
+    padding: 28px 40px !important;
+  }
+
+  /* Buttons: 96px → 160px min-height (≈ 1.67×);
+     also set min-width so emoji-picker buttons become large squares */
+  .game-area button {
+    min-height: 160px !important;
+    min-width: 160px !important;
+    font-size: 22px !important;
+    border-radius: 24px !important;
+    gap: 14px !important;
+  }
+
+  /* Keep action buttons (PhaseCompleteCard) at a reasonable size */
+  .game-area button.action-btn {
+    min-height: 70px !important;
+    min-width: 0 !important;
+    font-size: 18px !important;
+    border-radius: 50px !important;
+    padding: 0 28px !important;
+  }
+
+  /* Apple emoji images inside buttons: 56 → 100px (1.8×) */
+  .game-area button img.apple-emoji {
+    width: 100px !important;
+    height: 100px !important;
+  }
+
+  /* Apple emoji images outside buttons (game characters, items) */
+  .game-area img.apple-emoji {
+    min-width: 80px !important;
+    min-height: 80px !important;
+  }
+
+  /* Headings */
+  .game-area h2 {
+    font-size: 42px !important;
+    line-height: 1.2 !important;
+  }
+  .game-area h3 {
+    font-size: 34px !important;
+    line-height: 1.2 !important;
+  }
+  .game-area h4 {
+    font-size: 28px !important;
+  }
+
+  /* Body text */
+  .game-area p {
+    font-size: 26px !important;
+    line-height: 1.5 !important;
+  }
+  .game-area label {
+    font-size: 24px !important;
+  }
+  .game-area span {
+    font-size: inherit;
+  }
+
+  /* Gaps and padding inside game sub-containers */
+  .game-area > div {
+    gap: 20px;
+  }
+}
+
+/* ================================================================
    GAME CHARACTER ALIVE
    ================================================================ */
 
