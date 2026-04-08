@@ -372,9 +372,9 @@ export const games: Game[] = [
   },
   {
     id: 21,
-    title: "Pesquisa da Turma",
-    desc: "Colete os votos da turma e veja o gráfico crescer em tempo real!",
-    emoji: "📊",
+    title: "Meus Pets",
+    desc: "Leia o gráfico dos animais favoritos e responda as perguntas!",
+    emoji: "🐾",
     bg: "#E8EAF6",
     ano: 1,
     periodo: 3,
@@ -387,7 +387,7 @@ export const games: Game[] = [
     ageMin: 5, ageMax: 6,
     path: "/games/g21-pesquisa-turma",
     interactionType: "tap",
-    tutorialTheme: { bg: "#E8EAF6", color: "#3F51B5", emoji: "📊" },
+    tutorialTheme: { bg: "#E8EAF6", color: "#3F51B5", emoji: "🐾" },
   },
 ];
 

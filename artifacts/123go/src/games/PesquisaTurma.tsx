@@ -141,7 +141,7 @@ export function PesquisaTurma() {
 
   if (phaseComplete) {
     return (
-      <GameShell title="Pesquisa da Turma" emoji="📊" color="var(--c2)" currentPhase={phase} totalPhases={5} score={score} onRestart={restart}>
+      <GameShell title="Meus Pets" emoji="🐾" color="var(--c2)" currentPhase={phase} totalPhases={5} score={score} onRestart={restart}>
         <PhaseCompleteCard phase={phase} totalPhases={5} score={score} isGameComplete={gameComplete} onNext={nextPhase} onRestart={restart} color="var(--c2)" />
       </GameShell>
     );
@@ -152,7 +152,7 @@ export function PesquisaTurma() {
   const isAnimalPhase = isSingleSelect || isMulti;
 
   return (
-    <GameShell title="Pesquisa da Turma" emoji="📊" color="var(--c2)" currentPhase={phase} totalPhases={5} score={score} onRestart={restart}>
+    <GameShell title="Meus Pets" emoji="🐾" color="var(--c2)" currentPhase={phase} totalPhases={5} score={score} onRestart={restart}>
       <FeedbackOverlay type={feedback} />
 
       <div style={{ textAlign: 'center', marginBottom: 12 }}>
