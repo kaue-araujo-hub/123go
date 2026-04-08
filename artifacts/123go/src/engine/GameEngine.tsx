@@ -1055,24 +1055,6 @@ export function PhaseCompleteCard({ phase, totalPhases, score, isGameComplete, o
             : `Continue para a próxima fase!`}
         </p>
         <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
-          <button
-            className="btn-interactive action-btn"
-            onClick={onRestart}
-            style={{
-              padding: '12px 22px',
-              borderRadius: 'var(--radius-pill)',
-              border: '1.5px solid var(--border)',
-              background: '#fff',
-              color: 'var(--text)',
-              fontFamily: 'Nunito',
-              fontWeight: 700,
-              fontSize: 15,
-              cursor: 'pointer',
-              minHeight: 52,
-            }}
-          >
-            🔄 Recomeçar
-          </button>
           {!isGameComplete && (
             <button
               className="btn-interactive action-btn"
