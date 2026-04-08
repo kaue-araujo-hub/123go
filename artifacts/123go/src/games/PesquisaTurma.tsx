@@ -34,9 +34,9 @@ function BarChart({ highlightIdx }: { highlightIdx?: number }) {
       <p style={{ textAlign: 'center', fontFamily: 'Nunito', fontWeight: 700, fontSize: 12, color: 'var(--text2)', marginBottom: 8 }}>
         Dados da Pesquisa
       </p>
-      <div style={{ display: 'flex', alignItems: 'flex-end', gap: 8, height: 110, justifyContent: 'center' }}>
+      <div style={{ display: 'flex', alignItems: 'flex-end', gap: 8, height: 150, justifyContent: 'center' }}>
         {CHART_DATA.map((d, i) => {
-          const h = Math.round((d.votes / maxV) * 92);
+          const h = Math.round((d.votes / maxV) * 128);
           const isHighlight = highlightIdx === i;
           return (
             <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, flex: 1 }}>
