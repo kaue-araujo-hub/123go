@@ -1,30 +1,73 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { GameShell, useGameEngine, FeedbackOverlay, PhaseCompleteCard } from '../engine/GameEngine';
 import { AppleEmoji } from '../utils/AppleEmoji';
 
 const PHASES = [
-  { theme: '🍕', name: 'Pizza',        total: 5,  have: 2,  need: 3,  note: null },
-  { theme: '🥪', name: 'Sanduíche',    total: 10, have: 4,  need: 6,  note: null },
-  { theme: '🍦', name: 'Sorvete',      total: 8,  have: 10, need: -2, note: 'O cliente devolveu 2 bolas!' },
-  { theme: '🍫', name: 'Brigadeiro',   total: 7,  have: 3,  need: 4,  note: null },
-  { theme: '🎂', name: 'Bolo',         total: 10, have: 6,  need: 4,  note: null },
+  { theme: '🍕', name: 'Pizza',      need: 4,  total: 7  },
+  { theme: '🥪', name: 'Sanduíche',  need: 6,  total: 9  },
+  { theme: '🍦', name: 'Sorvete',    need: 5,  total: 8  },
+  { theme: '🍫', name: 'Brigadeiro', need: 7,  total: 11 },
+  { theme: '🎂', name: 'Bolo',       need: 8,  total: 12 },
 ];
+
+function seededRandom(seed: number) {
+  let s = seed;
+  return () => {
+    s = (s * 1664525 + 1013904223) & 0x7fffffff;
+    return s / 0x80000000;
+  };
+}
+
+/* Generate non-overlapping positions in the top zone (0–60% vertical) */
+function generatePositions(count: number, seed: number): { left: number; top: number }[] {
+  const rand = seededRandom(seed);
+  const positions: { left: number; top: number }[] = [];
+  const MIN_DIST = 18; // % distance threshold
+  let attempts = 0;
+  while (positions.length < count && attempts < 500) {
+    const left = 6 + rand() * 76;   // 6–82%
+    const top  = 5 + rand() * 52;   // 5–57%
+    const tooClose = positions.some(p =>
+      Math.abs(p.left - left) < MIN_DIST && Math.abs(p.top - top) < MIN_DIST
+    );
+    if (!tooClose) positions.push({ left, top });
+    attempts++;
+  }
+  // fallback: grid if too many collisions
+  while (positions.length < count) {
+    const idx  = positions.length;
+    const cols = 4;
+    positions.push({
+      left: 10 + (idx % cols) * 22,
+      top:  10 + Math.floor(idx / cols) * 22,
+    });
+  }
+  return positions;
+}
 
 export function PizzariaMagica() {
   const { phase, score, phaseComplete, gameComplete, onCorrect, onPhaseComplete, nextPhase, restart } = useGameEngine(5);
-  const [placed, setPlaced] = useState(0);
-  const [feedback, setFeedback] = useState<'correct' | 'wrong' | null>(null);
+
+  const [placedSet, setPlacedSet] = useState<Set<number>>(new Set());
+  const [feedback,  setFeedback]  = useState<'correct' | 'wrong' | null>(null);
+  const [dragging,  setDragging]  = useState<number | null>(null);
+  const [dragPos,   setDragPos]   = useState<{ x: number; y: number } | null>(null);
+  const [isOver,    setIsOver]    = useState(false);
+
   const phaseCompletedRef = useRef(false);
+  const draggingRef       = useRef<number | null>(null);
+  const plateRef          = useRef<HTMLDivElement>(null);
+
   const phaseData = PHASES[phase - 1];
-  const target = Math.abs(phaseData.need);
-  const isSubtraction = phaseData.need < 0;
+  const { theme, name, need: target, total } = phaseData;
+  const placed = placedSet.size;
 
-  useEffect(() => {
-    phaseCompletedRef.current = false;
-    setPlaced(0);
-    setFeedback(null);
-  }, [phase]);
+  const itemPositions = useMemo(
+    () => generatePositions(total, phase * 997 + total * 31),
+    [phase, total]
+  );
 
+  /* Completion effect first (sees phaseCompletedRef=true from prev phase) */
   useEffect(() => {
     if (placed >= target && !phaseCompletedRef.current) {
       phaseCompletedRef.current = true;
@@ -34,14 +77,59 @@ export function PizzariaMagica() {
     }
   }, [placed, target, onCorrect, onPhaseComplete]);
 
-  const addSlice = () => {
-    if (placed < target && !phaseCompletedRef.current) {
-      setPlaced(p => p + 1);
-    }
-  };
+  /* Reset after phase changes */
+  useEffect(() => {
+    phaseCompletedRef.current = false;
+    setPlacedSet(new Set());
+    setFeedback(null);
+    setDragging(null);
+    setDragPos(null);
+    setIsOver(false);
+    draggingRef.current = null;
+  }, [phase]);
 
-  const currentTotal = isSubtraction ? phaseData.have - placed : phaseData.have + placed;
-  const canAdd = placed < target;
+  const checkDrop = useCallback((x: number, y: number, idx: number) => {
+    const plate = plateRef.current;
+    if (!plate || placedSet.has(idx) || phaseCompletedRef.current) return;
+    const r   = plate.getBoundingClientRect();
+    const hit = x >= r.left && x <= r.right && y >= r.top && y <= r.bottom;
+    if (hit) setPlacedSet(prev => { const n = new Set(prev); n.add(idx); return n; });
+  }, [placedSet]);
+
+  /* Global pointer listeners */
+  useEffect(() => {
+    if (dragging === null) return;
+    const onMove = (e: PointerEvent) => {
+      setDragPos({ x: e.clientX, y: e.clientY });
+      const plate = plateRef.current;
+      if (plate) {
+        const r = plate.getBoundingClientRect();
+        setIsOver(e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom);
+      }
+    };
+    const onUp = (e: PointerEvent) => {
+      const idx = draggingRef.current;
+      if (idx !== null) checkDrop(e.clientX, e.clientY, idx);
+      setDragging(null);
+      setDragPos(null);
+      setIsOver(false);
+      draggingRef.current = null;
+    };
+    window.addEventListener('pointermove', onMove);
+    window.addEventListener('pointerup',   onUp);
+    return () => {
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerup',   onUp);
+    };
+  }, [dragging, checkDrop]);
+
+  const startDrag = (e: React.PointerEvent, idx: number) => {
+    e.preventDefault();
+    (e.target as HTMLElement).setPointerCapture(e.pointerId);
+    draggingRef.current = idx;
+    setDragging(idx);
+    setDragPos({ x: e.clientX, y: e.clientY });
+  };
 
   if (phaseComplete) {
     return (
@@ -51,71 +139,121 @@ export function PizzariaMagica() {
     );
   }
 
+  const pct = Math.min((placed / target) * 100, 100);
+
   return (
     <GameShell title="Pizzaria Mágica" emoji="🍕" color="var(--c1)" currentPhase={phase} totalPhases={5} score={score} onRestart={restart}>
       <FeedbackOverlay type={feedback} />
-      <div style={{ textAlign: 'center', marginBottom: 14 }}>
-        <span style={{ fontFamily: 'Nunito', fontWeight: 700, fontSize: 17, color: 'var(--text)' }}>
-          {phaseData.theme} {phaseData.name}
-        </span>
-        {phaseData.note && (
-          <p style={{ color: 'var(--c2)', fontSize: 13, fontWeight: 600, marginTop: 4 }}>
-            {isSubtraction ? '↩️ ' : ''}{phaseData.note}
-          </p>
-        )}
-      </div>
 
-      {/* Equation display */}
-      <div style={{ background: '#fff', borderRadius: 'var(--radius)', border: '1.5px solid var(--border)', padding: 20, textAlign: 'center', marginBottom: 18 }}>
-        <p style={{ color: 'var(--text2)', fontSize: 13, marginBottom: 8 }}>
-          Precisa de: <strong>{phaseData.total}</strong> porções
-        </p>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, flexWrap: 'wrap', marginBottom: 10 }}>
-          <span style={{ fontFamily: 'Nunito', fontWeight: 900, fontSize: 52, color: 'var(--text)' }}>{phaseData.have}</span>
-          <span style={{ fontFamily: 'Nunito', fontWeight: 700, fontSize: 30, color: isSubtraction ? 'var(--c2)' : 'var(--c5)' }}>
-            {isSubtraction ? '−' : '+'} {placed}
-          </span>
-          <span style={{ fontFamily: 'Nunito', fontWeight: 700, fontSize: 30, color: 'var(--text3)' }}>=</span>
-          <span style={{ fontFamily: 'Nunito', fontWeight: 900, fontSize: 52, color: currentTotal === phaseData.total ? 'var(--c5)' : 'var(--c1)' }}>
-            {currentTotal}
+      {/* Drag ghost */}
+      {dragging !== null && dragPos && (
+        <div style={{
+          position: 'fixed',
+          left: dragPos.x - 28, top: dragPos.y - 28,
+          pointerEvents: 'none', zIndex: 9999,
+          filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.3))',
+          transform: 'scale(1.15)',
+        }}>
+          <AppleEmoji emoji={theme} size={56} />
+        </div>
+      )}
+
+      <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
+
+        {/* Phase label */}
+        <div style={{ textAlign: 'center', flexShrink: 0, marginBottom: 6 }}>
+          <span style={{
+            background: 'var(--c1)', color: '#fff',
+            padding: '3px 14px', borderRadius: 'var(--radius-pill)',
+            fontSize: 12, fontWeight: 700,
+          }}>
+            {theme} {name} — arraste {target} porções para o prato
           </span>
         </div>
-        {/* Visual slices */}
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, justifyContent: 'center' }}>
-          {Array.from({ length: Math.min(currentTotal, 20) }).map((_, i) => (
-            <AppleEmoji key={i} emoji={phaseData.theme} size={22} />
-          ))}
-          {currentTotal > 20 && <span style={{ fontSize: 11, color: 'var(--text3)', fontWeight: 700 }}>+{currentTotal - 20}</span>}
+
+        {/* Scattered food area + plate — relative container */}
+        <div style={{ position: 'relative', flex: 1, overflow: 'hidden' }}>
+
+          {/* Scattered food items */}
+          {itemPositions.map((pos, i) => {
+            const isPlaced    = placedSet.has(i);
+            const isDraggingMe = dragging === i;
+            if (isPlaced) return null;
+            return (
+              <div
+                key={i}
+                onPointerDown={e => startDrag(e, i)}
+                style={{
+                  position: 'absolute',
+                  left: `${pos.left}%`,
+                  top:  `${pos.top}%`,
+                  marginLeft: -28, marginTop: -28,
+                  cursor: 'grab',
+                  touchAction: 'none',
+                  userSelect: 'none',
+                  opacity: isDraggingMe ? 0.25 : 1,
+                  transition: 'opacity 0.15s',
+                  filter: 'drop-shadow(2px 3px 6px rgba(0,0,0,0.18))',
+                  zIndex: isDraggingMe ? 0 : 2,
+                }}
+              >
+                <AppleEmoji emoji={theme} size={52} />
+              </div>
+            );
+          })}
+
+          {/* Plate — centered in the bottom 40% */}
+          <div style={{
+            position: 'absolute',
+            bottom: 0, left: 0, right: 0,
+            display: 'flex', flexDirection: 'column', alignItems: 'center',
+            paddingBottom: 8,
+          }}>
+            {/* Portion counter */}
+            <div style={{
+              fontFamily: 'Nunito', fontWeight: 900, fontSize: 20,
+              color: placed >= target ? '#10B981' : 'var(--c1)',
+              marginBottom: 4, transition: 'color 0.3s',
+            }}>
+              {placed} / {target} porções
+            </div>
+
+            {/* Progress arc */}
+            <div style={{
+              width: 180, height: 8, background: '#F0F0F0',
+              borderRadius: 8, overflow: 'hidden', marginBottom: 10,
+            }}>
+              <div style={{
+                height: '100%', borderRadius: 8,
+                background: placed >= target ? '#10B981' : 'var(--c1)',
+                width: `${pct}%`,
+                transition: 'width 0.4s ease, background 0.3s',
+              }} />
+            </div>
+
+            {/* Plate drop zone */}
+            <div
+              ref={plateRef}
+              style={{
+                width: 150, height: 150, borderRadius: '50%',
+                background: isOver ? '#FFF0E5' : '#FAFAFA',
+                border: `4px ${isOver ? 'solid' : 'dashed'} ${isOver ? 'var(--c1)' : '#D1D5DB'}`,
+                display: 'flex', flexDirection: 'column',
+                alignItems: 'center', justifyContent: 'center',
+                transition: 'all 0.2s',
+                boxShadow: isOver ? '0 0 0 6px rgba(255,100,0,0.15)' : '0 2px 12px rgba(0,0,0,0.08)',
+                zIndex: 3, position: 'relative',
+              }}
+            >
+              <AppleEmoji emoji="🍽️" size={72} style={{ opacity: isOver ? 0.9 : 0.7 }} />
+            </div>
+
+            <p style={{ color: 'var(--text3)', fontSize: 11, marginTop: 6 }}>
+              Arraste as porções até aqui
+            </p>
+          </div>
         </div>
-        {isSubtraction && (
-          <p style={{ color: 'var(--c2)', fontSize: 12, marginTop: 8, fontWeight: 600 }}>
-            ↩️ Remover: {placed}/{target} devolvidos
-          </p>
-        )}
       </div>
-
-      {/* Progress bar */}
-      <div style={{ background: 'var(--border)', borderRadius: 8, height: 10, marginBottom: 14, overflow: 'hidden' }}>
-        <div style={{ height: '100%', background: 'var(--c1)', width: `${Math.min((placed / target) * 100, 100)}%`, transition: 'width 0.3s ease', borderRadius: 8 }} />
-      </div>
-
-      {/* Add/remove button */}
-      <button
-        onPointerUp={addSlice}
-        disabled={!canAdd}
-        style={{
-          width: '100%', height: 70, borderRadius: 18,
-          background: canAdd ? 'var(--c1)' : 'var(--border)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: 32, cursor: canAdd ? 'pointer' : 'default',
-          fontFamily: 'Nunito', fontWeight: 800, color: '#fff',
-          gap: 10, border: 'none', transition: 'background 0.2s',
-          touchAction: 'manipulation',
-        }}
-      >
-        {isSubtraction ? '↩️' : '➕'} <AppleEmoji emoji={phaseData.theme} size={34} />
-        <span style={{ fontSize: 16 }}>{isSubtraction ? 'Devolver' : 'Adicionar'}</span>
-      </button>
     </GameShell>
   );
 }
