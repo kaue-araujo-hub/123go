@@ -4,31 +4,31 @@ import { AppleEmoji } from '../utils/AppleEmoji';
 
 const PHASES = [
   {
-    label: 'Padrão AB: qual vem a seguir?',
+    label: 'Qual é o próximo?',
     pattern: ['🌹', '🌼', '🌹', '🌼', '🌹'],
     next: '🌼',
     options: ['🌹', '🌼', '🌸'],
   },
   {
-    label: 'Padrão ABC: qual vem a seguir?',
+    label: 'Qual é o próximo?',
     pattern: ['🌹', '🌼', '🌸', '🌹', '🌼'],
     next: '🌸',
     options: ['🌹', '🌸', '🌺'],
   },
   {
-    label: 'Padrão por FORMA: qual vem a seguir?',
+    label: 'Qual é o próximo?',
     pattern: ['⭕', '⬛', '⭕', '⬛', '⭕'],
     next: '⬛',
     options: ['⭕', '⬛', '🔺'],
   },
   {
-    label: 'Padrão por TAMANHO: qual vem a seguir?',
+    label: 'Qual é o próximo?',
     pattern: ['🌸', '🌺', '🌸', '🌺', '🌸'],
     next: '🌺',
     options: ['🌸', '🌺', '🌻'],
   },
   {
-    label: 'Complete o padrão especial!',
+    label: 'Qual é o próximo?',
     pattern: ['🦋', '🐝', '🦋', '🐝', '🦋'],
     next: '🐝',
     options: ['🦋', '🐝', '🐛'],
@@ -148,12 +148,9 @@ export function JardimPadroes() {
       )}
 
       <div style={{ textAlign: 'center', marginBottom: 16 }}>
-        <h2 style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 17, color: 'var(--text)', marginBottom: 4 }}>
+        <h2 style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 17, color: 'var(--text)', marginBottom: 0 }}>
           {phaseData.label}
         </h2>
-        <p style={{ color: 'var(--text2)', fontSize: 12 }}>
-          Arraste a figura correta para completar o padrão
-        </p>
       </div>
 
       {/* Pattern sequence */}
