@@ -3,7 +3,6 @@ import { useLocation } from 'wouter';
 import { games } from '../data/games';
 import { StudentGameCard } from '../components/StudentGameCard';
 import { SessionManager } from '../auth/SessionManager';
-import { startBGM, stopBGM } from '../utils/bgm';
 import { useLogoColors } from '../hooks/useLogoColors';
 import styles from './StudentCatalog.module.css';
 
@@ -17,11 +16,6 @@ export function StudentCatalog() {
     SessionManager.logoutTeacher();
   }, []);
 
-  /* Catalog background music */
-  useEffect(() => {
-    startBGM('catalog');
-    return () => { stopBGM(); };
-  }, []);
 
   const [searchOpen, setSearchOpen] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
