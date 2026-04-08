@@ -52,13 +52,14 @@ function genPositions(n: number, areaW: number, areaH: number) {
 
 export function CalendarioVivo() {
   const { phase, score, phaseComplete, gameComplete, onCorrect, onPhaseComplete, nextPhase, restart } = useGameEngine(5);
-  const [feedback,       setFeedback]       = useState<'correct' | 'wrong' | null>(null);
-  const [clickedCount,   setClickedCount]   = useState(0);
-  const [remainingDays,  setRemainingDays]  = useState<typeof ALL_DAYS>([]);
-  const [positions,      setPositions]      = useState<{ x: number; y: number }[]>([]);
-  const [correctBubble,  setCorrectBubble]  = useState<string | null>(null);
-  const [wrongBubble,    setWrongBubble]    = useState<string | null>(null);
-  const [areaW,          setAreaW]          = useState(290);
+  const [feedback,      setFeedback]      = useState<'correct' | 'wrong' | null>(null);
+  const [clickedCount,  setClickedCount]  = useState(0);
+  const [allDays,       setAllDays]       = useState<typeof ALL_DAYS>([]);
+  const [positions,     setPositions]     = useState<{ x: number; y: number }[]>([]);
+  const [doneDays,      setDoneDays]      = useState<Set<string>>(new Set());
+  const [flashCorrect,  setFlashCorrect]  = useState<string | null>(null);
+  const [wrongBubble,   setWrongBubble]   = useState<string | null>(null);
+  const [areaW,         setAreaW]         = useState(290);
   const phaseCompletedRef = useRef(false);
   const containerRef      = useRef<HTMLDivElement>(null);
   const phaseData = PHASES[phase - 1];
@@ -73,30 +74,32 @@ export function CalendarioVivo() {
     phaseCompletedRef.current = false;
     setFeedback(null);
     setClickedCount(0);
-    setCorrectBubble(null);
+    setFlashCorrect(null);
     setWrongBubble(null);
+    setDoneDays(new Set());
     const shuffled = shuffleArr([...phaseData.days]);
-    setRemainingDays(shuffled);
+    setAllDays(shuffled);
     setPositions(genPositions(shuffled.length, areaW, PLAY_H));
   }, [phase, areaW]);
 
-  const reshufflePositions = useCallback((days: typeof ALL_DAYS) => {
+  const reshuffleAll = useCallback((days: typeof ALL_DAYS) => {
     setPositions(genPositions(days.length, areaW, PLAY_H));
   }, [areaW]);
 
   const handleTap = (dayName: string) => {
-    if (phaseCompletedRef.current || correctBubble || wrongBubble) return;
+    if (phaseCompletedRef.current || flashCorrect || wrongBubble) return;
+    if (doneDays.has(dayName)) return;
     const expectedName = phaseData.days[clickedCount].name;
 
     if (dayName === expectedName) {
-      setCorrectBubble(dayName);
+      setFlashCorrect(dayName);
       setTimeout(() => {
-        setCorrectBubble(null);
+        setFlashCorrect(null);
         const newCount = clickedCount + 1;
-        const newRemaining = remainingDays.filter(d => d.name !== dayName);
+        const newDone  = new Set([...doneDays, dayName]);
+        setDoneDays(newDone);
         setClickedCount(newCount);
-        setRemainingDays(newRemaining);
-        reshufflePositions(newRemaining);
+        reshuffleAll(allDays);
 
         if (newCount === phaseData.days.length) {
           if (!phaseCompletedRef.current) {
@@ -106,7 +109,7 @@ export function CalendarioVivo() {
             setTimeout(() => { setFeedback(null); onPhaseComplete(); }, 900);
           }
         }
-      }, 350);
+      }, 320);
     } else {
       setWrongBubble(dayName);
       setFeedback('wrong');
@@ -130,10 +133,6 @@ export function CalendarioVivo() {
         <h2 style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 17, color: 'var(--text)', margin: 0 }}>
           {phaseData.label}
         </h2>
-        <p style={{ color: 'var(--text2)', fontSize: 12, marginTop: 4 }}>
-          Toque os dias na ordem certa! &nbsp;
-          <strong style={{ color: 'var(--c4)' }}>{clickedCount}/{phaseData.days.length}</strong>
-        </p>
       </div>
 
       {/* Play area */}
@@ -141,10 +140,11 @@ export function CalendarioVivo() {
         ref={containerRef}
         style={{ position: 'relative', width: '100%', height: PLAY_H, overflow: 'hidden' }}
       >
-        {remainingDays.map((day, idx) => {
-          const pos = positions[idx] ?? { x: 0, y: 0 };
-          const isCorrect = correctBubble === day.name;
-          const isWrong   = wrongBubble   === day.name;
+        {allDays.map((day, idx) => {
+          const pos          = positions[idx] ?? { x: 0, y: 0 };
+          const isDone       = doneDays.has(day.name);
+          const isFlash      = flashCorrect === day.name;
+          const isWrong      = wrongBubble  === day.name;
           return (
             <div
               key={day.name}
@@ -155,21 +155,22 @@ export function CalendarioVivo() {
                 top:      pos.y,
                 width:    BUBBLE_W,
                 height:   BUBBLE_H,
-                transition: 'left 0.28s ease, top 0.28s ease, background 0.15s, transform 0.15s',
-                background: isCorrect ? '#4CAF50' : isWrong ? '#EF5350' : day.color,
+                transition: 'left 0.28s ease, top 0.28s ease, background 0.15s, transform 0.15s, opacity 0.25s',
+                background: isFlash ? '#4CAF50' : isWrong ? '#EF5350' : day.color,
                 borderRadius: 30,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                cursor: 'pointer',
+                cursor: isDone ? 'default' : 'pointer',
                 touchAction: 'manipulation', userSelect: 'none',
-                transform: isCorrect ? 'scale(1.12)' : isWrong ? 'scale(0.94)' : 'scale(1)',
-                boxShadow: '0 3px 10px rgba(0,0,0,0.18)',
+                transform: isFlash ? 'scale(1.12)' : isWrong ? 'scale(0.94)' : 'scale(1)',
+                opacity: isDone ? 0.28 : 1,
+                boxShadow: isDone ? 'none' : '0 3px 10px rgba(0,0,0,0.18)',
               }}
             >
               <span style={{
                 fontFamily: 'Nunito', fontWeight: 800, fontSize: 15, color: '#fff',
                 pointerEvents: 'none',
               }}>
-                {isCorrect ? '✓' : day.name}
+                {isFlash ? '✓' : day.name}
               </span>
             </div>
           );
