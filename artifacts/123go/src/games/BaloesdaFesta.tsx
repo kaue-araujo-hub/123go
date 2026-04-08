@@ -8,7 +8,7 @@ const PHASES = [
   { total: 18, pop: 7,  question: 'Estoure 7 balões!' },
   { total: 14, pop: 4,  question: 'Estoure 4 balões!' },
   { total: 18, pop: 6,  question: 'Estoure 6 balões!' },
-  { total: 16, pop: 8,  question: 'Estoure 8 balões!' },
+  { total: 22, pop: 14, question: 'Estoure 14 balões!' },
 ];
 
 const COLOR = ['#5B4FCF', '#E91E8C', '#4CAF50', '#FF9800', '#9C27B0'];
