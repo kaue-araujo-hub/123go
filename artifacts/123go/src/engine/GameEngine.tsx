@@ -1102,7 +1102,7 @@ export function PhaseCompleteCard({ phase, totalPhases, score, isGameComplete, o
             </button>
           )}
           {isGameComplete && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, width: '100%', alignItems: 'center' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, width: '100%' }}>
               <button
                 className="btn-interactive action-btn"
                 onClick={handlePlayAgain}
@@ -1122,46 +1122,44 @@ export function PhaseCompleteCard({ phase, totalPhases, score, isGameComplete, o
               >
                 🔄 Jogar de novo
               </button>
-              <div style={{ display: 'flex', gap: 10, width: '100%' }}>
-                <button
-                  className="btn-interactive action-btn"
-                  onClick={() => setShowShare(true)}
-                  style={{
-                    flex: 1,
-                    padding: '11px 14px',
-                    borderRadius: 'var(--radius-pill)',
-                    border: 'none',
-                    background: '#7C3AED',
-                    color: '#fff',
-                    fontFamily: 'Nunito',
-                    fontWeight: 800,
-                    fontSize: 14,
-                    cursor: 'pointer',
-                    minHeight: 46,
-                  }}
-                >
-                  Compartilhar
-                </button>
-                <button
-                  className="btn-interactive action-btn"
-                  onClick={() => setLocation(catalogPath)}
-                  style={{
-                    flex: 1,
-                    padding: '11px 14px',
-                    borderRadius: 'var(--radius-pill)',
-                    border: '1.5px solid var(--border)',
-                    background: '#fff',
-                    color: 'var(--text)',
-                    fontFamily: 'Nunito',
-                    fontWeight: 700,
-                    fontSize: 14,
-                    cursor: 'pointer',
-                    minHeight: 46,
-                  }}
-                >
-                  Ver outros jogos →
-                </button>
-              </div>
+              <button
+                className="btn-interactive action-btn"
+                onClick={() => setShowShare(true)}
+                style={{
+                  width: '100%',
+                  padding: '13px 22px',
+                  borderRadius: 'var(--radius-pill)',
+                  border: 'none',
+                  background: '#7C3AED',
+                  color: '#fff',
+                  fontFamily: 'Nunito',
+                  fontWeight: 800,
+                  fontSize: 15,
+                  cursor: 'pointer',
+                  minHeight: 52,
+                }}
+              >
+                Compartilhar
+              </button>
+              <button
+                className="btn-interactive action-btn"
+                onClick={() => setLocation(catalogPath)}
+                style={{
+                  width: '100%',
+                  padding: '13px 22px',
+                  borderRadius: 'var(--radius-pill)',
+                  border: '1.5px solid var(--border)',
+                  background: '#fff',
+                  color: 'var(--text)',
+                  fontFamily: 'Nunito',
+                  fontWeight: 700,
+                  fontSize: 15,
+                  cursor: 'pointer',
+                  minHeight: 52,
+                }}
+              >
+                Ver outros jogos →
+              </button>
             </div>
           )}
         </div>
