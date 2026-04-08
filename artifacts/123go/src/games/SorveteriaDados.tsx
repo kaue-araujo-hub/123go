@@ -120,69 +120,71 @@ export function SorveteriaDados() {
     <GameShell title="Sorveteria dos Dados" emoji="🍦" color="var(--c2)" currentPhase={phase} totalPhases={5} score={score} onRestart={restart}>
       <FeedbackOverlay type={feedback} />
 
-      <div style={{ textAlign: 'center', marginBottom: 14 }}>
-        <h2 style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 17, color: 'var(--text)' }}>
-          {phaseData.label}
-        </h2>
-      </div>
-
-      {/* Bar chart */}
-      <div style={{ background: '#fff', borderRadius: 'var(--radius)', border: '1.5px solid var(--border)', padding: '14px 10px', marginBottom: 16 }}>
-        <div style={{ display: 'flex', alignItems: 'flex-end', gap: 10, height: 140, justifyContent: 'center' }}>
-          {FLAVORS.map((f, i) => {
-            const h = Math.round((f.count / maxCount) * 120);
-            return (
-              <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, flex: 1 }}>
-                <span style={{ fontFamily: 'Nunito', fontWeight: 900, fontSize: 14, color: 'var(--text)' }}>{f.count}</span>
-                <button
-                  onPointerUp={() => phaseData.type === 'bar' ? handleFlavorAnswer(i) : undefined}
-                  style={{
-                    width: '100%', height: h, borderRadius: '8px 8px 0 0',
-                    background: f.color, border: `2px solid ${(f as any).borderColor ?? '#0002'}`,
-                    cursor: phaseData.type === 'bar' ? 'pointer' : 'default',
-                    transition: 'all 0.2s', minHeight: 10,
-                    touchAction: 'manipulation',
-                  }}
-                />
-                <span style={{ fontSize: 18 }}><AppleEmoji emoji={f.emoji} size={22} /></span>
-                <span style={{ fontFamily: 'Nunito', fontWeight: 700, fontSize: 10, color: f.color, textAlign: 'center' }}>{f.name}</span>
-              </div>
-            );
-          })}
+      <div style={{ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 0 }}>
+        <div style={{ textAlign: 'center', marginBottom: 14 }}>
+          <h2 style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 17, color: 'var(--text)' }}>
+            {phaseData.label}
+          </h2>
         </div>
-      </div>
 
-      {/* Count question: 3 button options */}
-      {phaseData.type === 'count' && (
-        <div>
-          <p style={{ textAlign: 'center', color: 'var(--text2)', fontSize: 13, marginBottom: 12 }}>
-            Olhe o gráfico — escolha o número certo:
-          </p>
-          <div style={{ display: 'flex', gap: 14, justifyContent: 'center' }}>
-            {countOptions.map(val => (
-              <button
-                key={val}
-                onPointerUp={() => handleCountAnswer(val)}
-                style={{
-                  width: 88, height: 88, borderRadius: 20,
-                  border: '2.5px solid var(--border)', background: '#fff',
-                  fontFamily: 'Nunito', fontWeight: 900, fontSize: 42, color: 'var(--text)',
-                  cursor: 'pointer', minHeight: 88, minWidth: 88,
-                  transition: 'all 0.15s', touchAction: 'manipulation',
-                }}
-              >
-                {val}
-              </button>
-            ))}
+        {/* Bar chart */}
+        <div style={{ background: '#fff', borderRadius: 'var(--radius)', border: '1.5px solid var(--border)', padding: '14px 10px', marginBottom: 16 }}>
+          <div style={{ display: 'flex', alignItems: 'flex-end', gap: 10, height: 140, justifyContent: 'center' }}>
+            {FLAVORS.map((f, i) => {
+              const h = Math.round((f.count / maxCount) * 120);
+              return (
+                <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, flex: 1 }}>
+                  <span style={{ fontFamily: 'Nunito', fontWeight: 900, fontSize: 14, color: 'var(--text)' }}>{f.count}</span>
+                  <button
+                    onPointerUp={() => phaseData.type === 'bar' ? handleFlavorAnswer(i) : undefined}
+                    style={{
+                      width: '100%', height: h, borderRadius: '8px 8px 0 0',
+                      background: f.color, border: `2px solid ${(f as any).borderColor ?? '#0002'}`,
+                      cursor: phaseData.type === 'bar' ? 'pointer' : 'default',
+                      transition: 'all 0.2s', minHeight: 10,
+                      touchAction: 'manipulation',
+                    }}
+                  />
+                  <span style={{ fontSize: 18 }}><AppleEmoji emoji={f.emoji} size={22} /></span>
+                  <span style={{ fontFamily: 'Nunito', fontWeight: 700, fontSize: 10, color: f.color, textAlign: 'center' }}>{f.name}</span>
+                </div>
+              );
+            })}
           </div>
         </div>
-      )}
 
-      {phaseData.type === 'bar' && !answered && (
-        <p style={{ textAlign: 'center', color: 'var(--text3)', fontSize: 12, marginTop: 6 }}>
-          Toque na barra do sabor correto!
-        </p>
-      )}
+        {/* Count question: 3 button options */}
+        {phaseData.type === 'count' && (
+          <div>
+            <p style={{ textAlign: 'center', color: 'var(--text2)', fontSize: 13, marginBottom: 12 }}>
+              Olhe o gráfico — escolha o número certo:
+            </p>
+            <div style={{ display: 'flex', gap: 14, justifyContent: 'center' }}>
+              {countOptions.map(val => (
+                <button
+                  key={val}
+                  onPointerUp={() => handleCountAnswer(val)}
+                  style={{
+                    width: 88, height: 88, borderRadius: 20,
+                    border: '2.5px solid var(--border)', background: '#fff',
+                    fontFamily: 'Nunito', fontWeight: 900, fontSize: 42, color: 'var(--text)',
+                    cursor: 'pointer', minHeight: 88, minWidth: 88,
+                    transition: 'all 0.15s', touchAction: 'manipulation',
+                  }}
+                >
+                  {val}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {phaseData.type === 'bar' && !answered && (
+          <p style={{ textAlign: 'center', color: 'var(--text3)', fontSize: 12, marginTop: 6 }}>
+            Toque na barra do sabor correto!
+          </p>
+        )}
+      </div>
     </GameShell>
   );
 }
