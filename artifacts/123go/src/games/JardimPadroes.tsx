@@ -222,8 +222,7 @@ export function JardimPadroes() {
                 transition: 'border 0.15s, background 0.15s, transform 0.15s',
                 transform: isHovered ? 'scale(1.1)' : isFilled ? 'scale(1.04)' : 'scale(1)',
                 boxShadow: isHovered ? '0 0 12px rgba(245,158,11,0.4)' : 'none',
-                animation: isFilled || draggingOpt ? undefined : 'vasoPulse 1.4s ease-in-out infinite',
-                animationDelay: `${i * 0.18}s`,
+                animation: isFilled || draggingOpt ? 'none' : `vasoPulse 1.4s ease-in-out ${i * 0.18}s infinite`,
               }}
             >
               {isFilled
