@@ -17,9 +17,9 @@ const PHASES = [
   },
   {
     label: 'Qual é o próximo?',
-    pattern: ['⭕', '⬛', '⭕', '⬛', '⭕'],
-    next: '⬛',
-    options: ['⭕', '⬛', '🔺'],
+    pattern: ['🐜', '🐞', '🐜', '🐞', '🐜'],
+    next: '🐞',
+    options: ['🐜', '🐞', '🐌'],
   },
   {
     label: 'Qual é o próximo?',
