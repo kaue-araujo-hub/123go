@@ -172,7 +172,7 @@ export function RaPuladora() {
               >
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, auto)', gap: 2, justifyContent: 'center' }}>
                   {Array.from({ length: visible }).map((_, i) => (
-                    <AppleEmoji key={i} emoji="🌸" size={13} />
+                    <AppleEmoji key={i} emoji="🌸" size={isDesktop ? 22 : 28} />
                   ))}
                 </div>
                 {extra > 0 && (

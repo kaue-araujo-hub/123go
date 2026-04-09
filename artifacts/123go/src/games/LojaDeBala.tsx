@@ -11,8 +11,8 @@ const PHASES = [
   { question: 'Qual pote tem MAIS balas?', potes: [{ count: 8, emoji: '🍬', label: 'A' }, { count: 5, emoji: '🍭', label: 'B' }], correct: 0 },
 ];
 
-function PoteVisual({ count, emoji, label, selected, onTap }: {
-  count: number; emoji: string; label: string; selected?: boolean; onTap: () => void;
+function PoteVisual({ count, emoji, label, selected, onTap, isDesktop }: {
+  count: number; emoji: string; label: string; selected?: boolean; onTap: () => void; isDesktop: boolean;
 }) {
   return (
     <button
@@ -28,13 +28,13 @@ function PoteVisual({ count, emoji, label, selected, onTap }: {
       }}
     >
       <span style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 13, color: 'var(--text2)', flexShrink: 0 }}>Pote {label}</span>
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 3, justifyContent: 'center', maxWidth: 90, overflow: 'hidden' }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, justifyContent: 'center', maxWidth: isDesktop ? 110 : 130, overflow: 'hidden' }}>
         {Array.from({ length: Math.min(count, 20) }).map((_, i) => (
-          <AppleEmoji key={i} emoji={emoji} size={13} />
+          <AppleEmoji key={i} emoji={emoji} size={isDesktop ? 28 : 34} />
         ))}
         {count > 20 && <span style={{ fontSize: 11, color: 'var(--text3)', fontWeight: 700 }}>+{count - 20}</span>}
       </div>
-      <span style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 24, color: 'var(--text)', flexShrink: 0 }}>{count}</span>
+      <span style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: isDesktop ? 20 : 24, color: 'var(--text)', flexShrink: 0 }}>{count}</span>
     </button>
   );
 }
@@ -97,6 +97,7 @@ export function LojaDeBala() {
               key={idx} count={pote.count} emoji={pote.emoji} label={pote.label}
               selected={idx === phaseData.correct && answered}
               onTap={() => handleChoice(idx)}
+              isDesktop={isDesktop}
             />
           ))}
         </div>
