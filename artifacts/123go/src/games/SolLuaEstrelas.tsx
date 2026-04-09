@@ -222,7 +222,7 @@ export function SolLuaEstrelas() {
                     opacity: isConnected ? 0.75 : 1,
                   }}
                 >
-                  <AppleEmoji emoji={meal.emoji} size={32} />
+                  <AppleEmoji emoji={meal.emoji} size={isDesktop ? 24 : 32} />
                   <span style={{ fontFamily: 'Nunito', fontWeight: 700, fontSize: 12, color: 'var(--text)' }}>
                     {meal.label}
                   </span>
@@ -269,7 +269,7 @@ export function SolLuaEstrelas() {
                     background: isConnected ? connColor! : isTarget ? 'var(--c4)' : '#ccc',
                     transition: 'background 0.15s',
                   }} />
-                  <AppleEmoji emoji={period.emoji} size={28} />
+                  <AppleEmoji emoji={period.emoji} size={isDesktop ? 22 : 28} />
                   <span style={{ fontFamily: 'Nunito', fontWeight: 700, fontSize: 12, color: period.textColor }}>
                     {period.name}
                   </span>

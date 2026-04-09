@@ -1,0 +1,63 @@
+CORREÇÃO GRANULAR: VARREDURA TOTAL DE ATIVOS (24 JOGOS)
+"Atenção: A escala de Desktop em todos os jogos (exceto a Lagarta) está incorreta. Você deve realizar uma correção granular e obrigatória em cada um dos 24 arquivos listados abaixo. Não pule nenhum arquivo e não use soluções globais; altere a lógica interna de cada um.
+
+DIRETRIZ DE ALTERAÇÃO (PADRÃO LAGARTA):
+Em todos os arquivos abaixo, localize as variáveis de tamanho de emojis/ícones (AppleEmoji, size, width) e substitua valores fixos pela lógica: isDesktop ? [TAMANHO_MENOR] : [TAMANHO_PADRÃO].
+
+Arquivos para modificar agora (Caminho: src/games/):
+
+RaPuladora.tsx: Reduzir FROG_SIZE para 44 e FLOWER_SIZE para 22 no desktop.
+
+LojaDeBalas.tsx: Reduzir tamanho dos potes e doces em 40% no desktop.
+
+BaloesDaFesta.tsx: Reduzir escala dos balões para size={isDesktop ? 45 : 70}.
+
+ParOuImpar.tsx: Ajustar botões numéricos para escala menor no desktop.
+
+CacaEstrelas.tsx: Reduzir tamanho das estrelas coletáveis.
+
+TremDosNumeros.tsx: Encolher os vagões para caberem na largura da tela sem scroll.
+
+RestauranteMagico.tsx: Reduzir pratos e ingredientes.
+
+BatalhaDeConstelacoes.tsx: Ajustar pontos de conexão e estrelas de fundo.
+
+AtelieDaOrdem.tsx: Reduzir molduras e objetos de arte.
+
+JardimDePadroes.tsx: Reduzir flores e sementes.
+
+NaveOrganizadora.tsx: Ajustar tamanho da nave e compartimentos.
+
+RoboPerdido.tsx: Reduzir o sprite do robô e ferramentas.
+
+SolLuaEEstrelas.tsx: Ajustar astros para não sobreporem o texto.
+
+CalendarioVivo.tsx: Reduzir células dos dias da semana.
+
+SorveteriaDosDados.tsx: Reduzir bolas de sorvete e casquinhas.
+
+ZooDeTabelas.tsx: Ajustar animais para caberem dentro das células da tabela.
+
+MeusPets.tsx: Reduzir acessórios e pets.
+
+MaisOuMenos.tsx: Ajustar ícones de polegar (👍/👎) e grupos de itens.
+
+ConecteOIgual.tsx: Reduzir as formas geométricas.
+
+QualCabeAqui.tsx: Ajustar escala dos objetos de comparação.
+
+AlimenteOMonstro.tsx: Reduzir tamanho da boca do monstro e dos alimentos.
+
+LigueNumeroAQuantidade.tsx: Ajustar tamanho dos cards de números.
+
+QuantosTem.tsx: Reduzir opções de resposta do quiz.
+
+FestaDaLagarta.tsx: (Validar se a escala atual de sucesso permanece intacta).
+
+REGRAS ADICIONAIS:
+
+Se o arquivo não usar isDesktop, importe o hook: import { useIsDesktop } from '../hooks/useIsDesktop';.
+
+Ajuste o maxHeight dos containers principais para isDesktop ? '220px' : undefined para evitar que os jogos estourem a altura da tela no PC.
+
+Confirme quando todos os 24 arquivos forem processados individualmente."

@@ -132,8 +132,8 @@ export function MaisOuMenos() {
     );
   }
 
-  const itemSz = isDesktop ? 32 : 26;
-  const perRow  = 5;
+  const itemSz = isDesktop ? 22 : 32;
+  const perRow  = isDesktop ? 6 : 5;
   const perguntaLabel = phaseData.pergunta === 'mais' ? 'MAIS' : 'MENOS';
 
   function renderGrupo(qtd: number, title: string) {
