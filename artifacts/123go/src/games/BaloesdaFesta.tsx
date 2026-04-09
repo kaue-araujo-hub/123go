@@ -127,6 +127,7 @@ export function BaloesdaFesta() {
           position: 'relative', flex: 1, borderRadius: 18,
           background: bg, overflow: 'hidden',
           border: `2px solid ${color}22`,
+          maxHeight: isDesktop ? 280 : undefined,
         }}>
           {balloons.map((b, i) => {
             const isPopped    = poppedSet.has(i);

@@ -150,7 +150,7 @@ export function RaPuladora() {
         </div>
 
         {/* Lily-pad buttons — grow to fill remaining space */}
-        <div style={{ display: 'flex', gap: 12, flex: 1, minHeight: 0 }}>
+        <div style={{ display: 'flex', gap: 12, flex: 1, minHeight: 0, maxHeight: isDesktop ? 220 : undefined }}>
           {([0, 1] as const).map(idx => {
             const count = round.counts[idx];
             const VISIBLE_CAP = 15;

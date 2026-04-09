@@ -91,7 +91,7 @@ export function LojaDeBala() {
         </div>
 
         {/* Potes — grow to fill remaining space */}
-        <div style={{ display: 'flex', gap: 14, flex: 1, minHeight: 0 }}>
+        <div style={{ display: 'flex', gap: 14, flex: 1, minHeight: 0, maxHeight: isDesktop ? 260 : undefined }}>
           {phaseData.potes.map((pote, idx) => (
             <PoteVisual
               key={idx} count={pote.count} emoji={pote.emoji} label={pote.label}

@@ -1,0 +1,47 @@
+CORREÇÃO URGENTE: ESCALA DESKTOP NOS ARQUIVOS DE COMPONENTE
+"A view Desktop de todos os jogos está quebrada e injogável devido ao tamanho exagerado dos ícones interativos (image_27.png a image_31.png). Os prompts anteriores falharam porque tentaram apenas aplicar classes utilitárias no topo. É necessário corrigir a lógica de dimensionamento dentro dos componentes.
+
+Siga estas instruções técnicas exatas para corrigir os 24 jogos globalmente:
+
+1. Arquivo Alvo Principal: artifacts/123go/src/engine/GameEngine.tsx
+Este arquivo provavelmente centraliza a renderização dos objetos.
+
+AÇÃO: Localize a lógica que define o tamanho (width, height, size) dos elementos DraggableObject ou InteractiveIcon.
+
+CORREÇÃO: Substitua valores fixos (como 128 ou 96) por uma lógica responsiva baseada no breakpoint do Tailwind.
+
+Exemplo de Código (substituição):
+
+Onde se lê: { size: 128 }
+
+Substitua por: { size: window.innerWidth > 1024 ? 64 : 128 } (Use 64px para Desktop).
+
+2. Arquivo Alvo de Estilo: artifacts/123go/src/index.css (ou fonts.css)
+
+AÇÃO: Force a substituição de classes de tamanho de 'hitbox' e ícones de emoji que foram definidos globalmente.
+
+CORREÇÃO: Adicione ou force o seguinte CSS para garantir consistência no PC:
+
+CSS
+/* Correção Global de Ícones de Jogo no Desktop */
+@media (min-width: 1024px) {
+  /* Alvo nos emojis/icones dentro da área de jogo */
+  .game-area-content .interactive-icon,
+  .game-area-content emoji-element {
+    width: 64px !important; /* Tamanho 50% menor */
+    height: 64px !important;
+  }
+  /* Alvo nos containers de organização */
+  .game-area-content .drop-zone-container {
+    padding: 1rem !important;
+    gap: 0.5rem !important;
+  }
+}
+3. Auditoria nos Arquivos Individuais de Jogo (src/games/)
+Se os passos 1 e 2 não resolverem tudo, é porque alguns jogos (ex: LojaDeBala.tsx, RaPuladora.tsx) têm tamanhos "hardcoded".
+
+AÇÃO: Faça uma busca global por width={, height={ ou size={ dentro da pasta artifacts/123go/src/games/.
+
+CORREÇÃO: Para qualquer valor maior que 90, aplique a lógica responsiva (reduzir para 50% se for Desktop).
+
+Execute essa substituição de lógica de código agora e confirme que todos os 24 jogos estão com os elementos menores no Desktop."
