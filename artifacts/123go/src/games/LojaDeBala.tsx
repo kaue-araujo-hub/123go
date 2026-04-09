@@ -27,9 +27,9 @@ function PoteVisual({ count, emoji, label, selected, onTap }: {
       }}
     >
       <span style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 13, color: 'var(--text2)', flexShrink: 0 }}>Pote {label}</span>
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 3, justifyContent: 'center', maxWidth: 130, overflow: 'hidden' }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, justifyContent: 'center', maxWidth: 180, overflow: 'hidden' }}>
         {Array.from({ length: Math.min(count, 20) }).map((_, i) => (
-          <AppleEmoji key={i} emoji={emoji} size={16} />
+          <AppleEmoji key={i} emoji={emoji} size={26} />
         ))}
         {count > 20 && <span style={{ fontSize: 11, color: 'var(--text3)', fontWeight: 700 }}>+{count - 20}</span>}
       </div>
