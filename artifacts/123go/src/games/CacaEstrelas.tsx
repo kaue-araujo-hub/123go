@@ -19,6 +19,7 @@ function generateOptions(correct: number): number[] {
 }
 
 function StarField({ count, visible }: { count: number; visible: boolean }) {
+  const isDesktop = useIsDesktop();
   const positions = useRef(
     Array.from({ length: count }, () => ({ x: 8 + Math.random() * 84, y: 8 + Math.random() * 84 }))
   );
@@ -33,7 +34,7 @@ function StarField({ count, visible }: { count: number; visible: boolean }) {
           animation: 'starTwinkle 0.5s ease-in-out infinite alternate',
           animationDelay: `${i * 0.08}s`, willChange: 'transform, opacity',
         }}>
-          <AppleEmoji emoji="⭐" size={26} />
+          <AppleEmoji emoji="⭐" size={isDesktop ? 32 : 44} />
         </div>
       ))}
       {!visible && (

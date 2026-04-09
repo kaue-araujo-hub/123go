@@ -26,6 +26,7 @@ function genCountOptions(correct: number): number[] {
 }
 
 function BarChart({ highlightIdx }: { highlightIdx?: number }) {
+  const isDesktop = useIsDesktop();
   const maxV = Math.max(...CHART_DATA.map(d => d.votes));
   return (
     <div style={{
@@ -54,7 +55,7 @@ function BarChart({ highlightIdx }: { highlightIdx?: number }) {
                 outline: isHighlight ? `3px solid ${d.color}` : 'none',
                 outlineOffset: 2,
               }} />
-              <AppleEmoji emoji={d.emoji} size={22} />
+              <AppleEmoji emoji={d.emoji} size={isDesktop ? 22 : 28} />
             </div>
           );
         })}
@@ -195,7 +196,7 @@ export function PesquisaTurma() {
                         boxShadow: isSelected ? '0 2px 10px rgba(233,30,99,0.2)' : '0 1px 4px rgba(0,0,0,0.07)',
                       }}
                     >
-                      <AppleEmoji emoji={animal.emoji} size={30} />
+                      <AppleEmoji emoji={animal.emoji} size={isDesktop ? 34 : 44} />
                       <span style={{
                         fontFamily: 'Nunito', fontWeight: 700, fontSize: 10,
                         color: isSelected ? 'var(--c2)' : 'var(--text2)',

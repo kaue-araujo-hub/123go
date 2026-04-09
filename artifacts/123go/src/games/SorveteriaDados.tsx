@@ -146,7 +146,7 @@ export function SorveteriaDados() {
                       touchAction: 'manipulation',
                     }}
                   />
-                  <span style={{ fontSize: 18 }}><AppleEmoji emoji={f.emoji} size={22} /></span>
+                  <span style={{ fontSize: 18 }}><AppleEmoji emoji={f.emoji} size={isDesktop ? 22 : 28} /></span>
                   <span style={{ fontFamily: 'Nunito', fontWeight: 700, fontSize: 10, color: f.color, textAlign: 'center' }}>{f.name}</span>
                 </div>
               );

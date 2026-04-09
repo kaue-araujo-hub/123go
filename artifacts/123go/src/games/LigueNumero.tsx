@@ -219,7 +219,7 @@ export function LigueNumero() {
                 }}
               >
                 {Array.from({ length: p.num }).map((_, i) => (
-                  <AppleEmoji key={i} emoji={p.emoji} size={20} />
+                  <AppleEmoji key={i} emoji={p.emoji} size={isDesktop ? 22 : 30} />
                 ))}
               </div>
             );

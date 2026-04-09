@@ -106,7 +106,7 @@ export function AlimenteMonstro() {
       }}>
         <span style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 16, color: '#1A1A2E' }}>
           O monstro quer <strong style={{ color: '#FF6B35', fontSize: 22 }}>{phaseData.pedido}</strong>{' '}
-          <AppleEmoji emoji={phaseData.item} size={22} />
+          <AppleEmoji emoji={phaseData.item} size={isDesktop ? 24 : 34} />
         </span>
       </div>
 

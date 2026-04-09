@@ -211,7 +211,7 @@ export function FestaDaLagarta() {
           </div>
           <div style={{ display: 'flex', gap: 3, flexWrap: 'wrap', justifyContent: 'center', maxWidth: 180 }}>
             {Array.from({ length: Math.min(collected, 12) }).map((_, i) => (
-              <AppleEmoji key={i} emoji="🌿" size={16} />
+              <AppleEmoji key={i} emoji="🌿" size={isDesktop ? 16 : 22} />
             ))}
             {collected > 12 && <span style={{ fontSize: 11, color: 'var(--c5)', fontWeight: 700 }}>+{collected - 12}</span>}
           </div>

@@ -287,7 +287,7 @@ export function AtelieOrdem() {
                 justifyContent: 'center', flex: 1, alignContent: 'center',
               }}>
                 {(placed[drawer.key] || []).map((emoji, i) => (
-                  <AppleEmoji key={i} emoji={emoji} size={26} />
+                  <AppleEmoji key={i} emoji={emoji} size={isDesktop ? 28 : 36} />
                 ))}
               </div>
             </div>

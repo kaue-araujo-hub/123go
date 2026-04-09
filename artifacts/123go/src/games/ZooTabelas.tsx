@@ -144,7 +144,7 @@ export function ZooTabelas() {
             }}
           >
             <span style={{ fontFamily: 'Nunito', fontWeight: 700, fontSize: 13, color: 'var(--text)' }}>{row.animal}</span>
-            <AppleEmoji emoji={row.emoji} size={22} />
+            <AppleEmoji emoji={row.emoji} size={isDesktop ? 22 : 28} />
             <span style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 16, color: 'var(--c2)' }}>{row.count}</span>
             <span style={{ fontFamily: 'Nunito', fontSize: 11, color: 'var(--text3)' }}>{row.area}</span>
           </div>
@@ -178,7 +178,7 @@ export function ZooTabelas() {
                     boxShadow: isSelected ? '0 2px 10px rgba(233,30,99,0.2)' : '0 1px 4px rgba(0,0,0,0.07)',
                   }}
                 >
-                  <AppleEmoji emoji={animal.emoji} size={30} />
+                  <AppleEmoji emoji={animal.emoji} size={isDesktop ? 34 : 44} />
                   <span style={{
                     fontFamily: 'Nunito', fontWeight: 700, fontSize: 10,
                     color: isSelected ? 'var(--c2)' : 'var(--text2)',
