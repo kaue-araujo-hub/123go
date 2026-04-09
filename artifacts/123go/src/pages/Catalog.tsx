@@ -7,6 +7,7 @@ import { GameListRow } from '../components/GameListRow';
 import { GameModal } from '../components/GameModal';
 import { Pagination } from '../components/Pagination';
 import { TrailSection } from '../components/TrailSection';
+import { NivelCards } from '../components/NivelCards/NivelCards';
 import { games, type Game } from '../data/games';
 
 const ITEMS_PER_PAGE = 10;
@@ -193,6 +194,9 @@ export function Catalog() {
             </span>
           </div>
         </div>
+
+        {/* Níveis de aprendizagem */}
+        <NivelCards />
 
         {/* Featured carousel */}
         <TrailSection />

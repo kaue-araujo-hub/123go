@@ -4,7 +4,6 @@ import { games } from '../data/games';
 import { StudentGameCard } from '../components/StudentGameCard';
 import { SessionManager } from '../auth/SessionManager';
 import { useLogoColors } from '../hooks/useLogoColors';
-import { NivelCards } from '../components/NivelCards/NivelCards';
 import styles from './StudentCatalog.module.css';
 
 export function StudentCatalog() {
@@ -142,38 +141,26 @@ export function StudentCatalog() {
       </header>
 
       <main className={styles.main}>
-        {!searchQuery && <NivelCards />}
-
         {filteredGames.length === 0 ? (
           <div className={styles.empty} role="status">
             <span aria-hidden="true">🔍</span>
             <p>Nenhum jogo encontrado para "{searchQuery}"</p>
           </div>
         ) : (
-          <>
-            {!searchQuery && (
-              <h2 style={{
-                fontFamily: 'Nunito', fontWeight: 800, fontSize: 16,
-                color: 'var(--text, #1A1A2E)', marginBottom: 12, marginTop: 0,
-              }}>
-                Todos os jogos
-              </h2>
-            )}
-            <div
-              className={styles.grid}
-              role="list"
-              aria-label={`${filteredGames.length} jogos disponíveis`}
-            >
-              {filteredGames.map((game, index) => (
-                <StudentGameCard
-                  key={game.id}
-                  game={game}
-                  index={index}
-                  onTap={handleCardTap}
-                />
-              ))}
-            </div>
-          </>
+          <div
+            className={styles.grid}
+            role="list"
+            aria-label={`${filteredGames.length} jogos disponíveis`}
+          >
+            {filteredGames.map((game, index) => (
+              <StudentGameCard
+                key={game.id}
+                game={game}
+                index={index}
+                onTap={handleCardTap}
+              />
+            ))}
+          </div>
         )}
       </main>
 
