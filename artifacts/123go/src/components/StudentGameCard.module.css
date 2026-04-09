@@ -120,9 +120,19 @@
   .name  { font-size: 12px; padding: 0 8px 10px; }
 }
 
+/* Desktop: reduce emoji by 70% (from ~56px max down to ~24px) */
 @media (min-width: 768px) {
-  .emoji { font-size: clamp(40px, 7vw, 56px); }
+  .emoji { font-size: clamp(18px, 2.5vw, 24px); }
+  .name  { font-size: 12px; }
+}
+
+@media (min-width: 1024px) {
+  .emoji { font-size: clamp(20px, 2.2vw, 26px); }
   .name  { font-size: 13px; }
+}
+
+@media (min-width: 1280px) {
+  .emoji { font-size: clamp(20px, 1.8vw, 26px); }
 }
 
 @media (prefers-reduced-motion: reduce) {
