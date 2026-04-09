@@ -357,9 +357,10 @@ input {
   /* Buttons: 96px → 160px min-height (≈ 1.67×);
      also set min-width so emoji-picker buttons become large squares */
   .game-area button {
-    min-height: 160px !important;
-    min-width: 160px !important;
-    font-size: 22px !important;
+    /* DEPOIS — reduza para isso */
+    min-height: 80px !important;
+    min-width: 80px !important;
+    font-size: 16px !important;
     border-radius: 24px !important;
     gap: 14px !important;
   }
@@ -375,14 +376,16 @@ input {
 
   /* Apple emoji images inside buttons: 56 → 100px (1.8×) */
   .game-area button img.apple-emoji {
-    width: 100px !important;
-    height: 100px !important;
+    /* DEPOIS */
+    width: 52px !important;
+    height: 52px !important;
   }
 
   /* Apple emoji images outside buttons (game characters, items) */
   .game-area img.apple-emoji {
-    min-width: 80px !important;
-    min-height: 80px !important;
+    /* DEPOIS */
+    min-width: 48px !important;
+    min-height: 48px !important;
   }
 
   /* Headings */

@@ -355,8 +355,8 @@ export function RoboPerdido() {
             key={dir}
             onPointerUp={() => move(dir)}
             style={{
-              width: isDesktop ? 14 : 18,
-              height: isDesktop ? 14 : 18,
+              width: isDesktop ? 10 : 12,
+              height: isDesktop ? 10 : 12,
               borderRadius: 14,
               border: "2px solid var(--c1)",
               background: "#fff",
