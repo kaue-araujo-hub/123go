@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { GameShell, useGameEngine, FeedbackOverlay, PhaseCompleteCard } from '../engine/GameEngine';
 import { AppleEmoji } from '../utils/AppleEmoji';
+import { useIsDesktop } from '../hooks/useIsDesktop';
 
 const PHASES = [
   { theme: '🍕', name: 'Pizza',      need: 4,  total: 7  },
@@ -47,6 +48,7 @@ function generatePositions(count: number, seed: number): { left: number; top: nu
 
 export function PizzariaMagica() {
   const { phase, score, phaseComplete, gameComplete, onCorrect, onPhaseComplete, nextPhase, restart } = useGameEngine(5);
+  const isDesktop = useIsDesktop();
 
   const [placedSet, setPlacedSet] = useState<Set<number>>(new Set());
   const [feedback,  setFeedback]  = useState<'correct' | 'wrong' | null>(null);
@@ -149,12 +151,12 @@ export function PizzariaMagica() {
       {dragging !== null && dragPos && (
         <div style={{
           position: 'fixed',
-          left: dragPos.x - 28, top: dragPos.y - 28,
+          left: dragPos.x - (isDesktop ? 18 : 28), top: dragPos.y - (isDesktop ? 18 : 28),
           pointerEvents: 'none', zIndex: 9999,
           filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.3))',
           transform: 'scale(1.15)',
         }}>
-          <AppleEmoji emoji={theme} size={56} />
+          <AppleEmoji emoji={theme} size={isDesktop ? 36 : 56} />
         </div>
       )}
 
@@ -198,7 +200,7 @@ export function PizzariaMagica() {
                   position: 'absolute',
                   left: `${pos.left}%`,
                   top:  `${pos.top}%`,
-                  marginLeft: -28, marginTop: -28,
+                  marginLeft: isDesktop ? -18 : -28, marginTop: isDesktop ? -18 : -28,
                   cursor: 'grab',
                   touchAction: 'none',
                   userSelect: 'none',
@@ -208,7 +210,7 @@ export function PizzariaMagica() {
                   zIndex: isDraggingMe ? 0 : 2,
                 }}
               >
-                <AppleEmoji emoji={theme} size={52} />
+                <AppleEmoji emoji={theme} size={isDesktop ? 34 : 52} />
               </div>
             );
           })}
@@ -224,7 +226,7 @@ export function PizzariaMagica() {
             <div
               ref={plateRef}
               style={{
-                width: 150, height: 150, borderRadius: '50%',
+                width: isDesktop ? 100 : 150, height: isDesktop ? 100 : 150, borderRadius: '50%',
                 background: isOver ? '#FFF0E5' : '#FAFAFA',
                 border: `4px ${isOver ? 'solid' : 'dashed'} ${isOver ? 'var(--c1)' : '#D1D5DB'}`,
                 display: 'flex', flexDirection: 'column',
@@ -234,7 +236,7 @@ export function PizzariaMagica() {
                 zIndex: 3, position: 'relative',
               }}
             >
-              <AppleEmoji emoji="🍽️" size={72} style={{ opacity: isOver ? 0.9 : 0.7 }} />
+              <AppleEmoji emoji="🍽️" size={isDesktop ? 46 : 72} style={{ opacity: isOver ? 0.9 : 0.7 }} />
             </div>
 
             <p style={{ color: 'var(--text3)', fontSize: 11, marginTop: 6 }}>

@@ -195,7 +195,7 @@ export function MaisOuMenos() {
           onPointerMove={onPointerMove}
           onPointerUp={onPointerUp}
           style={{
-            fontSize: 52, cursor: 'grab', touchAction: 'none',
+            fontSize: isDesktop ? 34 : 52, cursor: 'grab', touchAction: 'none',
             filter: chosen ? (feedback === 'correct' ? 'drop-shadow(0 0 8px #4CAF50)' : 'drop-shadow(0 0 8px #F44336)') : 'none',
             transition: 'filter 0.2s',
           }}

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { GameShell, useGameEngine, FeedbackOverlay, PhaseCompleteCard } from '../engine/GameEngine';
 import { AppleEmoji } from '../utils/AppleEmoji';
+import { useIsDesktop } from '../hooks/useIsDesktop';
 
 function generateProblem(phase: number): { a: number; b: number; op: '+' | '-'; ans: number } {
   if (phase <= 2) {
@@ -31,6 +32,7 @@ const TOTAL_PER_PHASE = [3, 3, 3, 3, 4];
 
 export function TremDosNumeros() {
   const { phase, score, phaseComplete, gameComplete, onCorrect, onPhaseComplete, nextPhase, restart } = useGameEngine(5);
+  const isDesktop = useIsDesktop();
   const [problem, setProblem]         = useState(() => generateProblem(1));
   const [options,  setOptions]        = useState<number[]>([]);
   const [round,    setRound]          = useState(1);
@@ -159,11 +161,11 @@ export function TremDosNumeros() {
       {dragging !== null && dragPos && (
         <div style={{
           position: 'fixed',
-          left: dragPos.x - 44, top: dragPos.y - 44,
-          width: 88, height: 88, borderRadius: 20,
+          left: dragPos.x - (isDesktop ? 28 : 44), top: dragPos.y - (isDesktop ? 28 : 44),
+          width: isDesktop ? 56 : 88, height: isDesktop ? 56 : 88, borderRadius: isDesktop ? 14 : 20,
           background: '#fff', border: '2.5px solid var(--c3)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontFamily: 'Nunito', fontWeight: 900, fontSize: 44, color: 'var(--c3)',
+          fontFamily: 'Nunito', fontWeight: 900, fontSize: isDesktop ? 28 : 44, color: 'var(--c3)',
           boxShadow: '0 8px 32px rgba(0,0,0,0.22)',
           opacity: 0.92, pointerEvents: 'none', zIndex: 9999,
           transform: 'scale(1.08)',
@@ -228,19 +230,19 @@ export function TremDosNumeros() {
 
         {/* Equation */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
-          <div style={{ fontFamily: 'Nunito', fontWeight: 900, fontSize: 46, color: 'var(--text)' }}>{problem.a}</div>
-          <div style={{ fontFamily: 'Nunito', fontWeight: 700, fontSize: 34, color: problem.op === '+' ? 'var(--c5)' : 'var(--c2)' }}>{problem.op}</div>
-          <div style={{ fontFamily: 'Nunito', fontWeight: 900, fontSize: 46, color: 'var(--text)' }}>{problem.b}</div>
-          <div style={{ fontFamily: 'Nunito', fontWeight: 700, fontSize: 34, color: 'var(--text3)' }}>=</div>
+          <div style={{ fontFamily: 'Nunito', fontWeight: 900, fontSize: isDesktop ? 30 : 46, color: 'var(--text)' }}>{problem.a}</div>
+          <div style={{ fontFamily: 'Nunito', fontWeight: 700, fontSize: isDesktop ? 22 : 34, color: problem.op === '+' ? 'var(--c5)' : 'var(--c2)' }}>{problem.op}</div>
+          <div style={{ fontFamily: 'Nunito', fontWeight: 900, fontSize: isDesktop ? 30 : 46, color: 'var(--text)' }}>{problem.b}</div>
+          <div style={{ fontFamily: 'Nunito', fontWeight: 700, fontSize: isDesktop ? 22 : 34, color: 'var(--text3)' }}>=</div>
           {/* Drop zone */}
           <div
             ref={dropZoneRef}
             style={{
-              width: 68, height: 68, borderRadius: 14,
+              width: isDesktop ? 44 : 68, height: isDesktop ? 44 : 68, borderRadius: isDesktop ? 10 : 14,
               border: `3px dashed ${isOver ? 'var(--c3)' : 'var(--border)'}`,
               background: isOver ? '#EDE9FF' : 'var(--bg)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontFamily: 'Nunito', fontWeight: 900, fontSize: 26, color: 'var(--text3)',
+              fontFamily: 'Nunito', fontWeight: 900, fontSize: isDesktop ? 18 : 26, color: 'var(--text3)',
               transition: 'all 0.2s',
               animation: isOver ? 'dropPulse 0.8s ease infinite' : undefined,
             }}
@@ -255,14 +257,14 @@ export function TremDosNumeros() {
             key={val}
             onPointerDown={e => startDrag(e, val)}
             style={{
-              width: 88, height: 88, borderRadius: 20,
+              width: isDesktop ? 60 : 88, height: isDesktop ? 60 : 88, borderRadius: isDesktop ? 14 : 20,
               background: dragging === val ? '#F3F0FF' : '#fff',
               border: `2.5px solid ${dragging === val ? 'var(--c3)' : 'var(--border)'}`,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontFamily: 'Nunito', fontWeight: 900, fontSize: 44,
+              fontFamily: 'Nunito', fontWeight: 900, fontSize: isDesktop ? 28 : 44,
               color: dragging === val ? 'var(--c3)' : 'var(--text)',
               cursor: 'grab', boxShadow: dragging === val ? 'none' : 'var(--shadow)',
-              minHeight: 88, minWidth: 88, transition: 'all 0.15s',
+              minHeight: isDesktop ? 60 : 88, minWidth: isDesktop ? 60 : 88, transition: 'all 0.15s',
               touchAction: 'none', userSelect: 'none',
               opacity: dragging === val ? 0.45 : 1,
             }}

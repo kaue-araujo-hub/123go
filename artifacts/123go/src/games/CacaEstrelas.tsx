@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { GameShell, useGameEngine, FeedbackOverlay, PhaseCompleteCard } from '../engine/GameEngine';
 import { AppleEmoji } from '../utils/AppleEmoji';
+import { useIsDesktop } from '../hooks/useIsDesktop';
 
 const FLASH_DURATIONS = [7000, 4000, 4000, 4000, 4000];
 const STAR_COUNTS     = [3, 7, 4, 9, 5];
@@ -52,6 +53,7 @@ function StarField({ count, visible }: { count: number; visible: boolean }) {
 
 export function CacaEstrelas() {
   const { phase, score, phaseComplete, gameComplete, onCorrect, onPhaseComplete, nextPhase, restart } = useGameEngine(5);
+  const isDesktop = useIsDesktop();
   const [showStars, setShowStars] = useState(false);
   const [showButtons, setShowButtons] = useState(false);
   const [answered, setAnswered] = useState(false);
@@ -156,10 +158,10 @@ export function CacaEstrelas() {
               key={opt}
               onPointerUp={() => handleAnswer(opt)}
               style={{
-                width: 100, height: 100, borderRadius: 22,
+                width: isDesktop ? 64 : 100, height: isDesktop ? 64 : 100, borderRadius: isDesktop ? 14 : 22,
                 border: '3px solid var(--border)', background: '#fff',
-                fontFamily: 'Nunito', fontWeight: 900, fontSize: 48,
-                color: 'var(--text)', cursor: 'pointer', minHeight: 100, minWidth: 100,
+                fontFamily: 'Nunito', fontWeight: 900, fontSize: isDesktop ? 30 : 48,
+                color: 'var(--text)', cursor: 'pointer', minHeight: isDesktop ? 64 : 100, minWidth: isDesktop ? 64 : 100,
                 transition: 'all 0.15s ease', touchAction: 'manipulation',
               }}
             >

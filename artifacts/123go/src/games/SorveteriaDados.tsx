@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { GameShell, useGameEngine, FeedbackOverlay, PhaseCompleteCard } from '../engine/GameEngine';
 import { AppleEmoji } from '../utils/AppleEmoji';
+import { useIsDesktop } from '../hooks/useIsDesktop';
 
 const FLAVORS = [
   { name: 'Chocolate', emoji: '🍫', color: '#795548', count: 8 },
@@ -51,6 +52,7 @@ const PHASES = [
 
 export function SorveteriaDados() {
   const { phase, score, phaseComplete, gameComplete, onCorrect, onPhaseComplete, nextPhase, restart } = useGameEngine(5);
+  const isDesktop = useIsDesktop();
   const [feedback, setFeedback] = useState<'correct' | 'wrong' | null>(null);
   const [answered, setAnswered] = useState(false);
   const [countOptions, setCountOptions] = useState<number[]>([]);
@@ -164,10 +166,10 @@ export function SorveteriaDados() {
                   key={val}
                   onPointerUp={() => handleCountAnswer(val)}
                   style={{
-                    width: 88, height: 88, borderRadius: 20,
+                    width: isDesktop ? 60 : 88, height: isDesktop ? 60 : 88, borderRadius: isDesktop ? 14 : 20,
                     border: '2.5px solid var(--border)', background: '#fff',
-                    fontFamily: 'Nunito', fontWeight: 900, fontSize: 42, color: 'var(--text)',
-                    cursor: 'pointer', minHeight: 88, minWidth: 88,
+                    fontFamily: 'Nunito', fontWeight: 900, fontSize: isDesktop ? 26 : 42, color: 'var(--text)',
+                    cursor: 'pointer', minHeight: isDesktop ? 60 : 88, minWidth: isDesktop ? 60 : 88,
                     transition: 'all 0.15s', touchAction: 'manipulation',
                   }}
                 >

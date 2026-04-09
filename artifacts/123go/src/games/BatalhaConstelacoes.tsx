@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { GameShell, useGameEngine, FeedbackOverlay, PhaseCompleteCard } from '../engine/GameEngine';
+import { useIsDesktop } from '../hooks/useIsDesktop';
 
 function generateProblem(type: 'add' | 'sub' | 'mix'): { a: number; b: number; op: '+' | '-'; ans: number } {
   if (type === 'add') {
@@ -28,6 +29,7 @@ const ROUNDS_PER_PHASE = [2, 2, 2, 3, 2];
 
 export function BatalhaConstelacoes() {
   const { phase, score, phaseComplete, gameComplete, onCorrect, onPhaseComplete, nextPhase, restart } = useGameEngine(5);
+  const isDesktop = useIsDesktop();
 
   const [problem,     setProblem]     = useState(() => generateProblem('add'));
   const [options,     setOptions]     = useState<number[]>([]);
@@ -173,15 +175,15 @@ export function BatalhaConstelacoes() {
       {ghostPos && draggingVal !== null && (
         <div style={{
           position: 'fixed',
-          left: ghostPos.x - 44,
-          top:  ghostPos.y - 44,
-          width: 88, height: 88,
-          borderRadius: 20,
+          left: ghostPos.x - (isDesktop ? 28 : 44),
+          top:  ghostPos.y - (isDesktop ? 28 : 44),
+          width: isDesktop ? 56 : 88, height: isDesktop ? 56 : 88,
+          borderRadius: isDesktop ? 14 : 20,
           background: '#fff',
           border: '3px solid var(--c3)',
           boxShadow: '0 8px 24px rgba(0,0,0,0.22)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontFamily: 'Nunito', fontWeight: 900, fontSize: 44, color: 'var(--c3)',
+          fontFamily: 'Nunito', fontWeight: 900, fontSize: isDesktop ? 28 : 44, color: 'var(--c3)',
           zIndex: 9999, pointerEvents: 'none',
           transform: 'scale(1.1)',
         }}>
@@ -258,16 +260,16 @@ export function BatalhaConstelacoes() {
         ))}
 
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, flexWrap: 'wrap' }}>
-          <span style={{ fontFamily: 'Nunito', fontWeight: 900, fontSize: 56, color: '#fff' }}>{problem.a}</span>
-          <span style={{ fontFamily: 'Nunito', fontWeight: 700, fontSize: 40, color: problem.op === '+' ? '#81C784' : '#EF9A9A' }}>{problem.op}</span>
-          <span style={{ fontFamily: 'Nunito', fontWeight: 900, fontSize: 56, color: '#fff' }}>{problem.b}</span>
-          <span style={{ fontFamily: 'Nunito', fontWeight: 700, fontSize: 36, color: 'rgba(255,255,255,0.5)' }}>=</span>
+          <span style={{ fontFamily: 'Nunito', fontWeight: 900, fontSize: isDesktop ? 36 : 56, color: '#fff' }}>{problem.a}</span>
+          <span style={{ fontFamily: 'Nunito', fontWeight: 700, fontSize: isDesktop ? 26 : 40, color: problem.op === '+' ? '#81C784' : '#EF9A9A' }}>{problem.op}</span>
+          <span style={{ fontFamily: 'Nunito', fontWeight: 900, fontSize: isDesktop ? 36 : 56, color: '#fff' }}>{problem.b}</span>
+          <span style={{ fontFamily: 'Nunito', fontWeight: 700, fontSize: isDesktop ? 22 : 36, color: 'rgba(255,255,255,0.5)' }}>=</span>
 
           {/* Drop zone */}
           <div
             ref={dropZoneRef}
             style={{
-              width: 80, height: 80, borderRadius: 18,
+              width: isDesktop ? 52 : 80, height: isDesktop ? 52 : 80, borderRadius: isDesktop ? 12 : 18,
               border: isOver
                 ? '3px solid #F9A825'
                 : draggingVal !== null
@@ -319,11 +321,11 @@ export function BatalhaConstelacoes() {
               key={val}
               onPointerDown={e => startDrag(e, val)}
               style={{
-                width: 92, height: 92, borderRadius: 22,
+                width: isDesktop ? 60 : 92, height: isDesktop ? 60 : 92, borderRadius: isDesktop ? 14 : 22,
                 border: '3px solid var(--border)',
                 background: isDraggingMe ? '#f0f0f0' : '#fff',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontFamily: 'Nunito', fontWeight: 900, fontSize: 46, color: 'var(--text)',
+                fontFamily: 'Nunito', fontWeight: 900, fontSize: isDesktop ? 28 : 46, color: 'var(--text)',
                 cursor: 'grab', touchAction: 'none', userSelect: 'none',
                 opacity: isDraggingMe ? 0.3 : 1,
                 transition: 'opacity 0.15s, transform 0.15s',

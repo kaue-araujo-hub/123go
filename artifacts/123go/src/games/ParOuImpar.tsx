@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { GameShell, useGameEngine, FeedbackOverlay, PhaseCompleteCard } from '../engine/GameEngine';
 import { AppleEmoji } from '../utils/AppleEmoji';
+import { useIsDesktop } from '../hooks/useIsDesktop';
 
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];
@@ -31,6 +32,7 @@ const PHASE_BUILDERS = [
 
 export function ParOuImpar() {
   const { phase, score, phaseComplete, gameComplete, onCorrect, onPhaseComplete, nextPhase, restart } = useGameEngine(5);
+  const isDesktop = useIsDesktop();
   const [feedback, setFeedback] = useState<'correct' | 'wrong' | null>(null);
   const [answered, setAnswered] = useState(false);
   const [phaseItems, setPhaseItems] = useState<{ id: string; emoji: string; isSolo: boolean }[]>([]);
@@ -86,15 +88,15 @@ export function ParOuImpar() {
             key={item.id}
             onPointerUp={() => handleTap(item)}
             style={{
-              width: 88, height: 88, borderRadius: 20,
+              width: isDesktop ? 60 : 88, height: isDesktop ? 60 : 88, borderRadius: isDesktop ? 14 : 20,
               border: `2.5px solid ${item.isSolo && answered ? 'var(--c5)' : 'var(--border)'}`,
               background: item.isSolo && answered ? '#E8F5E9' : '#fff',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               cursor: 'pointer', transition: 'all 0.2s ease',
-              minHeight: 88, minWidth: 88, touchAction: 'manipulation',
+              minHeight: isDesktop ? 60 : 88, minWidth: isDesktop ? 60 : 88, touchAction: 'manipulation',
             }}
           >
-            <AppleEmoji emoji={item.emoji} size={58} />
+            <AppleEmoji emoji={item.emoji} size={isDesktop ? 38 : 58} />
           </button>
         ))}
       </div>

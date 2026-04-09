@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { GameShell, useGameEngine, FeedbackOverlay, PhaseCompleteCard } from '../engine/GameEngine';
 import { AppleEmoji } from '../utils/AppleEmoji';
+import { useIsDesktop } from '../hooks/useIsDesktop';
 
 const ZOO_DATA = [
   { animal: 'Leão',    emoji: '🦁', count: 4,  area: 'Savana' },
@@ -26,6 +27,7 @@ function genTotalOptions(correct: number): number[] {
 
 export function ZooTabelas() {
   const { phase, score, phaseComplete, gameComplete, onCorrect, onPhaseComplete, nextPhase, restart } = useGameEngine(5);
+  const isDesktop = useIsDesktop();
   const [feedback,     setFeedback]    = useState<'correct' | 'wrong' | null>(null);
   const [answered,     setAnswered]    = useState(false);
   const [selectedIdxs, setSelectedIdxs] = useState<Set<number>>(new Set());
@@ -217,10 +219,10 @@ export function ZooTabelas() {
                 key={val}
                 onPointerUp={() => handleTotalAnswer(val)}
                 style={{
-                  width: 86, height: 86, borderRadius: 20,
+                  width: isDesktop ? 56 : 86, height: isDesktop ? 56 : 86, borderRadius: isDesktop ? 12 : 20,
                   border: '2.5px solid var(--border)', background: '#fff',
-                  fontFamily: 'Nunito', fontWeight: 900, fontSize: 36, color: 'var(--text)',
-                  cursor: 'pointer', minHeight: 86, touchAction: 'manipulation',
+                  fontFamily: 'Nunito', fontWeight: 900, fontSize: isDesktop ? 22 : 36, color: 'var(--text)',
+                  cursor: 'pointer', minHeight: isDesktop ? 56 : 86, touchAction: 'manipulation',
                 }}
               >
                 {val}

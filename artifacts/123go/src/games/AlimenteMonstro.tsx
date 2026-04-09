@@ -36,7 +36,7 @@ export function AlimenteMonstro() {
     setItems(Array.from({ length: phaseData.total }, (_, i) => ({ id: i, eaten: false })));
   }, [phase]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const itemSize = isDesktop ? 56 : 48;
+  const itemSize = isDesktop ? 36 : 48;
 
   function handleFeedItem(itemId: number) {
     if (feedback || items.find(i => i.id === itemId)?.eaten) return;
@@ -131,7 +131,7 @@ export function AlimenteMonstro() {
         ref={mouthRef}
         style={{
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: isDesktop ? 90 : 72,
+          fontSize: isDesktop ? 60 : 72,
           marginBottom: 12,
           filter: feedback === 'correct'
             ? 'drop-shadow(0 0 16px #4CAF50)'
