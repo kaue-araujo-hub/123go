@@ -22,6 +22,12 @@ import { CalendarioVivo }       from "./games/CalendarioVivo";
 import { SorveteriaDados }      from "./games/SorveteriaDados";
 import { ZooTabelas }           from "./games/ZooTabelas";
 import { PesquisaTurma }        from "./games/PesquisaTurma";
+import { MaisOuMenos }          from "./games/MaisOuMenos";
+import { ConecteIgual }         from "./games/ConecteIgual";
+import { QualCabeAqui }         from "./games/QualCabeAqui";
+import { AlimenteMonstro }      from "./games/AlimenteMonstro";
+import { LigueNumero }          from "./games/LigueNumero";
+import { QuantosTem }           from "./games/QuantosTem";
 
 function NotFound() {
   return (
@@ -60,6 +66,12 @@ function Router() {
       <Route path="/games/g19-sorveteria-dados"    component={SorveteriaDados} />
       <Route path="/games/g20-zoo-tabelas"         component={ZooTabelas} />
       <Route path="/games/g21-pesquisa-turma"      component={PesquisaTurma} />
+      <Route path="/games/g22-mais-ou-menos"       component={MaisOuMenos} />
+      <Route path="/games/g23-conecte-igual"        component={ConecteIgual} />
+      <Route path="/games/g24-qual-cabe-aqui"       component={QualCabeAqui} />
+      <Route path="/games/g25-alimente-monstro"     component={AlimenteMonstro} />
+      <Route path="/games/g26-ligue-numero"         component={LigueNumero} />
+      <Route path="/games/g27-quantos-tem"          component={QuantosTem} />
       <Route component={NotFound} />
     </Switch>
   );

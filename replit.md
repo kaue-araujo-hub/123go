@@ -28,7 +28,11 @@ See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and pa
 
 ## 123GO! Game Platform Notes
 
-- 21 games in `artifacts/123go/src/games/` — all fully audited and fixed per audit spec
+- **27 games total** in `artifacts/123go/src/games/` (G01–G27)
+- G22–G27 added: MaisOuMenos, ConecteIgual, QualCabeAqui, AlimenteMonstro, LigueNumero, QuantosTem
+- `Game` interface has `nivel?: 'pre-numerico' | 'numerico'` — G22–G24 = pre-numerico, G25–G27 = numerico
+- `NivelCards` component in `src/components/NivelCards/` — two cards at top of StudentCatalog opening NivelModal with filtered games per nivel
+- NivelModal: bottom-sheet on mobile, centered modal on desktop; ESC/backdrop-click to close; blocks body scroll
 - All games use `phaseCompletedRef.current` guard before `onPhaseComplete()` to prevent double-fire
 - All interactive buttons use `onPointerUp` instead of `onClick` for touch reliability + `touchAction: 'manipulation'`
 - Drag games (G01 FestaDaLagarta, G07 TremDosNumeros, G08 PizzariaMagica) support both HTML5 drag (desktop) and pointer-up tap (touch)
