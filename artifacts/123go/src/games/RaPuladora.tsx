@@ -118,8 +118,8 @@ export function RaPuladora() {
   const cfg = PHASE_CONFIGS[phase - 1];
 
   // Ajustes de Escala Desktop (Baseados no sucesso da Lagarta)
-  const FROG_SIZE = isDesktop ? 44 : 64;
-  const FLOWER_SIZE = isDesktop ? 22 : 28;
+  const FROG_SIZE = isDesktop ? 22 : 64;
+  const FLOWER_SIZE = isDesktop ? 12 : 28;
   const GRID_COLS = isDesktop ? "repeat(5, auto)" : "repeat(4, auto)";
 
   useEffect(() => {
