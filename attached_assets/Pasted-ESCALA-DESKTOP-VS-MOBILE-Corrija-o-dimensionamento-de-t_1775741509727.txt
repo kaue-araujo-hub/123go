@@ -1,0 +1,32 @@
+ESCALA DESKTOP VS MOBILE
+"Corrija o dimensionamento de todos os elementos jogáveis e ícones selecionáveis nos 24 jogos da plataforma. Atualmente, os elementos estão exageradamente grandes em telas de Desktop, prejudicando a jogabilidade. Aplique estas regras de estilo responsivo globalmente:
+
+1. Escala Diferenciada (Breakpoints):
+
+Desktop (telas > 1024px): Reduza o tamanho de todos os ícones interativos (emojis de jogo, balões, flores, itens de arrastar) para aproximadamente 50% a 60% do tamanho atual.
+
+Exemplo: Se um item tem w-32 h-32 (128px), mude para md:w-16 md:h-16 (64px) ou md:w-20 md:h-20.
+
+Mobile (telas < 768px): Mantenha os tamanhos grandes atuais para garantir a acessibilidade do toque infantil.
+
+2. Ajuste de Containers e Grades:
+
+Nas visualizações Desktop, os containers (como as lagoas da rã, os potes de balas e as caixas de organização) devem se ajustar para ocupar menos espaço vertical, permitindo que todo o jogo seja visível sem scroll.
+
+Use md:grid-cols-X para organizar itens em mais colunas no computador, aproveitando a largura da tela e reduzindo a altura necessária.
+
+3. Proporção de Fontes e Botões:
+
+Reduza o tamanho dos botões de interface ('Pular', 'Voltar', 'Meu Progresso') e textos de títulos apenas na visualização Desktop. No PC, o cursor do mouse é muito mais preciso que o dedo, permitindo elementos mais refinados.
+
+4. Alinhamento de Imagens de Referência:
+
+Analise as imagens de image_17.png a image_26.png. Note como os elementos estão sobrepostos ou saindo da tela no computador.
+
+Garanta que o personagem principal (Lagarta, Rã, Balconista) não oculte os itens de jogo quando a tela for larga.
+
+5. Aplicação Global:
+
+Identifique o componente base de jogo ou o arquivo de estilos globais (globals.css ou o objeto de configuração de temas) e aplique essas variações usando classes utilitárias como w-20 md:w-12 ou via variáveis CSS de escala.
+
+Otimize a visualização para desktop agora, garantindo que o jogo fique elegante e funcional em telas grandes sem perder a acessibilidade no mobile."

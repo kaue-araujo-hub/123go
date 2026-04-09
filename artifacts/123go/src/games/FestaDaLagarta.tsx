@@ -166,13 +166,13 @@ export function FestaDaLagarta() {
       {pointerDrag && (
         <div style={{
           position: 'fixed',
-          left: pointerDrag.ghostX - (isDesktop ? 41 : 27),
-          top:  pointerDrag.ghostY - (isDesktop ? 41 : 27),
-          width: isDesktop ? 82 : 54, height: isDesktop ? 82 : 54,
-          borderRadius: isDesktop ? 20 : 14,
+          left: pointerDrag.ghostX - (isDesktop ? 27 : 41),
+          top:  pointerDrag.ghostY - (isDesktop ? 27 : 41),
+          width: isDesktop ? 54 : 82, height: isDesktop ? 54 : 82,
+          borderRadius: isDesktop ? 14 : 20,
           background: LEAF_COLORS[pointerDrag.id % LEAF_COLORS.length],
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: isDesktop ? 44 : 28, opacity: 0.88,
+          fontSize: isDesktop ? 28 : 44, opacity: 0.88,
           pointerEvents: 'none', zIndex: 9999,
           boxShadow: '0 8px 24px rgba(0,0,0,0.30)',
           transform: 'scale(1.18)',
@@ -207,7 +207,7 @@ export function FestaDaLagarta() {
           }}
         >
           <div className={collected > 0 ? '' : 'game-character-idle'}>
-            <AppleEmoji emoji="🐛" size={isDesktop ? 120 : 76} />
+            <AppleEmoji emoji="🐛" size={isDesktop ? 76 : 120} />
           </div>
           <div style={{ display: 'flex', gap: 3, flexWrap: 'wrap', justifyContent: 'center', maxWidth: 180 }}>
             {Array.from({ length: Math.min(collected, 12) }).map((_, i) => (
@@ -232,17 +232,17 @@ export function FestaDaLagarta() {
             const dur = 2.4 + (id % 4) * 0.35;
             const del = -(id * 0.47 % dur);
             const isBeingDragged = id === draggingId;
-            const leafSize = isDesktop ? 82 : 54;
+            const leafSize = isDesktop ? 52 : 82;
             return (
               <div
                 key={id}
                 onPointerDown={e => onLeafPointerDown(id, e)}
                 style={{
                   position: 'absolute', left: pos.x, top: pos.y,
-                  width: leafSize, height: leafSize, borderRadius: isDesktop ? 20 : 14,
+                  width: leafSize, height: leafSize, borderRadius: isDesktop ? 14 : 20,
                   background: LEAF_COLORS[id % LEAF_COLORS.length],
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: isDesktop ? 44 : 28,
+                  fontSize: isDesktop ? 28 : 44,
                   cursor: phaseReady ? 'grab' : 'default',
                   boxShadow: '0 3px 10px rgba(0,0,0,0.18)',
                   opacity: isBeingDragged ? 0 : phaseReady ? 1 : 0.5,

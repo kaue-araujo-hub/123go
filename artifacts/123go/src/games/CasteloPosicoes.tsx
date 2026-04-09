@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { GameShell, useGameEngine, FeedbackOverlay, PhaseCompleteCard } from '../engine/GameEngine';
 import { AppleEmoji } from '../utils/AppleEmoji';
+import { useIsDesktop } from '../hooks/useIsDesktop';
 
 type Zone = 'top' | 'bottom' | 'left' | 'right' | 'center';
 
@@ -39,6 +40,7 @@ const INSTRUCTIONS_BY_PHASE: Instruction[][] = [
 
 export function CasteloPosicoes() {
   const { phase, score, phaseComplete, gameComplete, onCorrect, onPhaseComplete, nextPhase, restart } = useGameEngine(5);
+  const isDesktop = useIsDesktop();
   const [feedback, setFeedback] = useState<'correct' | 'wrong' | null>(null);
   const [answered, setAnswered] = useState(false);
   const [instrIdx, setInstrIdx] = useState(0);
@@ -97,7 +99,7 @@ export function CasteloPosicoes() {
 
       <div style={{ textAlign: 'center', marginBottom: 12 }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 8 }}>
-          <AppleEmoji emoji="👑" size={34} />
+          <AppleEmoji emoji="👑" size={isDesktop ? 24 : 34} />
           <span style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 18, color: 'var(--text)' }}>O Rei diz:</span>
         </div>
         <div style={{ background: '#FFF9C4', border: '2px solid #F9A825', borderRadius: 16, padding: '10px 18px', display: 'inline-block' }}>
@@ -111,7 +113,7 @@ export function CasteloPosicoes() {
       </div>
 
       {/* Castle grid - 3×3 */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gridTemplateRows: '1fr 1fr 1fr', gap: 8, height: 230, marginBottom: 14 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gridTemplateRows: '1fr 1fr 1fr', gap: 8, height: isDesktop ? 170 : 230, marginBottom: 14 }}>
         <div />
         <button onPointerUp={() => handleZone('top')}    style={zoneStyle('top',    instruction.targetZone === 'top'    || instruction.secondZone === 'top',    answered)}>⬆️<br/>Em cima</button>
         <div />
@@ -124,7 +126,7 @@ export function CasteloPosicoes() {
       </div>
 
       <div style={{ textAlign: 'center' }}>
-        <AppleEmoji emoji="🗡️" size={48} className="game-character-idle" />
+        <AppleEmoji emoji="🗡️" size={isDesktop ? 32 : 48} className="game-character-idle" />
       </div>
     </GameShell>
   );

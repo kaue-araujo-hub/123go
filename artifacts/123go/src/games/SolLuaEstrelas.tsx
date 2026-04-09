@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
 import { GameShell, useGameEngine, FeedbackOverlay, PhaseCompleteCard } from '../engine/GameEngine';
 import { AppleEmoji } from '../utils/AppleEmoji';
+import { useIsDesktop } from '../hooks/useIsDesktop';
 
 /* ── helpers ── */
 function shuffleArr<T>(arr: T[]): T[] {
@@ -47,6 +48,7 @@ const PHASES = [
 
 export function SolLuaEstrelas() {
   const { phase, score, phaseComplete, gameComplete, onCorrect, onPhaseComplete, nextPhase, restart } = useGameEngine(5);
+  const isDesktop = useIsDesktop();
   const [feedback,    setFeedback]    = useState<'correct' | 'wrong' | null>(null);
   const [answered,    setAnswered]    = useState(false);
   const phaseCompletedRef = useRef(false);
@@ -294,7 +296,7 @@ export function SolLuaEstrelas() {
           <h2 style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 17, color: 'var(--text)', marginBottom: 8 }}>
             {phaseData.question}
           </h2>
-          <AppleEmoji emoji={period.emoji} size={72} />
+          <AppleEmoji emoji={period.emoji} size={isDesktop ? 48 : 72} />
           <p style={{ fontFamily: 'Nunito', fontWeight: 700, fontSize: 16, color: 'var(--text)', marginTop: 6 }}>{period.name}</p>
         </div>
         <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
@@ -309,7 +311,7 @@ export function SolLuaEstrelas() {
                 touchAction: 'manipulation', flex: 1,
               }}
             >
-              <AppleEmoji emoji={act.emoji} size={44} />
+              <AppleEmoji emoji={act.emoji} size={isDesktop ? 28 : 44} />
               <span style={{ fontFamily: 'Nunito', fontWeight: 700, fontSize: 12, color: 'var(--text)' }}>{act.label}</span>
             </button>
           ))}
@@ -326,7 +328,7 @@ export function SolLuaEstrelas() {
         <h2 style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 17, color: 'var(--text)', marginBottom: 10 }}>
           {phaseData.question}
         </h2>
-        <AppleEmoji emoji={phaseData.showEmoji ?? '☀️'} size={88} />
+        <AppleEmoji emoji={phaseData.showEmoji ?? '☀️'} size={isDesktop ? 56 : 88} />
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
         {PERIODS.map((p, i) => (
@@ -340,7 +342,7 @@ export function SolLuaEstrelas() {
               minHeight: 64, transition: 'all 0.15s', touchAction: 'manipulation',
             }}
           >
-            <AppleEmoji emoji={p.emoji} size={40} />
+            <AppleEmoji emoji={p.emoji} size={isDesktop ? 28 : 40} />
             <span style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 15, color: p.textColor }}>{p.name}</span>
           </button>
         ))}

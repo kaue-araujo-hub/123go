@@ -196,17 +196,17 @@ export function AtelieOrdem() {
       {ghostPos && draggingObj && (
         <div style={{
           position: 'fixed',
-          left: ghostPos.x - (isDesktop ? 50 : 36),
-          top:  ghostPos.y - (isDesktop ? 50 : 36),
-          width: isDesktop ? 100 : 72, height: isDesktop ? 100 : 72,
-          background: '#fff', borderRadius: isDesktop ? 24 : 18,
+          left: ghostPos.x - (isDesktop ? 30 : 36),
+          top:  ghostPos.y - (isDesktop ? 30 : 36),
+          width: isDesktop ? 60 : 72, height: isDesktop ? 60 : 72,
+          background: '#fff', borderRadius: isDesktop ? 16 : 18,
           border: '3px solid var(--c1)',
           boxShadow: '0 8px 24px rgba(0,0,0,0.2)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           zIndex: 9999, pointerEvents: 'none',
           transform: 'scale(1.15)',
         }}>
-          <AppleEmoji emoji={draggingObj.emoji} size={isDesktop ? 68 : 46} />
+          <AppleEmoji emoji={draggingObj.emoji} size={isDesktop ? 40 : 46} />
         </div>
       )}
 
@@ -232,8 +232,8 @@ export function AtelieOrdem() {
         )}
         {remaining.map(obj => {
           const isDraggingMe = draggingObj?.emoji === obj.emoji;
-          const tileSize = isDesktop ? 100 : 64;
-          const emojiSize = isDesktop ? 68 : 44;
+          const tileSize = isDesktop ? 56 : 64;
+          const emojiSize = isDesktop ? 36 : 44;
           return (
             <div
               key={obj.emoji}
@@ -241,7 +241,7 @@ export function AtelieOrdem() {
               style={{
                 width: tileSize, height: tileSize,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                cursor: 'grab', background: 'var(--bg)', borderRadius: isDesktop ? 24 : 16,
+                cursor: 'grab', background: 'var(--bg)', borderRadius: isDesktop ? 14 : 16,
                 border: '2px solid var(--border)',
                 boxShadow: isDraggingMe ? 'none' : '0 2px 6px rgba(0,0,0,0.08)',
                 touchAction: 'none', userSelect: 'none',
@@ -257,7 +257,7 @@ export function AtelieOrdem() {
       </div>
 
       {/* Drawer drop zones */}
-      <div style={{ display: 'flex', gap: isDesktop ? 14 : 8 }}>
+      <div style={{ display: 'flex', gap: 8 }}>
         {phaseData.drawers.map(drawer => {
           const isHovered = hoveredKey === drawer.key;
           return (
@@ -265,10 +265,10 @@ export function AtelieOrdem() {
               key={drawer.key}
               ref={el => { drawerNodeRefs.current[drawer.key] = el; }}
               style={{
-                flex: 1, padding: isDesktop ? '14px 10px' : '8px 6px', borderRadius: 16,
+                flex: 1, padding: '8px 6px', borderRadius: 16,
                 border: `3px solid ${isHovered ? drawer.color : `${drawer.color}88`}`,
                 background: isHovered ? `${drawer.color}33` : `${drawer.color}12`,
-                minHeight: isDesktop ? 210 : 130,
+                minHeight: 130,
                 display: 'flex', flexDirection: 'column', gap: 5,
                 alignItems: 'center',
                 transition: 'border 0.15s, background 0.15s, transform 0.15s',
@@ -277,17 +277,17 @@ export function AtelieOrdem() {
               }}
             >
               <span style={{
-                fontSize: isDesktop ? 15 : 11, fontWeight: 800, color: drawer.color,
+                fontSize: 11, fontWeight: 800, color: drawer.color,
                 textAlign: 'center', fontFamily: 'Nunito', lineHeight: 1.2,
               }}>
                 {drawer.label}
               </span>
               <div style={{
-                display: 'flex', flexWrap: 'wrap', gap: isDesktop ? 6 : 3,
+                display: 'flex', flexWrap: 'wrap', gap: 3,
                 justifyContent: 'center', flex: 1, alignContent: 'center',
               }}>
                 {(placed[drawer.key] || []).map((emoji, i) => (
-                  <AppleEmoji key={i} emoji={emoji} size={isDesktop ? 40 : 26} />
+                  <AppleEmoji key={i} emoji={emoji} size={26} />
                 ))}
               </div>
             </div>

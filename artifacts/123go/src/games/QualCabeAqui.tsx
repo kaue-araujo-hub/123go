@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { GameShell, useGameEngine, FeedbackOverlay, PhaseCompleteCard } from '../engine/GameEngine';
 import { AppleEmoji } from '../utils/AppleEmoji';
+import { useIsDesktop } from '../hooks/useIsDesktop';
 
 /* ── Fases ───────────────────────────────────────────────────────────────────── */
 type Tam = 'pequeno' | 'medio' | 'grande';
@@ -29,6 +30,7 @@ function shuffleArr<T>(arr: T[]): T[] {
 
 export function QualCabeAqui() {
   const { phase, score, phaseComplete, gameComplete, onCorrect, onPhaseComplete, nextPhase, restart } = useGameEngine(5);
+  const isDesktop = useIsDesktop();
 
   const [feedback,   setFeedback]   = useState<'correct' | 'wrong' | null>(null);
   const [acertos,    setAcertos]    = useState(0);
@@ -75,7 +77,9 @@ export function QualCabeAqui() {
     }
   }
 
-  const holeSize = HOLE_SIZES[phaseData.buraco];
+  const rHoleSizes = isDesktop ? { pequeno: 56, medio: 84, grande: 112 } : HOLE_SIZES;
+  const rObjSizes  = isDesktop ? { pequeno: 28, medio: 42, grande: 56  } : OBJ_SIZES;
+  const holeSize = rHoleSizes[phaseData.buraco];
   const tamLabel: Record<Tam, string> = { pequeno: 'PEQUENO', medio: 'MÉDIO', grande: 'GRANDE' };
 
   if (phaseComplete) {
@@ -122,7 +126,7 @@ export function QualCabeAqui() {
         }}>
           {enterObj && (
             <span style={{
-              fontSize: OBJ_SIZES[phaseData.buraco],
+              fontSize: rObjSizes[phaseData.buraco],
               animation: 'objEnter 0.5s cubic-bezier(0.34,1.56,0.64,1) both',
             }}>
               {enterObj}
@@ -139,13 +143,13 @@ export function QualCabeAqui() {
         {opcoes.map(opcao => {
           const isWrong   = wrongObj === opcao.item;
           const isCorrect = enterObj === opcao.item;
-          const sz = OBJ_SIZES[opcao.tam];
+          const sz = rObjSizes[opcao.tam];
           return (
             <button
               key={opcao.item}
               onPointerUp={() => handleTap(opcao)}
               style={{
-                minWidth: 88, minHeight: 88, borderRadius: 20,
+                minWidth: isDesktop ? 60 : 88, minHeight: isDesktop ? 60 : 88, borderRadius: isDesktop ? 14 : 20,
                 background: '#fff', border: '2px solid var(--border)',
                 cursor: 'pointer', touchAction: 'manipulation', userSelect: 'none',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',

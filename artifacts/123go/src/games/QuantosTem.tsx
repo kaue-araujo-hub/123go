@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { GameShell, useGameEngine, FeedbackOverlay, PhaseCompleteCard } from '../engine/GameEngine';
 import { AppleEmoji } from '../utils/AppleEmoji';
+import { useIsDesktop } from '../hooks/useIsDesktop';
 
 /* ── Fases ───────────────────────────────────────────────────────────────────── */
 interface Phase {
@@ -47,6 +48,7 @@ function generateRound(maxQtd: number, numOpcoes: number) {
 
 export function QuantosTem() {
   const { phase, score, phaseComplete, gameComplete, onCorrect, onPhaseComplete, nextPhase, restart } = useGameEngine(5);
+  const isDesktop = useIsDesktop();
 
   const [feedback,    setFeedback]    = useState<'correct' | 'wrong' | null>(null);
   const [correct,     setCorrect]     = useState(0);
@@ -161,7 +163,7 @@ export function QuantosTem() {
           rows.map((count, ri) => (
             <div key={ri} style={{ display: 'flex', gap: 4, justifyContent: 'center' }}>
               {Array.from({ length: count }).map((_, ci) => (
-                <AppleEmoji key={ci} emoji={phaseData.item} size={32} />
+                <AppleEmoji key={ci} emoji={phaseData.item} size={isDesktop ? 22 : 32} />
               ))}
             </div>
           ))
@@ -185,8 +187,8 @@ export function QuantosTem() {
               key={num}
               onPointerUp={() => handleTap(num)}
               style={{
-                minWidth: 72, minHeight: 72, borderRadius: 16,
-                fontFamily: 'Nunito', fontWeight: 900, fontSize: 28,
+                minWidth: isDesktop ? 50 : 72, minHeight: isDesktop ? 50 : 72, borderRadius: 16,
+                fontFamily: 'Nunito', fontWeight: 900, fontSize: isDesktop ? 20 : 28,
                 color: '#fff', background: color,
                 border: 'none', cursor: 'pointer', touchAction: 'manipulation',
                 userSelect: 'none',

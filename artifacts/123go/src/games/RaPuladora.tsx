@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { GameShell, useGameEngine, FeedbackOverlay, PhaseCompleteCard } from '../engine/GameEngine';
 import { AppleEmoji } from '../utils/AppleEmoji';
+import { useIsDesktop } from '../hooks/useIsDesktop';
 
 interface PhaseConfig {
   min: number;
@@ -58,6 +59,7 @@ function generateRound(cfg: PhaseConfig): Round {
 
 export function RaPuladora() {
   const { phase, score, phaseComplete, gameComplete, onCorrect, onPhaseComplete, nextPhase, restart } = useGameEngine(5);
+  const isDesktop = useIsDesktop();
   const [round, setRound] = useState<Round | null>(null);
   const [roundNum, setRoundNum] = useState(1);
   const [feedback, setFeedback] = useState<'correct' | 'wrong' | null>(null);
@@ -143,7 +145,7 @@ export function RaPuladora() {
         {/* Frog */}
         <div style={{ display: 'flex', justifyContent: 'center', flexShrink: 0, willChange: 'transform' }}>
           <div style={{ display: 'inline-block', animation: jumping !== null ? 'frogJump 0.42s ease' : undefined }}>
-            <AppleEmoji emoji="🐸" size={64} className={jumping === null ? 'game-character-idle' : ''} />
+            <AppleEmoji emoji="🐸" size={isDesktop ? 44 : 64} className={jumping === null ? 'game-character-idle' : ''} />
           </div>
         </div>
 
@@ -176,7 +178,7 @@ export function RaPuladora() {
                 {extra > 0 && (
                   <span style={{ fontFamily: 'Nunito', fontSize: 11, color: '#4CAF50', fontWeight: 700 }}>+{extra}</span>
                 )}
-                <span style={{ fontFamily: 'Nunito', fontWeight: 900, fontSize: 28, color: '#2E7D32', lineHeight: 1 }}>
+                <span style={{ fontFamily: 'Nunito', fontWeight: 900, fontSize: isDesktop ? 20 : 28, color: '#2E7D32', lineHeight: 1 }}>
                   {count}
                 </span>
                 <span style={{ fontFamily: 'Nunito', fontSize: 11, color: '#888' }}>flores</span>

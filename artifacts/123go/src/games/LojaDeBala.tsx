@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { GameShell, useGameEngine, FeedbackOverlay, PhaseCompleteCard } from '../engine/GameEngine';
 import { AppleEmoji } from '../utils/AppleEmoji';
+import { useIsDesktop } from '../hooks/useIsDesktop';
 
 const PHASES = [
   { question: 'Qual pote tem MAIS balas?', potes: [{ count: 5, emoji: '🍬', label: 'A' }, { count: 9, emoji: '🍭', label: 'B' }], correct: 1 },
@@ -40,6 +41,7 @@ function PoteVisual({ count, emoji, label, selected, onTap }: {
 
 export function LojaDeBala() {
   const { phase, score, phaseComplete, gameComplete, onCorrect, onPhaseComplete, nextPhase, restart } = useGameEngine(5);
+  const isDesktop = useIsDesktop();
   const [feedback, setFeedback] = useState<'correct' | 'wrong' | null>(null);
   const [answered, setAnswered] = useState(false);
   const phaseCompletedRef = useRef(false);
@@ -82,7 +84,7 @@ export function LojaDeBala() {
 
         {/* Header */}
         <div style={{ textAlign: 'center', flexShrink: 0 }}>
-          <div style={{ marginBottom: 6 }}><AppleEmoji emoji="🏪" size={40} /></div>
+          <div style={{ marginBottom: 6 }}><AppleEmoji emoji="🏪" size={isDesktop ? 28 : 40} /></div>
           <h2 style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 18, color: 'var(--text)', margin: 0 }}>
             {phaseData.question}
           </h2>

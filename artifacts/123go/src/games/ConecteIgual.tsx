@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { GameShell, useGameEngine, FeedbackOverlay, PhaseCompleteCard } from '../engine/GameEngine';
 import { AppleEmoji } from '../utils/AppleEmoji';
+import { useIsDesktop } from '../hooks/useIsDesktop';
 
 /* ── Fases ───────────────────────────────────────────────────────────────────── */
 interface PhaseItem { id: string; emoji: string; color: string; }
@@ -51,6 +52,7 @@ interface DragLine { fromX: number; fromY: number; toX: number; toY: number; }
 
 export function ConecteIgual() {
   const { phase, score, phaseComplete, gameComplete, onCorrect, onPhaseComplete, nextPhase, restart } = useGameEngine(5);
+  const isDesktop = useIsDesktop();
 
   const [feedback,     setFeedback]     = useState<'correct' | 'wrong' | null>(null);
   const [connections,  setConnections]  = useState<Connection[]>([]);
@@ -163,7 +165,7 @@ export function ConecteIgual() {
         onPointerMove={handlePointerMove}
         onPointerUp={e => { if (dragFromId && dragFromSide !== side) handlePointerUp(e, item.id, side); }}
         style={{
-          width: 60, height: 60, borderRadius: 14,
+          width: isDesktop ? 42 : 60, height: isDesktop ? 42 : 60, borderRadius: 14,
           background: linked ? conn!.color + '22' : '#fff',
           border: `2.5px solid ${linked ? conn!.color : isWrong ? '#F44336' : '#E8E8F0'}`,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -174,7 +176,7 @@ export function ConecteIgual() {
           boxShadow: linked ? `0 0 12px ${conn!.color}44` : '0 2px 6px rgba(0,0,0,0.08)',
         }}
       >
-        <AppleEmoji emoji={item.emoji} size={34} />
+        <AppleEmoji emoji={item.emoji} size={isDesktop ? 24 : 34} />
       </div>
     );
   }

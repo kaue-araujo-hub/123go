@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { GameShell, useGameEngine, FeedbackOverlay, PhaseCompleteCard } from '../engine/GameEngine';
 import { AppleEmoji } from '../utils/AppleEmoji';
+import { useIsDesktop } from '../hooks/useIsDesktop';
 
 /* ── Fases ───────────────────────────────────────────────────────────────────── */
 interface Pair { num: number; emoji: string; }
@@ -26,6 +27,7 @@ interface DragLine { fromX: number; fromY: number; toX: number; toY: number; }
 
 export function LigueNumero() {
   const { phase, score, phaseComplete, gameComplete, onCorrect, onPhaseComplete, nextPhase, restart } = useGameEngine(5);
+  const isDesktop = useIsDesktop();
 
   const [feedback,    setFeedback]    = useState<'correct' | 'wrong' | null>(null);
   const [connections, setConnections] = useState<Connection[]>([]);
@@ -145,7 +147,7 @@ export function LigueNumero() {
                 ref={el => { itemRefs.current[`num-${p.num}`] = el; }}
                 onPointerDown={e => handleNumDown(e, p.num)}
                 style={{
-                  width: 56, height: 56, borderRadius: 14,
+                  width: isDesktop ? 40 : 56, height: isDesktop ? 40 : 56, borderRadius: 14,
                   background: linked ? color + '22' : '#fff',
                   border: `2.5px solid ${linked ? color : dragNum === p.num ? '#5B4FCF' : '#E8E8F0'}`,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -204,7 +206,7 @@ export function LigueNumero() {
                 ref={el => { itemRefs.current[`grp-${p.emoji}`] = el; }}
                 onPointerUp={e => { if (dragNum !== null) handleGroupUp(e, p); }}
                 style={{
-                  width: 80, minHeight: 56, borderRadius: 14,
+                  width: isDesktop ? 56 : 80, minHeight: isDesktop ? 40 : 56, borderRadius: 14,
                   background: linked ? color + '22' : '#fff',
                   border: `2.5px solid ${linked ? color : isWrong ? '#F44336' : '#E8E8F0'}`,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',

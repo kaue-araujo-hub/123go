@@ -60,8 +60,8 @@ export function JardimPadroes() {
   /* tile size: desktop = ~1.7× mobile */
   const totalItems = phaseData.pattern.length + phaseData.nexts.length;
   const tileSize   = isDesktop
-    ? (totalItems <= 6 ? 90 : 76)
-    : (totalItems <= 6 ? 54 : 46);
+    ? (totalItems <= 6 ? 54 : 42)
+    : (totalItems <= 6 ? 62 : 52);
   const emojiSize  = tileSize - 18;
 
   /* ── 1. completion — must be BEFORE the phase-reset effect ── */
@@ -183,7 +183,7 @@ export function JardimPadroes() {
       {/* Pattern + slots row */}
       <div style={{
         background: '#fff', borderRadius: 'var(--radius)', border: '1.5px solid var(--border)',
-        padding: isDesktop ? 22 : 14, marginBottom: isDesktop ? 36 : 28,
+        padding: 14, marginBottom: isDesktop ? 20 : 28,
         display: 'flex', alignItems: 'center',
         gap: isDesktop ? (totalItems <= 6 ? 16 : 12) : (totalItems <= 6 ? 8 : 6),
         justifyContent: 'center',
@@ -244,17 +244,17 @@ export function JardimPadroes() {
       </div>
 
       {/* Draggable options bank */}
-      <div style={{ display: 'flex', gap: isDesktop ? 28 : 16, justifyContent: 'center' }}>
+      <div style={{ display: 'flex', gap: 16, justifyContent: 'center' }}>
         {phaseData.options.map(opt => {
           const isDraggingMe = draggingOpt === opt;
-          const optSize = isDesktop ? 144 : 90;
-          const optEmoji = isDesktop ? 96 : 54;
+          const optSize = isDesktop ? 80 : 90;
+          const optEmoji = isDesktop ? 50 : 54;
           return (
             <div
               key={opt}
               onPointerDown={e => startDrag(e, opt)}
               style={{
-                width: optSize, height: optSize, borderRadius: isDesktop ? 32 : 22,
+                width: optSize, height: optSize, borderRadius: isDesktop ? 18 : 22,
                 border: '3px solid var(--border)',
                 background: '#fff',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',

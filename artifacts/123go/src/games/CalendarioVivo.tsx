@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useLayoutEffect, useRef, useCallback } from 'react';
 import { GameShell, useGameEngine, FeedbackOverlay, PhaseCompleteCard } from '../engine/GameEngine';
+import { useIsDesktop } from '../hooks/useIsDesktop';
 
 const ALL_DAYS = [
   { name: 'Segunda',  color: '#7C3AED' },
@@ -52,6 +53,7 @@ function genPositions(n: number, areaW: number, areaH: number) {
 
 export function CalendarioVivo() {
   const { phase, score, phaseComplete, gameComplete, onCorrect, onPhaseComplete, nextPhase, restart } = useGameEngine(5);
+  const isDesktop = useIsDesktop();
   const [feedback,      setFeedback]      = useState<'correct' | 'wrong' | null>(null);
   const [clickedCount,  setClickedCount]  = useState(0);
   const [allDays,       setAllDays]       = useState<typeof ALL_DAYS>([]);
@@ -153,8 +155,8 @@ export function CalendarioVivo() {
                 position: 'absolute',
                 left:     pos.x,
                 top:      pos.y,
-                width:    BUBBLE_W,
-                height:   BUBBLE_H,
+                width:    isDesktop ? 80 : BUBBLE_W,
+                height:   isDesktop ? 32 : BUBBLE_H,
                 transition: 'left 0.28s ease, top 0.28s ease, background 0.15s, transform 0.15s, opacity 0.25s',
                 background: isFlash ? '#4CAF50' : isWrong ? '#EF5350' : day.color,
                 borderRadius: 30,

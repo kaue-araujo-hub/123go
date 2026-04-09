@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { GameShell, useGameEngine, FeedbackOverlay, PhaseCompleteCard } from '../engine/GameEngine';
+import { useIsDesktop } from '../hooks/useIsDesktop';
 
 type Direction = 'up' | 'down' | 'left' | 'right';
 
@@ -28,6 +29,7 @@ const PHASES = [
 
 export function RoboPerdido() {
   const { phase, score, phaseComplete, gameComplete, onCorrect, onPhaseComplete, nextPhase, restart } = useGameEngine(5);
+  const isDesktop = useIsDesktop();
   const [robotPos,    setRobotPos]    = useState<[number, number]>([0, 0]);
   const [robot2Pos,   setRobot2Pos]   = useState<[number, number]>([0, 0]);
   const [activeRobot, setActiveRobot] = useState(0);
@@ -204,9 +206,9 @@ export function RoboPerdido() {
             key={dir}
             onPointerUp={() => move(dir)}
             style={{
-              width: 58, height: 58, borderRadius: 14,
+              width: isDesktop ? 44 : 58, height: isDesktop ? 44 : 58, borderRadius: 14,
               border: '2px solid var(--c1)',
-              background: '#fff', fontSize: 24, cursor: 'pointer',
+              background: '#fff', fontSize: isDesktop ? 18 : 24, cursor: 'pointer',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               touchAction: 'manipulation',
               boxShadow: '0 2px 8px rgba(0,0,0,0.08)',

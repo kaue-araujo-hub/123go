@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { GameShell, useGameEngine, FeedbackOverlay, PhaseCompleteCard } from '../engine/GameEngine';
 import { AppleEmoji } from '../utils/AppleEmoji';
 import { playBalloonPop } from '../utils/sounds';
+import { useIsDesktop } from '../hooks/useIsDesktop';
 
 const PHASES = [
   { total: 20, pop: 8,  question: 'Estoure 8 balões!' },
@@ -38,6 +39,7 @@ function seededRandom(seed: number) {
 
 export function BaloesdaFesta() {
   const { phase, score, phaseComplete, gameComplete, onCorrect, onPhaseComplete, nextPhase, restart } = useGameEngine(5);
+  const isDesktop = useIsDesktop();
   const [poppedSet,  setPoppedSet]  = useState<Set<number>>(new Set());
   const [splashing,  setSplashing]  = useState<Set<number>>(new Set());
   const [feedback,   setFeedback]   = useState<'correct' | 'wrong' | null>(null);
@@ -140,10 +142,10 @@ export function BaloesdaFesta() {
                   left: `${b.left}%`,
                   top:  `${b.top}%`,
                   /* center via margin — NO transform here, animation owns transform */
-                  marginLeft: -24,
-                  marginTop:  -28,
+                  marginLeft: isDesktop ? -17 : -24,
+                  marginTop:  isDesktop ? -21 : -28,
                   background: 'none', border: 'none', padding: 0,
-                  width: 48, height: 56,
+                  width: isDesktop ? 34 : 48, height: isDesktop ? 42 : 56,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   cursor: (isPopped || popped >= phaseData.pop) ? 'default' : 'pointer',
                   touchAction: 'manipulation',
@@ -162,7 +164,7 @@ export function BaloesdaFesta() {
                   ? <span style={{ fontSize: 28 }}>💥</span>
                   : isPopped
                   ? null
-                  : <AppleEmoji emoji="🎈" size={38} style={{ filter: b.hue, display: 'block' }} />
+                  : <AppleEmoji emoji="🎈" size={isDesktop ? 26 : 38} style={{ filter: b.hue, display: 'block' }} />
                 }
               </button>
             );
