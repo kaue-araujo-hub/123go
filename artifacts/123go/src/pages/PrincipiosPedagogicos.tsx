@@ -59,7 +59,7 @@ export function PrincipiosPedagogicos() {
       
       <main style={{ flex: 1, maxWidth: 900, margin: '0 auto', width: '100%', padding: '20px 16px' }}>
         <button
-          onClick={() => setLocation('/catalog')}
+          onClick={() => setLocation('/student')}
           style={{ background: 'none', border: 'none', color: 'var(--text3)', cursor: 'pointer', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 6, fontWeight: 700, fontFamily: 'Nunito' }}
         >
           ← Voltar ao Catálogo
@@ -69,12 +69,111 @@ export function PrincipiosPedagogicos() {
           Princípios Pedagógicos
         </h1>
 
-        <div style={{ background: '#fff', padding: '24px', borderRadius: '16px', border: '1px solid var(--border)', marginBottom: 32 }}>
-          <p style={{ color: 'var(--text2)', lineHeight: '1.6', marginBottom: 12 }}>
-            A plataforma <strong>123GO!</strong> foi desenvolvida em total alinhamento ao <strong>Currículo Paulista</strong>, garantindo que cada atividade gamificada contribua para o desenvolvimento das competências essenciais do 1º ano.
+        <div style={{ 
+          background: '#fff', 
+          padding: '32px 28px', 
+          borderRadius: '20px', 
+          border: '1px solid var(--border)', 
+          marginBottom: 40,
+          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.04)'
+        }}>
+          
+          <p style={{ 
+            color: 'var(--text2)', 
+            lineHeight: '1.75', 
+            fontSize: '15.5px',
+            marginBottom: 18 
+          }}>
+            O <strong>123GO!</strong> nasceu com um objetivo claro: tornar o aprendizado de matemática 
+            acessível, mesmo em contextos de baixa conectividade e dispositivos simples.
           </p>
-          <p style={{ color: 'var(--text2)', lineHeight: '1.6' }}>
-            Abaixo, os jogos estão organizados por habilidades específicas, permitindo um planejamento pedagógico preciso e intencional.
+
+          <p style={{ 
+            color: 'var(--text2)', 
+            lineHeight: '1.75', 
+            fontSize: '15.5px',
+            marginBottom: 18 
+          }}>
+            Toda a plataforma foi construída em total alinhamento com o <strong>Currículo Paulista</strong>, 
+            garantindo que cada atividade gamificada desenvolva habilidades essenciais do 1º ano de forma prática, 
+            leve e envolvente.
+          </p>
+
+          <p style={{ 
+            color: 'var(--text2)', 
+            lineHeight: '1.75', 
+            fontSize: '15.5px',
+            marginBottom: 18 
+          }}>
+            Mas esse projeto <strong>não está pronto</strong> — e nem deve estar.
+          </p>
+
+          <p style={{ 
+            color: 'var(--text2)', 
+            lineHeight: '1.75', 
+            fontSize: '15.5px',
+            marginBottom: 18 
+          }}>
+            Acreditamos que a melhor forma de construir uma solução educacional relevante é <strong>junto de quem vive 
+            a realidade da sala de aula todos os dias</strong>, e também com pessoas dispostas a fazer acontecer.
+          </p>
+
+          <p style={{ 
+            color: 'var(--text2)', 
+            lineHeight: '1.75', 
+            fontSize: '15.5px',
+            marginBottom: 18 
+          }}>
+            Se você é professor, educador, desenvolvedor, designer ou simplesmente alguém que acredita que a educação 
+            pode ser mais acessível, prática e conectada com a realidade dos alunos — <strong>esse espaço também é seu</strong>.
+          </p>
+
+          <p style={{ 
+            color: 'var(--text2)', 
+            lineHeight: '1.75', 
+            fontSize: '15.5px',
+            marginBottom: 18 
+          }}>
+            Aqui, os jogos estão organizados por habilidades específicas para apoiar um planejamento pedagógico 
+            intencional e eficaz.
+          </p>
+
+          <p style={{ 
+            color: 'var(--text2)', 
+            lineHeight: '1.75', 
+            fontSize: '15.5px',
+            marginBottom: 24,
+            fontWeight: 600
+          }}>
+            Agora, o próximo passo é evoluir <strong>juntos</strong>.
+          </p>
+
+          <p style={{ 
+            color: '#16A34A', 
+            fontSize: '17px', 
+            fontWeight: 700, 
+            lineHeight: '1.6',
+            marginBottom: 8 
+          }}>
+            🚀 Quer construir isso com a gente?
+          </p>
+
+          <p style={{ 
+            color: 'var(--text2)', 
+            lineHeight: '1.7', 
+            fontSize: '15.5px' 
+          }}>
+            Entre em contato e faça parte dessa jornada. 
+            <a 
+              href="mailto:kauearaujo_@outlook.com" 
+              style={{ 
+                color: '#16A34A', 
+                textDecoration: 'underline', 
+                cursor: 'pointer' 
+              }}
+            >
+              kauearaujo_@outlook.com
+            </a>
           </p>
         </div>
 

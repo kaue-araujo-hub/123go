@@ -1,6 +1,5 @@
 import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
-import { useLocation } from 'wouter';
-import { Link } from "wouter";
+import { useLocation, useSearchParams, Link } from "wouter";
 import { games } from '../data/games';
 import { StudentGameCard } from '../components/StudentGameCard';
 import { SessionManager } from '../auth/SessionManager';
@@ -9,15 +8,18 @@ import styles from './StudentCatalog.module.css';
 
 export function StudentCatalog() {
   const [, setLocation] = useLocation();
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const currentTheme = searchParams.get("tema") || null;
+
   const logoColors = useLogoColors();
 
-  /* Always enforce student role on this page */
+  // Forçar logout do professor
   useEffect(() => {
     SessionManager.logoutTeacher();
   }, []);
 
-
+  const [searchQuery, setSearchQuery] = useState('');
   const [searchOpen, setSearchOpen] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
@@ -31,32 +33,87 @@ export function StudentCatalog() {
     setSearchQuery('');
   }, []);
 
+  // Filtragem otimizada
+  // Filtragem otimizada - Busca por TÍTULO OU por CÓDIGO (EF01MA02, EF01MA03, etc.)
   const filteredGames = useMemo(() => {
-    if (!searchQuery.trim()) return games;
-    const q = searchQuery.toLowerCase();
-    return games.filter(g => g.title.toLowerCase().includes(q));
-  }, [searchQuery]);
+    const query = searchQuery.toLowerCase().trim();
 
-  function handleCardTap(path: string) {
+    // Se não tiver busca, só aplica o filtro de tema
+    if (!query) {
+      return games.filter(game => 
+        !currentTheme || currentTheme === 'all' || game.tema === currentTheme
+      );
+    }
+
+    return games.filter(game => {
+      // Busca por título
+      const matchesTitle = game.title.toLowerCase().includes(query);
+
+      // Busca por código de habilidade (ex: EF01MA02, EF01MA03...)
+      const matchesCode = game.codigo 
+        ? game.codigo.toLowerCase().includes(query) 
+        : false;
+
+      const matchesSearch = matchesTitle || matchesCode;
+
+      // Filtro por tema continua funcionando
+      const matchesTheme = !currentTheme || 
+                           currentTheme === 'all' || 
+                           game.tema === currentTheme;
+
+      return matchesSearch && matchesTheme;
+    });
+  }, [searchQuery, currentTheme]);
+
+  const handleCardTap = (path: string) => {
     setLocation(path);
-  }
+  };
+
+  const handleThemeClick = (themeId: string) => {
+    if (themeId === 'all') {
+      setSearchParams({});
+    } else {
+      setSearchParams({ tema: themeId });
+    }
+  };
+
+  const isAllActive = !currentTheme || currentTheme === 'all';
 
   return (
     <div className={styles.screen}>
 
+      {/* ==================== HEADER ATUALIZADO ==================== */}
       <header className={styles.header}>
 
-        {/* ── Search overlay ── */}
+        {/* Search Overlay */}
+        {/* Search Overlay - Versão mais compacta e parecida com a imagem */}
         {searchOpen && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1, padding: '10px 14px' }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 10,
+            padding: '12px 16px',
+            background: '#ffffff',
+            width: '100%'
+          }}>
+            {/* Campo de busca menor e mais bonito */}
             <div style={{
-              flex: 1, display: 'flex', alignItems: 'center', gap: 8,
-              background: '#F3F4F6', border: '1.5px solid #E5E7EB',
-              borderRadius: 9999, padding: '0 12px 0 14px',
+              flex: 1,
+              maxWidth: '680px',                    // ← Limita a largura máxima
+              display: 'flex',
+              alignItems: 'center',
+              gap: 10,
+              background: '#F8FAFC',
+              border: '1.5px solid #E2E8F0',
+              borderRadius: 9999,
+              padding: '10px 16px',
+              margin: '0 auto',                     // Centraliza
             }}>
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="11" cy="11" r="8"/>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"/>
               </svg>
+
               <input
                 ref={searchInputRef}
                 type="text"
@@ -65,27 +122,58 @@ export function StudentCatalog() {
                 onChange={e => setSearchQuery(e.target.value)}
                 aria-label="Buscar jogo por nome"
                 style={{
-                  flex: 1, border: 'none', outline: 'none',
+                  flex: 1,
+                  border: 'none',
+                  outline: 'none',
                   background: 'transparent',
-                  fontFamily: 'Nunito', fontWeight: 600, fontSize: 15,
-                  color: '#1A1A2E', padding: '10px 0',
+                  fontFamily: 'Nunito',
+                  fontWeight: 600,
+                  fontSize: 15,
+                  color: '#1E2937',
                 }}
               />
+
+              {/* Botão X para limpar a busca */}
               {searchQuery && (
                 <button
                   onPointerUp={() => setSearchQuery('')}
-                  style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#9CA3AF', fontSize: 16, padding: 0, lineHeight: 1, touchAction: 'manipulation' }}
                   aria-label="Limpar busca"
-                >✕</button>
+                  style={{
+                    border: 'none',
+                    background: 'none',
+                    color: '#94A3B8',
+                    fontSize: 18,
+                    cursor: 'pointer',
+                    padding: 0,
+                    width: 24,
+                    height: 24,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    touchAction: 'manipulation'
+                  }}
+                >
+                  ✕
+                </button>
               )}
             </div>
+
+            {/* Botão Cancelar */}
             <button
               onPointerUp={closeSearch}
               style={{
-                flexShrink: 0, border: '1px solid #E5E7EB', background: '#F9FAFB',
-                borderRadius: 9999, color: '#6B7280',
-                fontFamily: 'Nunito', fontWeight: 700, fontSize: 13,
-                cursor: 'pointer', padding: '8px 14px', touchAction: 'manipulation',
+                flexShrink: 0,
+                border: '1px solid #E2E8F0',
+                background: '#F8FAFC',
+                borderRadius: 9999,
+                color: '#64748B',
+                fontFamily: 'Nunito',
+                fontWeight: 700,
+                fontSize: 13.5,
+                padding: '9px 18px',
+                cursor: 'pointer',
+                touchAction: 'manipulation',
+                whiteSpace: 'nowrap'
               }}
             >
               Cancelar
@@ -93,7 +181,7 @@ export function StudentCatalog() {
           </div>
         )}
 
-        {/* ── Default: large centered logo + search icon ── */}
+        {/* Default Header: Logo + Badges */}
         {!searchOpen && (
           <div style={{ width: '100%', position: 'relative', textAlign: 'center', padding: '20px 16px 12px' }}>
 
@@ -135,50 +223,181 @@ export function StudentCatalog() {
               fontFamily: 'Nunito', fontWeight: 600, fontSize: 13,
               color: '#9CA3AF', margin: 0,
             }}>
-              Jogos de matemática
+              Jogos de matemática criados para quem tem dispositivos simples e conexão limitada
             </p>
+
+            {/* Badges - um ao lado do outro */}
+            <div style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              justifyContent: 'center',
+              gap: 8,
+              marginTop: 12,
+            }}>
+              {/* Badge 1 - Feito para celulares */}
+              <div style={{
+                display: 'inline-flex', alignItems: 'center', gap: 6,
+                background: '#f0f3fd', border: '1px solid #bbc0f7',
+                borderRadius: 999, padding: '6px 14px',
+              }}>
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#2248c5" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="20 6 9 17 4 12"/>
+                </svg>
+                <span style={{
+                  fontFamily: 'Nunito Sans, sans-serif', 
+                  fontWeight: 700, 
+                  fontSize: 10,
+                  color: '#161ba3', 
+                  letterSpacing: '0.04em', 
+                  textTransform: 'uppercase',
+                }}>
+                  FEITO PARA CELULARES E LAPTOP SIMPLES
+                </span>
+              </div>
+
+              {/* Badge 2 - Não precisa instalar */}
+              <div style={{
+                display: 'inline-flex', alignItems: 'center', gap: 6,
+                background: '#fdfbf0', border: '1px solid #f7ecbb',
+                borderRadius: 999, padding: '6px 14px',
+              }}>
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#c5b222" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="20 6 9 17 4 12"/>
+                </svg>
+                <span style={{
+                  fontFamily: 'Nunito Sans, sans-serif', 
+                  fontWeight: 700, 
+                  fontSize: 10,
+                  color: '#a38916', 
+                  letterSpacing: '0.04em', 
+                  textTransform: 'uppercase',
+                }}>
+                  NÃO PRECISA INSTALAR
+                </span>
+              </div>
+
+              {/* Badge 3 - Alinhado ao Currículo Paulista */}
+              <div style={{
+                display: 'inline-flex', alignItems: 'center', gap: 6,
+                background: '#fdf0f9', border: '1px solid #f7bbe6',
+                borderRadius: 999, padding: '6px 14px',
+              }}>
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#c5229f" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="20 6 9 17 4 12"/>
+                </svg>
+                <span style={{
+                  fontFamily: 'Nunito Sans, sans-serif', 
+                  fontWeight: 700, 
+                  fontSize: 10,
+                  color: '#a31693', 
+                  letterSpacing: '0.04em', 
+                  textTransform: 'uppercase',
+                }}>
+                  ALINHADO AO CURRÍCULO PAULISTA
+                </span>
+              </div>
+            </div>
           </div>
         )}
       </header>
 
       <main className={styles.main}>
-        {filteredGames.length === 0 ? (
-          <div className={styles.empty} role="status">
-            <span aria-hidden="true">🔍</span>
-            <p>Nenhum jogo encontrado para "{searchQuery}"</p>
+        {/* Theme Filters */}
+        {!searchQuery && (
+          <div style={{ 
+            display: 'flex', 
+            flexWrap: 'wrap', 
+            justifyContent: 'center', 
+            gap: 14, 
+            marginBottom: 32, 
+            padding: '0 10px' 
+          }}>
+            {[
+              { id: 'all', label: 'Todos', emoji: '🌟', color: '#003989' },
+              { id: 'numeros', label: 'Números', emoji: '🔢', color: '#5B4FCF' },
+              { id: 'algebra', label: 'Álgebra', emoji: '✖️', color: '#EC4899' },
+              { id: 'geometria', label: 'Geometria', emoji: '📐', color: '#10B981' },
+              { id: 'grandezas', label: 'Grandezas e Medidas', emoji: '⚖️', color: '#F59E0B' },
+              { id: 'probabilidade', label: 'Probabilidade e Estatística', emoji: '📊', color: '#6366F1' },
+            ].map(unit => {
+              const isActive = unit.id === 'all' ? isAllActive : currentTheme === unit.id;
+
+              return (
+                <button
+                  key={unit.id}
+                  onClick={() => handleThemeClick(unit.id)}
+                  style={{
+                    flex: '0 0 105px',
+                    background: isActive ? unit.color : '#fff',
+                    border: `2px solid ${unit.color}`,
+                    borderRadius: 16,
+                    padding: '16px 76px',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: 4,
+                    boxShadow: isActive ? `0 4px 12px ${unit.color}44` : 'none',
+                    transform: isActive ? 'scale(1.05)' : 'none',
+                    transition: 'all 0.2s ease'
+                  }}
+                >
+                  <span style={{ fontSize: 22 }}>{unit.emoji}</span>
+                  <span style={{
+                    fontFamily: 'Nunito',
+                    fontWeight: 800,
+                    fontSize: 9,
+                    color: isActive ? '#fff' : unit.color,
+                    textTransform: 'uppercase',
+                    textAlign: 'center',
+                    lineHeight: 1.1
+                  }}>
+                    {unit.label}
+                  </span>
+                </button>
+              );
+            })}
           </div>
-        ) : (
-          <div
-            className={styles.grid}
-            role="list"
-            aria-label={`${filteredGames.length} jogos disponíveis`}
-          >
-            {filteredGames.map((game, index) => (
+        )}
+
+        {/* Games Grid */}
+        <div className={styles.grid}>
+          {filteredGames.length > 0 ? (
+            filteredGames.map((game, index) => (
               <StudentGameCard
                 key={game.id}
                 game={game}
                 index={index}
                 onTap={handleCardTap}
               />
-            ))}
-          </div>
-        )}
+            ))
+          ) : (
+            <div style={{ textAlign: 'center', padding: '60px 20px', color: '#9CA3AF' }}>
+              <p style={{ fontFamily: 'Nunito', fontWeight: 700, fontSize: 18 }}>
+                Nenhum jogo encontrado
+              </p>
+              <p style={{ fontSize: 14, marginTop: 8 }}>
+                Tente mudar o filtro ou a busca
+              </p>
+            </div>
+          )}
+        </div>
       </main>
 
-      <footer style={{
-        flexShrink: 0,
-        borderTop: '1px solid #F0F0F0',
-        background: '#FAFAFA',
-        padding: '18px 20px 16px',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        gap: 10,
+      {/* ==================== FOOTER COMPLETO ==================== */}
+      <footer className={styles.footer} style={{ 
+        flexShrink: 0, 
+        borderTop: '1px solid #F0F0F0', 
+        background: '#FAFAFA', 
+        padding: '24px 20px 32px', 
+        display: 'flex', 
+        flexDirection: 'column', 
+        alignItems: 'center', 
+        gap: 16 
       }}>
 
         {/* Legal links row */}
-
-        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap', justifyContent: 'center' }}>
           <Link href="/termos">
             <a
               href="#termos"
@@ -211,7 +430,7 @@ export function StudentCatalog() {
           </Link>
 
           <Link href="/principios">
-                      <span style={{ color: '#D1D5DB', fontSize: 10 }}>•</span>
+            <span style={{ color: '#D1D5DB', fontSize: 10 }}>•</span>
             <a
               href="#privacidade"
               style={{
@@ -225,7 +444,6 @@ export function StudentCatalog() {
               Princípios Pedagógicos
             </a>
           </Link>
-
         </div>
 
         {/* Copyright */}
@@ -239,7 +457,7 @@ export function StudentCatalog() {
           {' '}Todos os direitos reservados.
         </p>
 
-        {/* Currículo Paulista badge */}
+        {/* Contato badge */}
         <div style={{
           display: 'inline-flex', alignItems: 'center', gap: 5,
           background: '#F0FDF4', border: '1px solid #BBF7D0',
@@ -252,11 +470,21 @@ export function StudentCatalog() {
             fontFamily: 'Nunito Sans, sans-serif', fontWeight: 700, fontSize: 10,
             color: '#16A34A', letterSpacing: '0.04em', textTransform: 'uppercase',
           }}>
-            Alinhado ao Currículo Paulista
+            Quer colaborar? Contate-me: {' '}
+            <a 
+              href="mailto:kauearaujo_@outlook.com" 
+              style={{ 
+                color: '#16A34A', 
+                textDecoration: 'underline', 
+                cursor: 'pointer' 
+              }}
+            >
+              kauearaujo_@outlook.com
+            </a>
           </span>
         </div>
 
-        {/* Subtle teacher link */}
+        {/* Área do Professor */}
         <button
           onClick={() => setLocation('/teacher-pin')}
           style={{
@@ -275,11 +503,10 @@ export function StudentCatalog() {
             <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
             <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
           </svg>
-          Área do Professor
+          
         </button>
 
       </footer>
-
     </div>
   );
 }

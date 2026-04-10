@@ -11,7 +11,7 @@ export function Privacidade() {
 
       <main style={{ flex: 1, maxWidth: 800, margin: '0 auto', width: '100%', padding: '24px 16px' }}>
         <button
-          onClick={() => setLocation('/catalog')}
+          onClick={() => setLocation('/student')}
           style={{
             background: 'none', border: 'none', color: 'var(--text3)',
             cursor: 'pointer', marginBottom: 24, display: 'flex',

@@ -1,4 +1,5 @@
 import { Switch, Route, Router as WouterRouter } from "wouter";
+import { MathGames } from "./pages/MathGames";
 
 // Páginas Principais
 import { StudentCatalog }      from "./pages/StudentCatalog";
@@ -54,6 +55,7 @@ function Router() {
       <Route path="/student"     component={StudentCatalog} />
       <Route path="/teacher-pin" component={TeacherPinScreen} />
       <Route path="/catalog"     component={Catalog} />
+      <Route path="/math-games" component={MathGames} />
       
       {/* Rotas Institucionais */}
       <Route path="/termos"      component={TermosDeUso} />
