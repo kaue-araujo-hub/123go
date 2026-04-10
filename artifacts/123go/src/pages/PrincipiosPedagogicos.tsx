@@ -134,7 +134,7 @@ export function PrincipiosPedagogicos() {
             fontSize: '15.5px',
             marginBottom: 18 
           }}>
-            Aqui, os jogos estão organizados por habilidades específicas para apoiar um planejamento pedagógico 
+            Aqui, os jogos estão organizados por temas e habilidades específicas para apoiar um planejamento pedagógico 
             intencional e eficaz.
           </p>
 
