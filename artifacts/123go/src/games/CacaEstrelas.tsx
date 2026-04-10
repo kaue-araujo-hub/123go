@@ -18,34 +18,81 @@ function generateOptions(correct: number): number[] {
   return [...opts].sort(() => Math.random() - 0.5);
 }
 
+function getStarPositions(count: number): { x: number; y: number }[] {
+  const STAR_SIZE_PCT = 12; // star diameter as % of container width
+  const padding = STAR_SIZE_PCT / 2 + 2; // keep stars fully inside
+  const MIN_DIST = STAR_SIZE_PCT + 4;
+  const positions: { x: number; y: number }[] = [];
+
+  for (let i = 0; i < count; i++) {
+    let pos = { x: 0, y: 0 };
+    let attempts = 0;
+    do {
+      pos = {
+        x: padding + Math.random() * (100 - padding * 2),
+        y: padding + Math.random() * (100 - padding * 2),
+      };
+      attempts++;
+    } while (
+      attempts < 80 &&
+      positions.some(p => Math.hypot(p.x - pos.x, p.y - pos.y) < MIN_DIST)
+    );
+    positions.push(pos);
+  }
+  return positions;
+}
+
 function StarField({ count, visible }: { count: number; visible: boolean }) {
   const isDesktop = useIsDesktop();
-  const positions = useRef(
-    Array.from({ length: count }, () => ({ x: 8 + Math.random() * 84, y: 8 + Math.random() * 84 }))
-  );
+  const starSize = isDesktop ? 36 : 40;
+
+  // Regenerate positions whenever count changes
+  const positions = useRef<{ x: number; y: number }[]>([]);
+  useEffect(() => {
+    positions.current = getStarPositions(count);
+  }, [count]);
+
   return (
     <div style={{
-      position: 'relative', width: '100%', height: 156, background: '#0D1B2A',
-      borderRadius: 16, overflow: 'hidden', marginBottom: 16,
+      position: 'relative',
+      width: '100%',
+      height: isDesktop ? 220 : 260,
+      background: '#0D1B2A',
+      borderRadius: 16,
+      overflow: 'hidden',
+      marginBottom: 16,
     }}>
       {visible && positions.current.map((pos, i) => (
-        <div key={i} style={{
-          position: 'absolute', left: `${pos.x}%`, top: `${pos.y}%`,
-          animation: 'starTwinkle 0.5s ease-in-out infinite alternate',
-          animationDelay: `${i * 0.08}s`, willChange: 'transform, opacity',
-        }}>
-          <AppleEmoji emoji="⭐" size={isDesktop ? 32 : 44} />
+        <div
+          key={i}
+          style={{
+            position: 'absolute',
+            left: `${pos.x}%`,
+            top: `${pos.y}%`,
+            transform: 'translate(-50%, -50%)',
+            animation: 'starTwinkle 0.5s ease-in-out infinite alternate',
+            animationDelay: `${i * 0.08}s`,
+            willChange: 'transform, opacity',
+          }}
+        >
+          <AppleEmoji emoji="⭐" size={starSize} />
         </div>
       ))}
+
       {!visible && (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'rgba(255,255,255,0.4)', fontSize: 13 }}>
+        <div style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          height: '100%', color: 'rgba(255,255,255,0.4)', fontSize: 14,
+          fontFamily: 'Nunito', fontWeight: 600,
+        }}>
           Quantas estrelas você viu?
         </div>
       )}
+
       <style>{`
         @keyframes starTwinkle {
-          from { opacity: 0.6; transform: scale(0.88) translateZ(0); }
-          to   { opacity: 1;   transform: scale(1.12) translateZ(0); }
+          from { opacity: 0.6; transform: translate(-50%, -50%) scale(0.88); }
+          to   { opacity: 1;   transform: translate(-50%, -50%) scale(1.12); }
         }
       `}</style>
     </div>
@@ -55,15 +102,16 @@ function StarField({ count, visible }: { count: number; visible: boolean }) {
 export function CacaEstrelas() {
   const { phase, score, phaseComplete, gameComplete, onCorrect, onPhaseComplete, nextPhase, restart } = useGameEngine(5);
   const isDesktop = useIsDesktop();
-  const [showStars, setShowStars] = useState(false);
+  const [showStars, setShowStars]     = useState(false);
   const [showButtons, setShowButtons] = useState(false);
-  const [answered, setAnswered] = useState(false);
-  const [feedback, setFeedback] = useState<'correct' | 'wrong' | null>(null);
-  const [options, setOptions] = useState<number[]>([]);
+  const [answered, setAnswered]       = useState(false);
+  const [feedback, setFeedback]       = useState<'correct' | 'wrong' | null>(null);
+  const [options, setOptions]         = useState<number[]>([]);
   const phaseCompletedRef = useRef(false);
-  const starCount = STAR_COUNTS[phase - 1] ?? 3;
+  const hideTimerRef      = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const starCount     = STAR_COUNTS[phase - 1] ?? 3;
   const flashDuration = FLASH_DURATIONS[phase - 1] ?? 2000;
-  const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const startFlash = useCallback(() => {
     if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
@@ -105,23 +153,29 @@ export function CacaEstrelas() {
     );
   }
 
+  // Button sizing
+  const btnSize    = isDesktop ? 80 : 110;
+  const btnRadius  = isDesktop ? 18 : 26;
+  const btnFontSz  = isDesktop ? 42 : 62;
+
   return (
     <GameShell title="Caça Estrelas" emoji="⭐" color="var(--c3)" currentPhase={phase} totalPhases={5} score={score} onRestart={restart}>
       <FeedbackOverlay type={feedback} />
+
       <div style={{ textAlign: 'center', marginBottom: 8 }}>
         <h2 style={{ fontFamily: 'Nunito', fontWeight: 800, fontSize: 18, color: 'var(--text)', marginBottom: 4 }}>
           Memorize e conte as estrelas!
         </h2>
         {showStars && (
-          <p style={{ color: 'var(--text2)', fontSize: 13 }}>
+          <p style={{ color: 'var(--text2)', fontSize: 13, margin: 0 }}>
             ⏱ O céu pisca por {flashDuration / 1000}s
           </p>
         )}
       </div>
 
-      <StarField key={`${phase}-${answered}`} count={starCount} visible={showStars} />
+      <StarField key={`phase-${phase}`} count={starCount} visible={showStars} />
 
-      {/* Only show "Again" button while stars not shown AND buttons not yet shown */}
+      {/* "Show again" button — before answer buttons appear */}
       {!showStars && !showButtons && !answered && (
         <button
           onPointerUp={startFlash}
@@ -136,14 +190,14 @@ export function CacaEstrelas() {
         </button>
       )}
 
-      {/* Re-show button after answering wrong */}
+      {/* "See again" link above answer buttons */}
       {!showStars && showButtons && !answered && (
         <button
           onPointerUp={startFlash}
           style={{
-            display: 'block', margin: '0 auto 12px', padding: '8px 20px',
+            display: 'block', margin: '0 auto 14px', padding: '8px 20px',
             borderRadius: 'var(--radius-pill)', background: 'transparent', color: 'var(--text3)',
-            fontFamily: 'Nunito', fontWeight: 600, fontSize: 12, cursor: 'pointer',
+            fontFamily: 'Nunito', fontWeight: 600, fontSize: 13, cursor: 'pointer',
             border: '1.5px solid var(--border)', minHeight: 36, touchAction: 'manipulation',
           }}
         >
@@ -151,19 +205,32 @@ export function CacaEstrelas() {
         </button>
       )}
 
-      {/* Answer buttons — only show when flash finished */}
+      {/* Answer buttons */}
       {showButtons && (
-        <div style={{ display: 'flex', gap: 14, justifyContent: 'center', marginTop: 4 }}>
+        <div style={{ display: 'flex', gap: isDesktop ? 18 : 14, justifyContent: 'center', marginTop: 4 }}>
           {options.map(opt => (
             <button
               key={opt}
               onPointerUp={() => handleAnswer(opt)}
               style={{
-                width: isDesktop ? 64 : 100, height: isDesktop ? 64 : 100, borderRadius: isDesktop ? 14 : 22,
-                border: '3px solid var(--border)', background: '#fff',
-                fontFamily: 'Nunito', fontWeight: 900, fontSize: isDesktop ? 30 : 48,
-                color: 'var(--text)', cursor: 'pointer', minHeight: isDesktop ? 64 : 100, minWidth: isDesktop ? 64 : 100,
-                transition: 'all 0.15s ease', touchAction: 'manipulation',
+                width: btnSize, height: btnSize,
+                borderRadius: btnRadius,
+                border: '3px solid var(--border)',
+                background: '#fff',
+                fontFamily: 'Nunito',
+                fontWeight: 900,
+                fontSize: btnFontSz,
+                lineHeight: 1,
+                color: 'var(--text)',
+                cursor: 'pointer',
+                minHeight: btnSize,
+                minWidth: btnSize,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                transition: 'all 0.15s ease',
+                touchAction: 'manipulation',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
               }}
             >
               {opt}

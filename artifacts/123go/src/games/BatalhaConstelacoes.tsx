@@ -39,16 +39,15 @@ export function BatalhaConstelacoes() {
   const [rivalAnswer, setRivalAnswer] = useState<number | null>(null);
   const [rocketBurst, setRocketBurst] = useState(false);
 
-  /* Drag state */
   const [draggingVal, setDraggingVal] = useState<number | null>(null);
   const [ghostPos,    setGhostPos]    = useState<{ x: number; y: number } | null>(null);
-  const [isOver,      setIsOver]      = useState(false); // drop zone hover
+  const [isOver,      setIsOver]      = useState(false);
 
-  const dropZoneRef        = useRef<HTMLDivElement>(null);
-  const phaseCompletedRef  = useRef(false);
-  const roundRef           = useRef(1);
-  const rivalTimerRef      = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const draggingValRef     = useRef<number | null>(null);
+  const dropZoneRef       = useRef<HTMLDivElement>(null);
+  const phaseCompletedRef = useRef(false);
+  const roundRef          = useRef(1);
+  const rivalTimerRef     = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const draggingValRef    = useRef<number | null>(null);
 
   const loadProblem = (phaseIdx: number) => {
     const typeKey = PHASE_TYPES[phaseIdx];
@@ -110,7 +109,6 @@ export function BatalhaConstelacoes() {
     }
   }, [feedback, problem.ans, phase, onCorrect, onPhaseComplete]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  /* ── Drag handlers ── */
   const startDrag = (e: React.PointerEvent, val: number) => {
     if (feedback || phaseCompletedRef.current) return;
     e.currentTarget.setPointerCapture(e.pointerId);
@@ -120,7 +118,6 @@ export function BatalhaConstelacoes() {
 
     const onMove = (ev: PointerEvent) => {
       setGhostPos({ x: ev.clientX, y: ev.clientY });
-      /* Check hover over drop zone */
       if (dropZoneRef.current) {
         const r = dropZoneRef.current.getBoundingClientRect();
         setIsOver(
@@ -133,7 +130,6 @@ export function BatalhaConstelacoes() {
     const onUp = (ev: PointerEvent) => {
       window.removeEventListener('pointermove', onMove);
       window.removeEventListener('pointerup',   onUp);
-
       if (dropZoneRef.current) {
         const r = dropZoneRef.current.getBoundingClientRect();
         const landed =
@@ -143,7 +139,6 @@ export function BatalhaConstelacoes() {
           handleAnswer(draggingValRef.current);
         }
       }
-
       draggingValRef.current = null;
       setDraggingVal(null);
       setGhostPos(null);
@@ -171,7 +166,7 @@ export function BatalhaConstelacoes() {
     <GameShell title="Batalha de Constelações" emoji="🌌" color="var(--c3)" currentPhase={phase} totalPhases={5} score={score} onRestart={restart}>
       <FeedbackOverlay type={feedback} />
 
-      {/* Ghost element — follows pointer */}
+      {/* Ghost element */}
       {ghostPos && draggingVal !== null && (
         <div style={{
           position: 'fixed',
@@ -192,118 +187,153 @@ export function BatalhaConstelacoes() {
       )}
 
       {/* Battle counter */}
-      <div style={{ textAlign: 'center', marginBottom: 8 }}>
+      <div style={{ textAlign: 'center', marginBottom: 6 }}>
         <span style={{ background: 'var(--c3)', color: '#fff', padding: '3px 12px', borderRadius: 'var(--radius-pill)', fontSize: 11, fontWeight: 700 }}>
           Batalha {round}/{total}
         </span>
         {isRival && (
-          <p style={{ color: 'var(--text2)', fontSize: 12, marginTop: 4 }}>
+          <p style={{ color: 'var(--text2)', fontSize: 12, marginTop: 4, marginBottom: 0 }}>
             🤖 O astronauta rival vai responder em 2s… seja mais rápido!
           </p>
         )}
       </div>
 
-      {/* Rocket track */}
+      {/* ── Unified dark panel: title + rocket track + math problem ── */}
       <div style={{
-        position: 'relative', height: 54,
-        background: '#0D1B2A', borderRadius: 16,
-        marginBottom: 12, overflow: 'hidden',
+        background: '#0D1B2A',
+        borderRadius: 20,
+        overflow: 'hidden',
+        marginBottom: 16,
         border: '1.5px solid rgba(255,255,255,0.08)',
       }}>
-        {[12, 25, 38, 52, 65, 78].map((left, i) => (
-          <div key={i} style={{
-            position: 'absolute', top: '50%',
-            left: `${left}%`, marginTop: -1,
-            width: 3, height: 3, borderRadius: '50%',
-            background: left / 100 < rocketPct / 100 ? 'rgba(255,220,80,0.9)' : 'rgba(255,255,255,0.2)',
-            transition: 'background 0.4s',
-            boxShadow: left / 100 < rocketPct / 100 ? '0 0 4px gold' : 'none',
-          }} />
-        ))}
-        <div style={{
-          position: 'absolute', right: '3%', top: '50%',
-          transform: 'translateY(-50%)',
-          fontSize: 26,
-          filter: atTarget ? 'drop-shadow(0 0 10px #7C3AED)' : 'opacity(0.65)',
-          transition: 'filter 0.4s',
-        }}>🪐</div>
-        <div style={{
-          position: 'absolute', top: '50%',
-          left: `${rocketPct}%`,
-          transform: `translateY(-50%) ${rocketBurst ? 'scale(1.35)' : 'scale(1)'}`,
-          transition: rocketBurst
-            ? 'transform 0.15s ease, left 0.65s cubic-bezier(0.34,1.56,0.64,1)'
-            : 'left 0.65s cubic-bezier(0.34,1.56,0.64,1), transform 0.3s ease',
-          fontSize: 26,
-          filter: 'drop-shadow(0 0 6px rgba(120,180,255,0.7))',
-          zIndex: 2,
-        }}>🚀</div>
-        <div style={{
-          position: 'absolute', top: '50%',
-          left: '0%',
-          transform: 'translateY(-50%)',
-          width: `${Math.max(0, rocketPct - 2)}%`,
-          height: 3, borderRadius: 4,
-          background: 'linear-gradient(to right, transparent, rgba(120,180,255,0.6))',
-          transition: 'width 0.65s cubic-bezier(0.34,1.56,0.64,1)',
-        }} />
-      </div>
 
-      {/* Problem display with drop zone */}
-      <div style={{
-        background: '#0D1B2A', borderRadius: 20, padding: '18px 20px',
-        textAlign: 'center', marginBottom: 20,
-        position: 'relative', overflow: 'hidden',
-      }}>
-        {['⭐', '✨', '💫', '🌟'].map((s, i) => (
-          <span key={i} style={{ position: 'absolute', fontSize: 11, opacity: 0.35, top: `${18 + i * 22}%`, left: `${8 + i * 23}%` }}>{s}</span>
-        ))}
-
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, flexWrap: 'wrap' }}>
-          <span style={{ fontFamily: 'Nunito', fontWeight: 900, fontSize: isDesktop ? 36 : 56, color: '#fff' }}>{problem.a}</span>
-          <span style={{ fontFamily: 'Nunito', fontWeight: 700, fontSize: isDesktop ? 26 : 40, color: problem.op === '+' ? '#81C784' : '#EF9A9A' }}>{problem.op}</span>
-          <span style={{ fontFamily: 'Nunito', fontWeight: 900, fontSize: isDesktop ? 36 : 56, color: '#fff' }}>{problem.b}</span>
-          <span style={{ fontFamily: 'Nunito', fontWeight: 700, fontSize: isDesktop ? 22 : 36, color: 'rgba(255,255,255,0.5)' }}>=</span>
-
-          {/* Drop zone */}
-          <div
-            ref={dropZoneRef}
-            style={{
-              width: isDesktop ? 52 : 80, height: isDesktop ? 52 : 80, borderRadius: isDesktop ? 12 : 18,
-              border: isOver
-                ? '3px solid #F9A825'
-                : draggingVal !== null
-                  ? '3px dashed rgba(255,255,255,0.6)'
-                  : '3px dashed rgba(255,255,255,0.3)',
-              background: isOver
-                ? 'rgba(249,168,37,0.18)'
-                : draggingVal !== null
-                  ? 'rgba(255,255,255,0.08)'
-                  : 'rgba(255,255,255,0.04)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              transition: 'border 0.2s, background 0.2s, transform 0.2s',
-              transform: isOver ? 'scale(1.12)' : draggingVal !== null ? 'scale(1.05)' : 'scale(1)',
-              boxShadow: isOver ? '0 0 18px rgba(249,168,37,0.45)' : 'none',
-            }}
-          >
-            <span style={{
-              fontFamily: 'Nunito', fontWeight: 900, fontSize: 38,
-              color: isOver ? '#F9A825' : 'rgba(255,255,255,0.35)',
-              transition: 'color 0.2s',
-            }}>?</span>
-          </div>
+        {/* Title inside the panel */}
+        <div style={{ textAlign: 'center', paddingTop: 14, paddingBottom: 4 }}>
+          <span style={{
+            fontFamily: 'Nunito', fontWeight: 800,
+            fontSize: isDesktop ? 13 : 15,
+            color: 'rgba(255,255,255,0.55)',
+            letterSpacing: 1,
+            textTransform: 'uppercase',
+          }}>
+            🚀 Chegue ao planeta primeiro!
+          </span>
         </div>
 
-        {isRival && rivalAnswer !== null && (
-          <div style={{ marginTop: 10, background: 'rgba(255,100,100,0.2)', borderRadius: 10, padding: '5px 14px', display: 'inline-block' }}>
-            <span style={{ color: '#EF9A9A', fontFamily: 'Nunito', fontSize: 13, fontWeight: 700 }}>
-              🤖 Rival respondeu: <strong>{rivalAnswer}</strong> (errado!)
-            </span>
+        {/* Rocket track */}
+        <div style={{
+          position: 'relative',
+          height: isDesktop ? 56 : 64,
+          margin: '0 16px',
+        }}>
+          {/* Stars */}
+          {[12, 25, 38, 52, 65, 78].map((left, i) => (
+            <div key={i} style={{
+              position: 'absolute', top: '50%',
+              left: `${left}%`, marginTop: -1,
+              width: 3, height: 3, borderRadius: '50%',
+              background: left / 100 < rocketPct / 100 ? 'rgba(255,220,80,0.9)' : 'rgba(255,255,255,0.2)',
+              transition: 'background 0.4s',
+              boxShadow: left / 100 < rocketPct / 100 ? '0 0 4px gold' : 'none',
+            }} />
+          ))}
+
+          {/* Planet */}
+          <div style={{
+            position: 'absolute', right: '2%', top: '50%',
+            transform: 'translateY(-50%)',
+            fontSize: isDesktop ? 34 : 40,
+            filter: atTarget ? 'drop-shadow(0 0 10px #7C3AED)' : 'opacity(0.8)',
+            transition: 'filter 0.4s',
+          }}>🪐</div>
+
+          {/* Rocket trail */}
+          <div style={{
+            position: 'absolute', top: '50%',
+            left: '0%',
+            transform: 'translateY(-50%)',
+            width: `${Math.max(0, rocketPct - 2)}%`,
+            height: 3, borderRadius: 4,
+            background: 'linear-gradient(to right, transparent, rgba(120,180,255,0.6))',
+            transition: 'width 0.65s cubic-bezier(0.34,1.56,0.64,1)',
+          }} />
+
+          {/* Rocket */}
+          <div style={{
+            position: 'absolute', top: '50%',
+            left: `${rocketPct}%`,
+            transform: `translateY(-50%) ${rocketBurst ? 'scale(1.35)' : 'scale(1)'}`,
+            transition: rocketBurst
+              ? 'transform 0.15s ease, left 0.65s cubic-bezier(0.34,1.56,0.64,1)'
+              : 'left 0.65s cubic-bezier(0.34,1.56,0.64,1), transform 0.3s ease',
+            fontSize: isDesktop ? 34 : 40,
+            filter: 'drop-shadow(0 0 6px rgba(120,180,255,0.7))',
+            zIndex: 2,
+          }}>🚀</div>
+        </div>
+
+        {/* Divider */}
+        <div style={{ height: 1, background: 'rgba(255,255,255,0.07)', margin: '0 16px' }} />
+
+        {/* Math problem + drop zone */}
+        <div style={{
+          padding: isDesktop ? '28px 24px 32px' : '32px 20px 36px',
+          textAlign: 'center',
+          position: 'relative',
+          overflow: 'hidden',
+        }}>
+          {/* Decorative stars */}
+          {['⭐', '✨', '💫', '🌟'].map((s, i) => (
+            <span key={i} style={{ position: 'absolute', fontSize: 11, opacity: 0.25, top: `${18 + i * 22}%`, left: `${8 + i * 23}%` }}>{s}</span>
+          ))}
+
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: isDesktop ? 14 : 10, flexWrap: 'wrap' }}>
+            <span style={{ fontFamily: 'Nunito', fontWeight: 900, fontSize: isDesktop ? 48 : 64, color: '#fff' }}>{problem.a}</span>
+            <span style={{ fontFamily: 'Nunito', fontWeight: 700, fontSize: isDesktop ? 34 : 48, color: problem.op === '+' ? '#81C784' : '#EF9A9A' }}>{problem.op}</span>
+            <span style={{ fontFamily: 'Nunito', fontWeight: 900, fontSize: isDesktop ? 48 : 64, color: '#fff' }}>{problem.b}</span>
+            <span style={{ fontFamily: 'Nunito', fontWeight: 700, fontSize: isDesktop ? 30 : 44, color: 'rgba(255,255,255,0.5)' }}>=</span>
+
+            {/* Drop zone */}
+            <div
+              ref={dropZoneRef}
+              style={{
+                width: isDesktop ? 60 : 88, height: isDesktop ? 60 : 88,
+                borderRadius: isDesktop ? 14 : 20,
+                border: isOver
+                  ? '3px solid #F9A825'
+                  : draggingVal !== null
+                    ? '3px dashed rgba(255,255,255,0.6)'
+                    : '3px dashed rgba(255,255,255,0.3)',
+                background: isOver
+                  ? 'rgba(249,168,37,0.18)'
+                  : draggingVal !== null
+                    ? 'rgba(255,255,255,0.08)'
+                    : 'rgba(255,255,255,0.04)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                transition: 'border 0.2s, background 0.2s, transform 0.2s',
+                transform: isOver ? 'scale(1.12)' : draggingVal !== null ? 'scale(1.05)' : 'scale(1)',
+                boxShadow: isOver ? '0 0 18px rgba(249,168,37,0.45)' : 'none',
+              }}
+            >
+              <span style={{
+                fontFamily: 'Nunito', fontWeight: 900, fontSize: isDesktop ? 36 : 46,
+                color: isOver ? '#F9A825' : 'rgba(255,255,255,0.35)',
+                transition: 'color 0.2s',
+              }}>?</span>
+            </div>
           </div>
-        )}
+
+          {isRival && rivalAnswer !== null && (
+            <div style={{ marginTop: 12, background: 'rgba(255,100,100,0.2)', borderRadius: 10, padding: '5px 14px', display: 'inline-block' }}>
+              <span style={{ color: '#EF9A9A', fontFamily: 'Nunito', fontSize: 13, fontWeight: 700 }}>
+                🤖 Rival respondeu: <strong>{rivalAnswer}</strong> (errado!)
+              </span>
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* Drag instruction hint */}
+      {/* Drag hint */}
       <p style={{
         textAlign: 'center', color: 'rgba(0,0,0,0.35)',
         fontSize: 12, marginBottom: 12, fontFamily: 'Nunito',
@@ -312,7 +342,7 @@ export function BatalhaConstelacoes() {
         Arraste o número correto até o <strong>?</strong>
       </p>
 
-      {/* Draggable number tiles */}
+      {/* Draggable tiles */}
       <div style={{ display: 'flex', gap: 16, justifyContent: 'center' }}>
         {options.map(val => {
           const isDraggingMe = draggingVal === val;
@@ -321,11 +351,14 @@ export function BatalhaConstelacoes() {
               key={val}
               onPointerDown={e => startDrag(e, val)}
               style={{
-                width: isDesktop ? 60 : 92, height: isDesktop ? 60 : 92, borderRadius: isDesktop ? 14 : 22,
+                width: isDesktop ? 64 : 96, height: isDesktop ? 64 : 96,
+                borderRadius: isDesktop ? 14 : 22,
                 border: '3px solid var(--border)',
                 background: isDraggingMe ? '#f0f0f0' : '#fff',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontFamily: 'Nunito', fontWeight: 900, fontSize: isDesktop ? 28 : 46, color: 'var(--text)',
+                fontFamily: 'Nunito', fontWeight: 900,
+                fontSize: isDesktop ? 32 : 50,
+                color: 'var(--text)',
                 cursor: 'grab', touchAction: 'none', userSelect: 'none',
                 opacity: isDraggingMe ? 0.3 : 1,
                 transition: 'opacity 0.15s, transform 0.15s',

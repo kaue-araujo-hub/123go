@@ -40,14 +40,14 @@ interface PointerDrag {
 export function FestaDaLagarta() {
   const { phase, score, phaseComplete, gameComplete, onCorrect, onPhaseComplete, nextPhase, restart } = useGameEngine(5);
   const isDesktop = useIsDesktop();
-  const [collected, setCollected]     = useState(0);
-  const [feedback, setFeedback]       = useState<'correct' | 'wrong' | null>(null);
-  const [dragOver, setDragOver]       = useState(false);
-  const [phaseReady, setPhaseReady]   = useState(false);
-  const [positions, setPositions]     = useState<{ x: number; y: number }[]>([]);
+  const [collected, setCollected]       = useState(0);
+  const [feedback, setFeedback]         = useState<'correct' | 'wrong' | null>(null);
+  const [dragOver, setDragOver]         = useState(false);
+  const [phaseReady, setPhaseReady]     = useState(false);
+  const [positions, setPositions]       = useState<{ x: number; y: number }[]>([]);
   const [collectedIds, setCollectedIds] = useState<Set<number>>(new Set());
-  const [draggingId, setDraggingId]   = useState<number | null>(null);
-  const [pointerDrag, setPointerDrag] = useState<PointerDrag | null>(null);
+  const [draggingId, setDraggingId]     = useState<number | null>(null);
+  const [pointerDrag, setPointerDrag]   = useState<PointerDrag | null>(null);
 
   const phaseCompletedRef = useRef(false);
   const collectedRef      = useRef(0);
@@ -56,7 +56,6 @@ export function FestaDaLagarta() {
   const collectedIdsRef   = useRef<Set<number>>(new Set());
   const phaseData = PHASES[phase - 1];
 
-  // Keep ref in sync with state
   useEffect(() => { collectedIdsRef.current = collectedIds; }, [collectedIds]);
 
   useEffect(() => {
@@ -94,7 +93,7 @@ export function FestaDaLagarta() {
     handleCollect();
   }, [handleCollect]);
 
-  // ── Pointer-based drag ────────────────────────────────────────────────────
+  // ── Pointer-based drag only ───────────────────────────────────────────────
 
   const onLeafPointerDown = useCallback((id: number, e: React.PointerEvent) => {
     if (!phaseReady || phaseCompletedRef.current || collectedIdsRef.current.has(id)) return;
@@ -126,23 +125,17 @@ export function FestaDaLagarta() {
     setDraggingId(null);
     setDragOver(false);
 
+    // Only collect if the pointer actually moved (drag gesture) AND released over the drop zone
     const moved = Math.hypot(e.clientX - startX, e.clientY - startY) > 8;
-
-    if (moved) {
-      // Drag gesture — collect only if released over the drop zone
-      if (dropZoneRef.current) {
-        const r = dropZoneRef.current.getBoundingClientRect();
-        const over = e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
-        if (over) collectLeaf(id);
-      }
-    } else {
-      // Tap gesture — collect directly
-      collectLeaf(id);
+    if (moved && dropZoneRef.current) {
+      const r = dropZoneRef.current.getBoundingClientRect();
+      const over = e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
+      if (over) collectLeaf(id);
     }
+    // No tap/click fallback — drag-to-drop only
   }, [collectLeaf]);
 
   const onContainerPointerLeave = useCallback(() => {
-    // If pointer leaves the game area while dragging, cancel the drag
     if (!pointerDragRef.current) return;
     pointerDragRef.current = null;
     setPointerDrag(null);
@@ -162,7 +155,7 @@ export function FestaDaLagarta() {
     <GameShell title="Festa da Lagarta" emoji="🐛" color="var(--c5)" currentPhase={phase} totalPhases={5} score={score} onRestart={restart}>
       <FeedbackOverlay type={feedback} />
 
-      {/* Floating ghost leaf that follows the pointer while dragging */}
+      {/* Floating ghost leaf following the pointer while dragging */}
       {pointerDrag && (
         <div style={{
           position: 'fixed',
@@ -216,7 +209,7 @@ export function FestaDaLagarta() {
             {collected > 12 && <span style={{ fontSize: 11, color: 'var(--c5)', fontWeight: 700 }}>+{collected - 12}</span>}
           </div>
           <p style={{ color: 'var(--text3)', fontSize: 11, fontWeight: 600, margin: 0 }}>
-            {dragOver ? '🎯 Solte aqui!' : 'Arraste folhas ou toque nelas'}
+            {dragOver ? '🎯 Solte aqui!' : '⬆ Arraste as folhas até aqui'}
           </p>
         </div>
 
