@@ -1,9 +1,14 @@
 import { Switch, Route, Router as WouterRouter } from "wouter";
-import { EntryScreen }       from "./pages/EntryScreen";
-import { StudentCatalog }    from "./pages/StudentCatalog";
-import { TeacherPinScreen }  from "./pages/TeacherPinScreen";
-import { Catalog }           from "./pages/Catalog";
 
+// Páginas Principais
+import { StudentCatalog }      from "./pages/StudentCatalog";
+import { TeacherPinScreen }    from "./pages/TeacherPinScreen";
+import { Catalog }             from "./pages/Catalog";
+import { PrincipiosPedagogicos } from "./pages/PrincipiosPedagogicos";
+import { TermosDeUso }         from "./pages/TermosDeUso";
+import { Privacidade }         from "./pages/Privacidade";
+
+// Jogos
 import { FestaDaLagarta }       from "./games/FestaDaLagarta";
 import { ParOuImpar }           from "./games/ParOuImpar";
 import { CacaEstrelas }         from "./games/CacaEstrelas";
@@ -44,10 +49,18 @@ function NotFound() {
 function Router() {
   return (
     <Switch>
+      {/* Rotas de Sistema */}
       <Route path="/"            component={StudentCatalog} />
       <Route path="/student"     component={StudentCatalog} />
       <Route path="/teacher-pin" component={TeacherPinScreen} />
       <Route path="/catalog"     component={Catalog} />
+      
+      {/* Rotas Institucionais */}
+      <Route path="/termos"      component={TermosDeUso} />
+      <Route path="/privacidade" component={Privacidade} />
+      <Route path="/principios"  component={PrincipiosPedagogicos} />
+      
+      {/* Rotas de Jogos */}
       <Route path="/games/g01-festa-lagarta"       component={FestaDaLagarta} />
       <Route path="/games/g02-par-impar"           component={ParOuImpar} />
       <Route path="/games/g03-caca-estrelas"       component={CacaEstrelas} />
@@ -67,19 +80,23 @@ function Router() {
       <Route path="/games/g20-zoo-tabelas"         component={ZooTabelas} />
       <Route path="/games/g21-pesquisa-turma"      component={PesquisaTurma} />
       <Route path="/games/g22-mais-ou-menos"       component={MaisOuMenos} />
-      <Route path="/games/g23-conecte-igual"        component={ConecteIgual} />
-      <Route path="/games/g24-qual-cabe-aqui"       component={QualCabeAqui} />
-      <Route path="/games/g25-alimente-monstro"     component={AlimenteMonstro} />
-      <Route path="/games/g26-ligue-numero"         component={LigueNumero} />
-      <Route path="/games/g27-quantos-tem"          component={QuantosTem} />
+      <Route path="/games/g23-conecte-igual"       component={ConecteIgual} />
+      <Route path="/games/g24-qual-cabe-aqui"      component={QualCabeAqui} />
+      <Route path="/games/g25-alimente-monstro"    component={AlimenteMonstro} />
+      <Route path="/games/g26-ligue-numero"        component={LigueNumero} />
+      <Route path="/games/g27-quantos-tem"         component={QuantosTem} />
+      
+      {/* Fallback para 404 */}
       <Route component={NotFound} />
     </Switch>
   );
 }
 
 function App() {
+  const base = import.meta.env.BASE_URL?.replace(/\/$/, "") || "";
+  
   return (
-    <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+    <WouterRouter base={base}>
       <Router />
     </WouterRouter>
   );

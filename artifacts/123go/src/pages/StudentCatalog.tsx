@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { useLocation } from 'wouter';
+import { Link } from "wouter";
 import { games } from '../data/games';
 import { StudentGameCard } from '../components/StudentGameCard';
 import { SessionManager } from '../auth/SessionManager';
@@ -176,32 +177,55 @@ export function StudentCatalog() {
       }}>
 
         {/* Legal links row */}
+
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-          <a
-            href="#termos"
-            style={{
-              fontFamily: 'Nunito Sans, sans-serif', fontWeight: 600, fontSize: 11,
-              color: '#9CA3AF', textDecoration: 'none', letterSpacing: '0.02em',
-              transition: 'color 0.15s',
-            }}
-            onPointerEnter={e => ((e.currentTarget as HTMLAnchorElement).style.color = '#6B7280')}
-            onPointerLeave={e => ((e.currentTarget as HTMLAnchorElement).style.color = '#9CA3AF')}
-          >
-            Termos de Uso
-          </a>
-          <span style={{ color: '#D1D5DB', fontSize: 10 }}>•</span>
-          <a
-            href="#privacidade"
-            style={{
-              fontFamily: 'Nunito Sans, sans-serif', fontWeight: 600, fontSize: 11,
-              color: '#9CA3AF', textDecoration: 'none', letterSpacing: '0.02em',
-              transition: 'color 0.15s',
-            }}
-            onPointerEnter={e => ((e.currentTarget as HTMLAnchorElement).style.color = '#6B7280')}
-            onPointerLeave={e => ((e.currentTarget as HTMLAnchorElement).style.color = '#9CA3AF')}
-          >
-            Política de Privacidade
-          </a>
+          <Link href="/termos">
+            <a
+              href="#termos"
+              style={{
+                fontFamily: 'Nunito Sans, sans-serif', fontWeight: 600, fontSize: 11,
+                color: '#9CA3AF', textDecoration: 'none', letterSpacing: '0.02em',
+                transition: 'color 0.15s',
+              }}
+              onPointerEnter={e => ((e.currentTarget as HTMLAnchorElement).style.color = '#6B7280')}
+              onPointerLeave={e => ((e.currentTarget as HTMLAnchorElement).style.color = '#9CA3AF')}
+            >
+              Termos de Uso
+            </a>
+          </Link>
+
+          <Link href="/privacidade">
+            <span style={{ color: '#D1D5DB', fontSize: 10 }}>•</span>
+            <a
+              href="#privacidade"
+              style={{
+                fontFamily: 'Nunito Sans, sans-serif', fontWeight: 600, fontSize: 11,
+                color: '#9CA3AF', textDecoration: 'none', letterSpacing: '0.02em',
+                transition: 'color 0.15s',
+              }}
+              onPointerEnter={e => ((e.currentTarget as HTMLAnchorElement).style.color = '#6B7280')}
+              onPointerLeave={e => ((e.currentTarget as HTMLAnchorElement).style.color = '#9CA3AF')}
+            >
+              Política de Privacidade
+            </a>
+          </Link>
+
+          <Link href="/principios">
+                      <span style={{ color: '#D1D5DB', fontSize: 10 }}>•</span>
+            <a
+              href="#privacidade"
+              style={{
+                fontFamily: 'Nunito Sans, sans-serif', fontWeight: 600, fontSize: 11,
+                color: '#9CA3AF', textDecoration: 'none', letterSpacing: '0.02em',
+                transition: 'color 0.15s',
+              }}
+              onPointerEnter={e => ((e.currentTarget as HTMLAnchorElement).style.color = '#6B7280')}
+              onPointerLeave={e => ((e.currentTarget as HTMLAnchorElement).style.color = '#9CA3AF')}
+            >
+              Princípios Pedagógicos
+            </a>
+          </Link>
+
         </div>
 
         {/* Copyright */}
